@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="search">
+        <item>블로그</item>
+        <item>카페글</item>
+        <item>지식iN</item>
+    </string-array>
+</resources>

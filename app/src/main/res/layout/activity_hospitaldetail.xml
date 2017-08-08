@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!--여기는 이미지랑 병원 정보-->
+        <include layout="@layout/hospital_information" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/route_information"
+            android:textStyle="bold"
+            android:textSize="15sp"/>
+
+        <!--여기는 사용자가 남기는 부분-->
+        <include layout="@layout/hospital_review" />
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>
