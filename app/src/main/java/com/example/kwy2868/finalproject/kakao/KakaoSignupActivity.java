@@ -8,9 +8,13 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Window;
+import android.widget.Toast;
 
+import com.example.kwy2868.finalproject.Model.LoginResult;
 import com.example.kwy2868.finalproject.Model.UserInfo;
 import com.example.kwy2868.finalproject.R;
+import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
+import com.example.kwy2868.finalproject.Retrofit.NetworkService;
 import com.example.kwy2868.finalproject.View.MainActivity;
 import com.kakao.auth.ErrorCode;
 import com.kakao.network.ErrorResult;
@@ -24,6 +28,10 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import static android.os.Build.VERSION_CODES.M;
 
 /**
@@ -35,6 +43,7 @@ public class KakaoSignupActivity extends Activity {
 
     /**
      * Main으로 넘길지 가입 페이지를 그릴지 판단하기 위해 me를 호출한다.
+     *
      * @param savedInstanceState 기존 session 정보가 저장된 객체
      */
 
@@ -46,7 +55,7 @@ public class KakaoSignupActivity extends Activity {
     }
 
     // 카카오 로그인 화면의 StatusBar 색상도 바꿔주자.
-    public void setStatusBarColor(){
+    public void setStatusBarColor() {
         if (Build.VERSION.SDK_INT >= M) {
             Window window = getWindow();
             window.setStatusBarColor(getColor(R.color.kakaoColor));
@@ -55,7 +64,7 @@ public class KakaoSignupActivity extends Activity {
 
     // 유저의 정보를 받아오는 함수.
     // 세션 연결?
-    protected void requestMe(){
+    protected void requestMe() {
         List<String> propertyKeys = new ArrayList<String>();
         propertyKeys.add("kaccount_email");
         propertyKeys.add("nickname");
@@ -70,10 +79,9 @@ public class KakaoSignupActivity extends Activity {
 
                 ErrorCode result = ErrorCode.valueOf(errorResult.getErrorCode());
                 // 클라문제.
-                if(result == ErrorCode.CLIENT_ERROR_CODE){
+                if (result == ErrorCode.CLIENT_ERROR_CODE) {
                     finish();
-                }
-                else{
+                } else {
                     redirectLoginActivity();
                 }
             }
@@ -94,22 +102,43 @@ public class KakaoSignupActivity extends Activity {
                 Logger.d("UserProfile : " + result);
                 Log.d("UserProfile", "UserProfile : " + result);
                 Log.d("유저 아이디", "아이디 : " + result.getId());
+                Log.d("UserImagePath", result.getThumbnailImagePath() + " ");
 
                 // 유저 세팅.
-                UserInfo user = new UserInfo();
-                user.setEmail(result.getEmail());
-                user.setUserId(result.getId());
-                user.setNickname(result.getNickname());
-                user.setThumbnailImagePath(result.getThumbnailImagePath());
+                UserInfo user = new UserInfo(result.getEmail(), result.getId(), result.getNickname(), result.getThumbnailImagePath());
+
+//                user.setEmail(result.getEmail());
+//                user.setUserId(result.getId());
+//                user.setNickname(result.getNickname());
+//                user.setThumbnailImagePath(result.getThumbnailImagePath());
 
                 Log.d("유저", "User : " + user.toString());
-
-                redirectMainActivity(user);
+                loginToServer(user);
             }
         }, propertyKeys, false);
     }
 
-    private void redirectMainActivity(UserInfo user){
+    public void loginToServer(final UserInfo user) {
+        NetworkService networkService = NetworkManager.getNetworkService();
+        Call<LoginResult> call = networkService.login(user);
+        call.enqueue(new Callback<LoginResult>() {
+            @Override
+            public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
+                if (response.isSuccessful()) {
+                    if (response.body().getResultCode() == 200)
+                        redirectMainActivity(user);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LoginResult> call, Throwable t) {
+                Toast.makeText(KakaoSignupActivity.this, "네트워크 문제, 다시 로그인 해주세요.", Toast.LENGTH_SHORT).show();
+                redirectLoginActivity();
+            }
+        });
+    }
+
+    private void redirectMainActivity(UserInfo user) {
 //        Toast.makeText(this, "MainActivity로", Toast.LENGTH_SHORT).show();
         Parcelable wrappedUser = Parcels.wrap(user);
 
@@ -120,7 +149,7 @@ public class KakaoSignupActivity extends Activity {
         finish();
     }
 
-    protected void redirectLoginActivity(){
+    protected void redirectLoginActivity() {
 //        Toast.makeText(this, "LoginActivity로", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

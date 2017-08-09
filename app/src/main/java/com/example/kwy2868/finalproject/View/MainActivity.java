@@ -123,10 +123,9 @@ public class MainActivity extends AppCompatActivity
             Intent intent = getIntent();
             user = Parcels.unwrap(intent.getParcelableExtra(USER));
             if (user != null) {
-                if (user.getThumbnailImagePath() != null)
-                    Glide.with(this).load(user.getThumbnailImagePath())
-                            .centerCrop().bitmapTransform(new CropCircleTransformation(this))
-                            .into(userImage);
+                Glide.with(this).load(user.getThumbnailImagePath())
+                        .centerCrop().bitmapTransform(new CropCircleTransformation(this))
+                        .into(userImage);
                 userNickname.setText(user.getNickname());
                 Log.d("유저 이메일 널 테스트", user.getEmail() + " ");
                 userEmail.setText(user.getEmail());
@@ -165,10 +164,12 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(this, "현재 위치를 받아오는 중입니다.", Toast.LENGTH_SHORT).show();
                 getCurrentLocation();
             }
+        } else {
+            getCurrentLocation();
         }
     }
 
-    public void viewPagerSetting(){
+    public void viewPagerSetting() {
         // TabLayout과 ViewPager 연동을 하자.
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), currentLocation);
         viewPager.setAdapter(viewPagerAdapter);
@@ -205,8 +206,8 @@ public class MainActivity extends AppCompatActivity
         Toast.makeText(this, "onDestroy()", Toast.LENGTH_SHORT).show();
         Log.d("Session Test", Session.getCurrentSession() + " ");
         Session session = Session.getCurrentSession();
-        // 이거하면 로그아웃 할때마다?
-        // session.close();
+//         이거하면 로그아웃 할때마다?
+        session.close();
     }
 
     @Override
@@ -270,7 +271,7 @@ public class MainActivity extends AppCompatActivity
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                if(isFirst){
+                if (isFirst) {
                     isFirst = !isFirst;
                     currentLatitude = location.getLatitude();
                     currentLongitude = location.getLongitude();
@@ -282,8 +283,7 @@ public class MainActivity extends AppCompatActivity
                     currentLocation.setLatitude(currentLatitude);
                     currentLocation.setLongitude(currentLongitude);
                     viewPagerSetting();
-                }
-                else
+                } else
                     return;
             }
 

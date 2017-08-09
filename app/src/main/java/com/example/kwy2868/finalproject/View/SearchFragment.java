@@ -158,7 +158,6 @@ public class SearchFragment extends Fragment
         return false;
     }
 
-    // TODO : 이거도 아래에 있는 카페에서 검색, 지식인에서 검색하는 것이랑 Refactor 할 수 있을 듯!!!! 근데 해도 의미가 있을진 모르겠다. 튜터님한테 물어보자.
     public void blogSearch(SearchService searchService, String keyword) {
         Call<JsonObject> call = searchService.getBlogContentList(keyword, REQUEST_ITEM_COUNT);
         call.enqueue(new Callback<JsonObject>() {
@@ -169,16 +168,6 @@ public class SearchFragment extends Fragment
                     JsonObject jsonObject = response.body();
                     recyclerViewSetting(ParsingHelper.searchParsing(jsonObject, BLOG));
                     Snackbar.make(getActivity().getCurrentFocus(), "네이버 블로그에서 유사한 20가지의 결과를 검색합니다.", Snackbar.LENGTH_LONG);
-                    // 위와 같이 Refactor 했다.
-//                    if (jsonObject.has("items")) {
-//                        JsonArray jsonArray = jsonObject.getAsJsonArray("items");
-//                        if (jsonArray.size() > 0) {
-//                            String jsonString = jsonArray.toString();
-//                            ArrayList<BlogContent> list = gson.fromJson(jsonString, new TypeToken<ArrayList<BlogContent>>() {
-//                            }.getType());
-//                            ConvertHelper.convert(list);
-//                        }
-//                    }
                 }
             }
 

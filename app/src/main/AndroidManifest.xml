@@ -41,7 +41,8 @@
 
         </activity>
 
-        <activity android:name="com.example.kwy2868.finalproject.kakao.LoginActivity">
+        <activity
+            android:name="com.example.kwy2868.finalproject.kakao.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -49,7 +50,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".View.HospitalDetailActivity">
+        <activity
+            android:name=".View.HospitalDetailActivity"
+            android:theme="@style/AppTheme.NoActionBar">
 
         </activity>
 

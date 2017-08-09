@@ -1,6 +1,7 @@
 package com.example.kwy2868.finalproject.Model;
 
 import org.parceler.Parcel;
+import org.parceler.ParcelConstructor;
 
 /**
  * Created by kwy2868 on 2017-08-08.
@@ -9,30 +10,44 @@ import org.parceler.Parcel;
 // 병원에 대한 후기.
 @Parcel(Parcel.Serialization.BEAN)
 public class Review {
+    private int num;
     // 어느 병원에 남긴건가.
-    private Hospital hospital;
-
+    private int hospitalNum;
     // 어떤 유저가 쓴건가.
-    private UserInfo user;
-
+    private long userId;
     private String title;
-    private String cost;
+    private int cost;
     private String content;
+    private String date;
 
-    public Hospital getHospital() {
-        return hospital;
+    @ParcelConstructor
+    public Review(int hospitalNum, long userId, String title, int cost, String content, String date) {
+        this.hospitalNum = hospitalNum;
+        this.userId = userId;
+        this.title = title;
+        this.cost = cost;
+        this.content = content;
+        this.date = date;
     }
 
-    public void setHospital(Hospital hospital) {
-        this.hospital = hospital;
+    public void setNum(int num) {
+        this.num = num;
     }
 
-    public UserInfo getUser() {
-        return user;
+    public int getHospitalNum() {
+        return hospitalNum;
     }
 
-    public void setUser(UserInfo user) {
-        this.user = user;
+    public void setHospitalNum(int hospitalNum) {
+        this.hospitalNum = hospitalNum;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     public String getTitle() {
@@ -43,11 +58,11 @@ public class Review {
         this.title = title;
     }
 
-    public String getCost() {
+    public int getCost() {
         return cost;
     }
 
-    public void setCost(String cost) {
+    public void setCost(int cost) {
         this.cost = cost;
     }
 
@@ -57,5 +72,13 @@ public class Review {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }

@@ -51,4 +51,5 @@
         android:layout_height="wrap_content"
         android:layout_gravity="right"
         android:text="후기 등록"/>
+
 </LinearLayout>

@@ -23,6 +23,9 @@
 
         <!--여기는 사용자가 남기는 부분-->
         <include layout="@layout/hospital_review" />
+        <!--사용자 후기 보는 부분-->
+        <include layout="@layout/list_review"/>
+
     </LinearLayout>
 
 </android.support.v4.widget.NestedScrollView>

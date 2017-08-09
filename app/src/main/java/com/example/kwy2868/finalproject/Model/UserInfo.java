@@ -1,6 +1,7 @@
 package com.example.kwy2868.finalproject.Model;
 
 import org.parceler.Parcel;
+import org.parceler.ParcelConstructor;
 
 /**
  * Created by kwy2868 on 2017-07-25.
@@ -11,6 +12,14 @@ public class UserInfo {
     private long userId;
     private String nickname;
     private String thumbnailImagePath;
+
+    @ParcelConstructor
+    public UserInfo(String email, long userId, String nickname, String thumbnailImagePath) {
+        this.email = email;
+        this.userId = userId;
+        this.nickname = nickname;
+        this.thumbnailImagePath = thumbnailImagePath;
+    }
 
     public String getEmail() {
         return email;

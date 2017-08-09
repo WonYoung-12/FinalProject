@@ -20,6 +20,8 @@
     <string name="review_title_hint">후기의 제목을 입력해주세요.</string>
     <string name="cost_hint">진료비 또는 검사비를 입력해주세요.</string>
     <string name="treatment_hint">진료(검사) 내용과 후기를 입력해주세요.</string>
-
     <string name="text_count">글자수 : 0/300</string>
+
+    <string name="list_review">후기 목록</string>
+    <string name="no_review">등록된 후기가 없습니다.</string>
 </resources>
