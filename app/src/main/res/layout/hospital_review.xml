@@ -1,55 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:expandable="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
     android:background="@drawable/dialog_route"
     android:orientation="vertical">
-
-    <!--한줄만 입력 가능-->
-    <EditText
-        android:id="@+id/reviewTitle"
+    
+    <com.andexert.expandablelayout.library.ExpandableLayout
+        android:id="@+id/expandableLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:lines="1"
-        android:maxLines="1"
-        android:inputType="text"
-        android:hint="@string/review_title_hint"/>
+        expandable:headerLayout="@layout/expandable_header"
+        expandable:contentLayout="@layout/expandable_content">
+        
+    </com.andexert.expandablelayout.library.ExpandableLayout>
 
-    <!--한줄만 입력 가능-->
-    <EditText
-        android:id="@+id/reviewCost"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:lines="1"
-        android:maxLines="1"
-        android:inputType="number"
-        android:hint="@string/cost_hint"/>
+    <!--<com.andexert.expandablelayout.library.ExpandableLayoutListView-->
+        <!--android:id="@+id/expandableListView"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
 
-    <TextView
-        android:id="@+id/textCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:text="@string/text_count" />
+    <!--</com.andexert.expandablelayout.library.ExpandableLayoutListView>-->
+    <!--&lt;!&ndash;한줄만 입력 가능&ndash;&gt;-->
+    <!--<EditText-->
+        <!--android:id="@+id/reviewTitle"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:lines="1"-->
+        <!--android:maxLines="1"-->
+        <!--android:inputType="text"-->
+        <!--android:hint="@string/review_title_hint"/>-->
 
-    <EditText
-        android:id="@+id/reviewContent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:lines="5"
-        android:inputType="textMultiLine"
-        android:maxLength="300"
-        android:hint="@string/treatment_hint"/>
+    <!--&lt;!&ndash;한줄만 입력 가능&ndash;&gt;-->
+    <!--<EditText-->
+        <!--android:id="@+id/reviewCost"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:lines="1"-->
+        <!--android:maxLines="1"-->
+        <!--android:inputType="number"-->
+        <!--android:hint="@string/cost_hint"/>-->
 
-    <Button
-        android:id="@+id/writeReviewButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:text="후기 등록"/>
+    <!--<TextView-->
+        <!--android:id="@+id/textCount"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="right"-->
+        <!--android:layout_marginLeft="15dp"-->
+        <!--android:layout_marginRight="15dp"-->
+        <!--android:text="@string/text_count" />-->
 
-</LinearLayout>
+    <!--<EditText-->
+        <!--android:id="@+id/reviewContent"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:lines="5"-->
+        <!--android:inputType="textMultiLine"-->
+        <!--android:maxLength="300"-->
+        <!--android:hint="@string/treatment_hint"/>-->
+
+    <!--<Button-->
+        <!--android:id="@+id/writeReviewButton"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="right"-->
+        <!--android:text="후기 등록"/>-->
+
+</RelativeLayout>

@@ -1,19 +1,27 @@
 package com.example.kwy2868.finalproject.View;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.andexert.expandablelayout.library.ExpandableLayout;
 import com.example.kwy2868.finalproject.Adapter.ReviewAdapter;
+import com.example.kwy2868.finalproject.Model.BaseResult;
+import com.example.kwy2868.finalproject.Model.Black;
+import com.example.kwy2868.finalproject.Model.Favorite;
 import com.example.kwy2868.finalproject.Model.GetReviewResult;
 import com.example.kwy2868.finalproject.Model.Hospital;
 import com.example.kwy2868.finalproject.Model.Review;
@@ -23,6 +31,8 @@ import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
 import com.example.kwy2868.finalproject.Util.CustomDialog;
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
@@ -45,7 +55,8 @@ import retrofit2.Response;
  * Created by kwy2868 on 2017-08-08.
  */
 
-public class HospitalDetailActivity extends AppCompatActivity implements MapView.POIItemEventListener, MapView.CurrentLocationEventListener, MapView.MapViewEventListener{
+public class HospitalDetailActivity extends AppCompatActivity
+        implements MapView.POIItemEventListener, MapView.CurrentLocationEventListener, MapView.MapViewEventListener, TextWatcher{
     @BindView(R.id.hospitalName)
     TextView hospitalName;
     @BindView(R.id.hospitalAddress)
@@ -60,6 +71,8 @@ public class HospitalDetailActivity extends AppCompatActivity implements MapView
     EditText reviewTitle;
     @BindView(R.id.reviewCost)
     EditText reviewCost;
+    @BindView(R.id.textCount)
+    TextView textCount;
     @BindView(R.id.reviewContent)
     EditText reviewContent;
     @BindView(R.id.writeReviewButton)
@@ -73,11 +86,30 @@ public class HospitalDetailActivity extends AppCompatActivity implements MapView
     @BindView(R.id.noReview)
     TextView noReview;
 
+    @BindView(R.id.expandableLayout)
+    ExpandableLayout expandableLayout;
+    @BindView(R.id.expandableHeader)
+    RelativeLayout expandableHeader;
+    @BindView(R.id.headerText)
+    TextView headerText;
+
+    ////////////Floating Action Button//////////
+    @BindView(R.id.floatingActionsMenu)
+    FloatingActionsMenu floatingActionsMenu;
+    @BindView(R.id.favoriteButton)
+    FloatingActionButton favoriteButton;
+    @BindView(R.id.blackButton)
+    FloatingActionButton blackButton;
+
+    NetworkService networkService = NetworkManager.getNetworkService();
+
+    private Location currentLocation;
     private Double currentLatitude;
     private Double currentLongitude;
 
     private static final String HOSPITAL_TAG = "Hospital";
     private static final String USER_TAG = "User";
+    private static final String LOCATION_TAG = "Location";
 
     // 현재 보고 있는 화면에 해당하는 병원.
     private Hospital hospital;
@@ -96,15 +128,20 @@ public class HospitalDetailActivity extends AppCompatActivity implements MapView
         setContentView(R.layout.activity_hospitaldetail);
         ButterKnife.bind(this);
 
-        getHospital();
+        getDataFromMainActivity();
         recyclerViewSetting();
         getReviewList();
     }
 
-    public void getHospital(){
+    public void getDataFromMainActivity(){
         Intent intent = getIntent();
         hospital = Parcels.unwrap(intent.getParcelableExtra(HOSPITAL_TAG));
         user = Parcels.unwrap(intent.getParcelableExtra(USER_TAG));
+        currentLocation = intent.getParcelableExtra(LOCATION_TAG);
+
+        currentLatitude = currentLocation.getLatitude();
+        currentLongitude = currentLocation.getLongitude();
+
         setHospitalDataOnView();
         mapSetting();
     }
@@ -113,6 +150,8 @@ public class HospitalDetailActivity extends AppCompatActivity implements MapView
         hospitalName.setText(hospital.getName());
         hospitalAddress.setText(hospital.getAddress());
         hospitalTel.setText(hospital.getTel());
+
+        reviewContent.addTextChangedListener(this);
     }
 
     public void mapSetting(){
@@ -146,13 +185,14 @@ public class HospitalDetailActivity extends AppCompatActivity implements MapView
 
     // 서버에서 이 병원에 해당하는 리뷰 목록들 가져오자.
     public void getReviewList(){
-        NetworkService networkService = NetworkManager.getNetworkService();
         Call<List<GetReviewResult>> call = networkService.getReviewList(hospital.getNum());
         call.enqueue(new Callback<List<GetReviewResult>>() {
             @Override
             public void onResponse(Call<List<GetReviewResult>> call, Response<List<GetReviewResult>> response) {
                 if(response.isSuccessful()){
                     reviewList = response.body();
+                    if(reviewList != null)
+                        noReview.setVisibility(View.GONE);
                     refreshRecyclerView();
                 }
             }
@@ -169,14 +209,20 @@ public class HospitalDetailActivity extends AppCompatActivity implements MapView
         reviewRecyclerView.setAdapter(reviewAdapter);
     }
 
-    // TODO 8월 9일은 여기부터 하자.
-    // 서버에 데이터 써주자. 써주는 거는 사용자 id(long), 병원 num(int), cost(비용), 날짜,
     @OnClick(R.id.writeReviewButton)
     public void writeReview(){
+        // 포커스 없애주자.
+        reviewTitle.clearFocus();
+        reviewCost.clearFocus();
+        reviewContent.clearFocus();
+
         int hospitalNum = hospital.getNum();
         long userId = user.getUserId();
-
         String title = reviewTitle.getText().toString();
+        if(reviewCost.getText().toString().trim().equals("")){
+            Toast.makeText(this, "모두 빠짐없이 입력하여 주세요.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         int cost = Integer.parseInt(reviewCost.getText().toString());
         String content = reviewContent.getText().toString();
 
@@ -191,17 +237,14 @@ public class HospitalDetailActivity extends AppCompatActivity implements MapView
         }
         Review review = new Review(hospitalNum, userId, title, cost, content, date);
         sendReviewToServer(review);
+
         // EditText들 다 지워주자.
         reviewTitle.setText(null);
         reviewCost.setText(null);
         reviewContent.setText(null);
-
-        // 작성한 리뷰도 화면에 나오게 리사이클러뷰 갱신해줘야겠지.
-        getReviewList();
     }
 
     public void sendReviewToServer(final Review review){
-        NetworkService networkService = NetworkManager.getNetworkService();
         Call<WriteResult> call = networkService.writeReview(review);
         call.enqueue(new Callback<WriteResult>() {
             @Override
@@ -211,10 +254,9 @@ public class HospitalDetailActivity extends AppCompatActivity implements MapView
                         Log.d("게시글 번호", response.body().getReviewNum() + "");
                         review.setNum(response.body().getReviewNum());
                         Toast.makeText(HospitalDetailActivity.this, "후기를 정상적으로 등록하였습니다.", Toast.LENGTH_SHORT).show();
-                        // 에딧 텍스트의 포커스가 사라지게..!
-                        reviewTitle.clearFocus();
-                        reviewCost.clearFocus();
-                        reviewContent.clearFocus();
+                        // 작성했으면 새로 리스트 받아와야지!
+                        // 작성한 리뷰도 화면에 나오게 리사이클러뷰 갱신해줘야겠지.
+                        getReviewList();
                         if(noReview.getVisibility() == View.VISIBLE)
                             noReview.setVisibility(View.GONE);
                     }
@@ -260,7 +302,7 @@ public class HospitalDetailActivity extends AppCompatActivity implements MapView
         if(!isSetLocation){
             currentLatitude = mapPoint.getMapPointGeoCoord().latitude;
             currentLongitude = mapPoint.getMapPointGeoCoord().longitude;
-            Toast.makeText(this, "다음맵에서 정상적으로 현재 위치 받아옴.", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "다음맵에서 정상적으로 현재 위치 받아옴.", Toast.LENGTH_SHORT).show();
             isSetLocation = !isSetLocation;
         }
         else
@@ -334,5 +376,86 @@ public class HospitalDetailActivity extends AppCompatActivity implements MapView
     @Override
     public void onMapViewMoveFinished(MapView mapView, MapPoint mapPoint) {
 
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        textCount.setText("글자수 : " + String.valueOf(charSequence.length()) + "/300");
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+
+    }
+
+    @OnClick(R.id.expandableHeader)
+    public void headerClick(){
+        // 레이아웃이 펼쳐져 있으면 헤더의 텍스트 바꿔주자.
+        if(expandableLayout.isOpened()) {
+            headerText.setText(getString(R.string.header_open));
+            expandableLayout.hide();
+        }
+        else {
+            headerText.setText(getString(R.string.header_close));
+            expandableLayout.show();
+        }
+    }
+    
+    @OnClick(R.id.favoriteButton)
+    public void enrollFavorite(){
+        Favorite favorite = new Favorite(user.getUserId(), hospital.getNum());
+        Call<BaseResult> call = networkService.enrollFavorite(favorite);
+        call.enqueue(new Callback<BaseResult>() {
+            @Override
+            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+                if(response.isSuccessful()){
+                    BaseResult baseResult = response.body();
+                    if(baseResult.getResultCode() == 200) {
+                        Log.d("Result Code", baseResult.getResultCode() + " ");
+                        Log.d("즐겨찾기", "즐겨찾기 등록 성공");
+                    }
+                    else if(response.body().getResultCode() == 2000){
+                        Toast.makeText(HospitalDetailActivity.this, "이미 추가된 병원입니다.", Toast.LENGTH_SHORT).show();
+                        Log.d("Result Code", baseResult.getResultCode() + " ");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResult> call, Throwable t) {
+                Log.d("즐겨찾기", "즐겨찾기 등록 실패");
+            }
+        });
+    }
+    
+    @OnClick(R.id.blackButton)
+    public void enrollBlack(){
+        Black black = new Black(user.getUserId(), hospital.getNum());
+        Toast.makeText(this, "블랙리스트 등록", Toast.LENGTH_SHORT).show();
+        Call<BaseResult> call = networkService.enrollBlackList(black);
+        call.enqueue(new Callback<BaseResult>() {
+            @Override
+            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+                if(response.isSuccessful()){
+                    BaseResult baseResult = response.body();
+                    if(baseResult.getResultCode() == 200){
+                        Log.d("블랙리스트", "블랙리스트 추가");
+                    }
+                    else if(baseResult.getResultCode() == 2000){
+                        Toast.makeText(HospitalDetailActivity.this, "이미 블랙 리스트에 추가된 병원입니다.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResult> call, Throwable t) {
+                Log.d("블랙리스트", "네트워크 문제로 블랙리스트 추가 실패");
+            }
+        });
     }
 }

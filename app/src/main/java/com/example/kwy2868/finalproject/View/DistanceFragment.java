@@ -1,8 +1,14 @@
 package com.example.kwy2868.finalproject.View;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.baoyz.widget.PullRefreshLayout;
 import com.example.kwy2868.finalproject.Adapter.HospitalAdapter;
 import com.example.kwy2868.finalproject.Model.Hospital;
 import com.example.kwy2868.finalproject.R;
@@ -19,6 +26,7 @@ import com.example.kwy2868.finalproject.Retrofit.NaverAPI.GeocodingService;
 import com.example.kwy2868.finalproject.Retrofit.NaverAPI.NaverAPIManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
+import com.example.kwy2868.finalproject.Util.LocationHelper;
 import com.example.kwy2868.finalproject.Util.ParsingHelper;
 import com.google.gson.JsonObject;
 
@@ -37,8 +45,10 @@ import retrofit2.Response;
  * Created by kwy2868 on 2017-08-01.
  */
 
-public class DistanceFragment extends Fragment {
-
+public class DistanceFragment extends Fragment
+        implements PullRefreshLayout.OnRefreshListener, LocationHelper {
+    @BindView(R.id.distanceRefreshLayout)
+    PullRefreshLayout distanceRefreshLayout;
     @BindView(R.id.distanceRecyclerView)
     RecyclerView distanceRecyclerView;
 
@@ -48,8 +58,16 @@ public class DistanceFragment extends Fragment {
     private static final int REQUEST_CODE = 0;
     private static final int CLOSEST = 0;
     private static final int FURTHERMOST = 14;
+    private static final String LOCATION_TAG = "Current Location";
 
+    // 이걸로 안 막아두면 가만히 있어도 계속 위치 바껴서 refresh 된다..!
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+
+    // 현재 위치의 좌표값. 이걸 이용해서 이제 거리를 구할 수 있겠지?
     private Location currentLocation;
+    private double currentLatitude;
+    private double currentLongitude;
 
     // 모든 병원 정보를 받아오자. 나중에 정렬해주자.
     private List<Hospital> hospitalList;
@@ -59,7 +77,20 @@ public class DistanceFragment extends Fragment {
 
     private Unbinder unbinder;
 
-    public static DistanceFragment newInstance(Location location){
+    public interface LocationDelivery{
+        void locationDeliver(Double latitude, Double longitude);
+    }
+
+    LocationDelivery locationDelivery;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if(context instanceof LocationDelivery)
+            locationDelivery = (LocationDelivery)context;
+    }
+
+    public static DistanceFragment newInstance(Location location) {
         DistanceFragment distanceFragment = new DistanceFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable("Location", location);
@@ -73,6 +104,7 @@ public class DistanceFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_distance, container, false);
         unbinder = ButterKnife.bind(this, view);
+        distanceRefreshLayout.setOnRefreshListener(this);
 
         return view;
     }
@@ -81,7 +113,7 @@ public class DistanceFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("아규먼트 널 테스트", getArguments() + " ");
-        if(getArguments() != null)
+        if (getArguments() != null)
             currentLocation = getArguments().getParcelable("Location");
         getEveryHospitalFromServer();
     }
@@ -97,6 +129,7 @@ public class DistanceFragment extends Fragment {
                     // 모든 병원 리스트 받아왔어.
                     hospitalList = response.body();
                     calcDistance(hospitalList);
+                    distanceRefreshLayout.setRefreshing(false);
 //                    getLatLngForHospitalList();
                     Log.d("레트로핏 테스트.", "모두 정상적으로 받아왔다.");
                 }
@@ -104,13 +137,13 @@ public class DistanceFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<Hospital>> call, Throwable t) {
-
+                distanceRefreshLayout.setRefreshing(false);
             }
         });
     }
 
-    public void calcDistance(List<Hospital> hospitalList){
-        for(int i=0; i<hospitalList.size(); i++){
+    public void calcDistance(List<Hospital> hospitalList) {
+        for (int i = 0; i < hospitalList.size(); i++) {
             Hospital hospital = hospitalList.get(i);
 
             // 병원 목록들의 위치를 지정해준다.
@@ -131,21 +164,20 @@ public class DistanceFragment extends Fragment {
         recyclerviewSetting();
     }
 
-    public void recyclerviewSetting(){
+    public void recyclerviewSetting() {
         Log.d("거리 리사이클러뷰 세팅", "세팅하자");
         layoutManager = new LinearLayoutManager(getContext());
         distanceRecyclerView.setLayoutManager(layoutManager);
         distanceRecyclerView.setHasFixedSize(true);
-        // TODO 여기서 모든 리스트를 해버리니까 너무 버벅인다..! 15개만 가져오자.
         hospitalAdapter = new HospitalAdapter(sortedHospitalList);
         distanceRecyclerView.setAdapter(hospitalAdapter);
     }
 
-    public void summarizeList(){
+    public void summarizeList() {
         sortedHospitalList = new ArrayList<Hospital>();
         // 15개만 가져오자.
 //        sortedHospitalList.subList(CLOSEST, FURTHERMOST);
-        for(int i=CLOSEST; i<FURTHERMOST; i++){
+        for (int i = CLOSEST; i < FURTHERMOST; i++) {
             sortedHospitalList.add(hospitalList.get(i));
         }
     }
@@ -198,6 +230,64 @@ public class DistanceFragment extends Fragment {
 //            });
         }
         Toast.makeText(getContext(), "Latitude : " + hospitalList.get(0).getLatitude() + "Longitude : " + hospitalList.get(0).getLongitude(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRefresh() {
+        getCurrentLocation();
+    }
+
+    @Override
+    public void getCurrentLocation() {
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                afterLocationUpdated(location);
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+                Log.d("onStatusChanged", "onStatusChanged");
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+                Log.d("onProviderEnabled", "onProviderEnabled");
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+                Log.d("onProviderDisabled", "onProviderDisabled");
+                Toast.makeText(getContext(), "현재 위치를 받아오는데 실패 했습니다.", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        // 0.1초마다, 1m 변하면 업데이트.
+//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 1, locationListener);
+    }
+
+    public void afterLocationUpdated(Location location){
+        currentLatitude = location.getLatitude();
+        currentLongitude = location.getLongitude();
+        Log.d("Latitude", "Latitude : " + currentLatitude);
+        Log.d("Longitude", "Longitude : " + currentLongitude);
+        Toast.makeText(getContext(), "현재 위치를 받아오는데 성공 했습니다.", Toast.LENGTH_SHORT).show();
+        locationDelivery.locationDeliver(currentLatitude, currentLongitude);
+        locationManager.removeUpdates(locationListener);
+        getEveryHospitalFromServer();
     }
 
     //    @OnClick(R.id.enrollButton)

@@ -2,6 +2,7 @@ package com.example.kwy2868.finalproject.kakao;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -10,7 +11,7 @@ import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
-import com.example.kwy2868.finalproject.Model.LoginResult;
+import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.UserInfo;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
@@ -41,6 +42,8 @@ import static android.os.Build.VERSION_CODES.M;
 public class KakaoSignupActivity extends Activity {
     private static final String USER = "User";
 
+    private static final String LOCATION_TAG = "Current Location";
+    private Location currentLocation;
     /**
      * Main으로 넘길지 가입 페이지를 그릴지 판단하기 위해 me를 호출한다.
      *
@@ -50,8 +53,15 @@ public class KakaoSignupActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getDataFromLoginActivity();
         setStatusBarColor();
         requestMe();
+    }
+
+    public void getDataFromLoginActivity(){
+        if(getIntent() != null){
+            currentLocation = getIntent().getParcelableExtra(LOCATION_TAG);
+        }
     }
 
     // 카카오 로그인 화면의 StatusBar 색상도 바꿔주자.
@@ -107,11 +117,6 @@ public class KakaoSignupActivity extends Activity {
                 // 유저 세팅.
                 UserInfo user = new UserInfo(result.getEmail(), result.getId(), result.getNickname(), result.getThumbnailImagePath());
 
-//                user.setEmail(result.getEmail());
-//                user.setUserId(result.getId());
-//                user.setNickname(result.getNickname());
-//                user.setThumbnailImagePath(result.getThumbnailImagePath());
-
                 Log.d("유저", "User : " + user.toString());
                 loginToServer(user);
             }
@@ -120,30 +125,31 @@ public class KakaoSignupActivity extends Activity {
 
     public void loginToServer(final UserInfo user) {
         NetworkService networkService = NetworkManager.getNetworkService();
-        Call<LoginResult> call = networkService.login(user);
-        call.enqueue(new Callback<LoginResult>() {
+        Call<BaseResult> call = networkService.login(user);
+        call.enqueue(new Callback<BaseResult>() {
             @Override
-            public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
+            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
                 if (response.isSuccessful()) {
                     if (response.body().getResultCode() == 200)
-                        redirectMainActivity(user);
+                        redirectMainActivity(user, currentLocation);
                 }
             }
 
             @Override
-            public void onFailure(Call<LoginResult> call, Throwable t) {
+            public void onFailure(Call<BaseResult> call, Throwable t) {
                 Toast.makeText(KakaoSignupActivity.this, "네트워크 문제, 다시 로그인 해주세요.", Toast.LENGTH_SHORT).show();
                 redirectLoginActivity();
             }
         });
     }
 
-    private void redirectMainActivity(UserInfo user) {
+    private void redirectMainActivity(UserInfo user ,Location location) {
 //        Toast.makeText(this, "MainActivity로", Toast.LENGTH_SHORT).show();
         Parcelable wrappedUser = Parcels.wrap(user);
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(USER, wrappedUser);
+        intent.putExtra(LOCATION_TAG, location);
 
         startActivity(intent);
         finish();

@@ -16,8 +16,6 @@ import com.example.kwy2868.finalproject.View.SearchFragment;
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     private String[] tabTitles = new String[]{"지역별", "거리순", "검색"};
 
-    private Fragment[] fragmentArray;
-
     private static final int ITEM_COUNT = 3;
 
     private Location location;

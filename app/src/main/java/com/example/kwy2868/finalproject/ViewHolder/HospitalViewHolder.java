@@ -42,6 +42,7 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
 
     private static final String HOSPITAL_TAG = "Hospital";
     private static final String USER_TAG = "User";
+    private static final String LOCATION_TAG = "Location";
 
     private List<Hospital> hospitalList;
 
@@ -80,10 +81,11 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
         Parcelable wrappedHospital = Parcels.wrap(hospital);
         // TODO 야매 아니게 하는 법은 없을까..
         Parcelable wrappedUser = Parcels.wrap(MainActivity.getUser());
-        Log.d("어플리케이션 유저", MainActivity.getUser() + " ");
+
         Intent intent = new Intent(view.getContext(), HospitalDetailActivity.class);
         intent.putExtra(HOSPITAL_TAG, wrappedHospital);
         intent.putExtra(USER_TAG, wrappedUser);
+        intent.putExtra(LOCATION_TAG, MainActivity.getLocation());
         view.getContext().startActivity(intent);
     }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,12 +9,17 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-
-        <android.support.v7.widget.RecyclerView
+        <com.baoyz.widget.PullRefreshLayout
+            android:id="@+id/distanceRefreshLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/distanceRecyclerView">
-        </android.support.v7.widget.RecyclerView>
-    </LinearLayout>
+            android:layout_height="match_parent">
 
-</android.support.v4.widget.NestedScrollView>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/distanceRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+        </com.baoyz.widget.PullRefreshLayout>
+    </LinearLayout>
+</RelativeLayout>
+
+

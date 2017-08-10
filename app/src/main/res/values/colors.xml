@@ -4,10 +4,17 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="white">#FFFFFF</color>
+    <!--<color name="white">#FFFFFF</color>-->
     <color name="tabSelectedTextColor">#09ca03</color>
     <color name="navHeaderColor">#16a085</color>
 
     <color name="kakaoColor">#ffdc00</color>
     <color name="dialogColor">#1b1abc9c</color>
+
+    <color name="black_semi_transparent">#B2000000</color>
+    <color name="half_black">#808080</color>
+    <color name="white">#fafafa</color>
+    <color name="white_pressed">#f1f1f1</color>
+    <color name="pink">#e91e63</color>
+    <color name="pink_pressed">#ec407a</color>
 </resources>

@@ -17,7 +17,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.baoyz.widget.PullRefreshLayout;
 import com.example.kwy2868.finalproject.Adapter.BlogContentAdapter;
 import com.example.kwy2868.finalproject.Adapter.CafeArticleAdapter;
 import com.example.kwy2868.finalproject.Adapter.KiNContentAdapter;
@@ -44,10 +46,12 @@ import retrofit2.Response;
  */
 
 public class SearchFragment extends Fragment
-        implements AdapterView.OnItemSelectedListener, View.OnKeyListener, TextView.OnEditorActionListener {
+        implements AdapterView.OnItemSelectedListener, View.OnKeyListener, TextView.OnEditorActionListener, PullRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.searchSpinner)
     Spinner searchSpinner;
+    @BindView(R.id.searchRefreshLayout)
+    PullRefreshLayout searchRefreshLayout;
     @BindView(R.id.searchRecyclerView)
     RecyclerView searchRecyclerView;
     @BindView(R.id.searchButton)
@@ -80,6 +84,7 @@ public class SearchFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         unbinder = ButterKnife.bind(this, view);
         searchSpinner.setOnItemSelectedListener(this);
+        searchRefreshLayout.setOnRefreshListener(this);
 
         // 엔터키 이벤트
         searchEditText.setOnKeyListener(this);
@@ -123,7 +128,7 @@ public class SearchFragment extends Fragment
 
     // 검색 버튼 눌렀을 때.
     @OnClick(R.id.searchButton)
-    public void searchButtonClick() {
+    public void search() {
         String keyword = searchEditText.getText().toString();
         SearchService searchService = NaverAPIManager.getSearchService();
 
@@ -146,13 +151,14 @@ public class SearchFragment extends Fragment
                 kiNSearch(searchService, keyword);
                 break;
         }
+        searchRefreshLayout.setRefreshing(false);
     }
 
     // 엔터키 눌렀을 때도 검색이 되게 해주자.
     @Override
     public boolean onKey(View view, int i, KeyEvent keyEvent) {
         if ((keyEvent.getAction() == KeyEvent.ACTION_DOWN) && (i == KeyEvent.KEYCODE_ENTER)) {
-            searchButtonClick();
+            search();
             return true;
         }
         return false;
@@ -219,6 +225,11 @@ public class SearchFragment extends Fragment
     }
 
     public void recyclerViewSetting(List list) {
+        if(list == null){
+            Toast.makeText(getActivity(), "검색 결과가 없습니다.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         currentList = list;
 
         layoutManager = new LinearLayoutManager(getContext());
@@ -240,9 +251,14 @@ public class SearchFragment extends Fragment
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
         if (i == EditorInfo.IME_ACTION_SEARCH) {
-            searchButtonClick();
+            search();
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onRefresh() {
+        search();
     }
 }

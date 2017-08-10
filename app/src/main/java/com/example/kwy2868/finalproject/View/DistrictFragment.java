@@ -1,8 +1,6 @@
 package com.example.kwy2868.finalproject.View;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 
+import com.baoyz.widget.PullRefreshLayout;
 import com.example.kwy2868.finalproject.Adapter.HospitalAdapter;
 import com.example.kwy2868.finalproject.Model.Hospital;
 import com.example.kwy2868.finalproject.R;
@@ -33,10 +32,12 @@ import retrofit2.Response;
  * Created by kwy2868 on 2017-08-01.
  */
 
-public class DistrictFragment extends Fragment implements AdapterView.OnItemSelectedListener {
+public class DistrictFragment extends Fragment implements AdapterView.OnItemSelectedListener, PullRefreshLayout.OnRefreshListener {
     @BindView(R.id.districtSpinner)
     Spinner districtSpinner;
 
+    @BindView(R.id.districtRefreshLayout)
+    PullRefreshLayout districtRefreshLayout;
     @BindView(R.id.districtRecyclerView)
     RecyclerView districtRecyclerView;
 
@@ -48,24 +49,13 @@ public class DistrictFragment extends Fragment implements AdapterView.OnItemSele
     private String currentDistrict;
     private List<Hospital> hospitalList;
 
-    // 처음 실행될 때는 true, 이후에는 계속 false;
-    private boolean isFirst = true;
-
-    Handler mHandler = new Handler() {
-        @Override
-        public void dispatchMessage(Message msg) {
-            super.dispatchMessage(msg);
-
-            hospitalAdapter.notifyDataSetChanged();
-        }
-    };
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_district, container, false);
         unbinder = ButterKnife.bind(this, view);
         districtSpinner.setOnItemSelectedListener(this);
+        districtRefreshLayout.setOnRefreshListener(this);
 //        enrollLatLngToDB();
 
         return view;
@@ -93,16 +83,11 @@ public class DistrictFragment extends Fragment implements AdapterView.OnItemSele
             @Override
             public void onResponse(Call<List<Hospital>> call, Response<List<Hospital>> response) {
                 if (response.isSuccessful()) {
-//                    Toast.makeText(getContext(), "잘 받아옴", Toast.LENGTH_SHORT).show();
                     hospitalList = response.body();
                     Log.d("사이즈", hospitalList.size() + " ");
                     // notify 해주자.
                     refreshRecyclerView();
-//                    mHandler.sendEmptyMessage(0);
                     Log.d("HospitalList", hospitalList.get(0).getName() + " ");
-
-                    // workThread라 notify가 안된다. 함수 만들어줘서 UI 스레드에서 작업 해주자.
-//                    hospitalAdapter.notifyDataSetChanged();
                 } else {
 //                    Log.d("씨발", "레트로핏 안된다.");
                 }
@@ -113,6 +98,7 @@ public class DistrictFragment extends Fragment implements AdapterView.OnItemSele
                 Log.d("Network Error", "레트로핏 못 받아옴.");
             }
         });
+        districtRefreshLayout.setRefreshing(false);
     }
 
     public void refreshRecyclerView() {
@@ -140,5 +126,11 @@ public class DistrictFragment extends Fragment implements AdapterView.OnItemSele
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @Override
+    public void onRefresh() {
+        Log.d("갱신하자", "갱신하자");
+        getHospitalList(currentDistrict);
     }
 }

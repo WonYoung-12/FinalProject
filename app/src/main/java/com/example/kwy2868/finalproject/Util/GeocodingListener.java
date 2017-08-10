@@ -1,9 +1,8 @@
-package com.example.kwy2868.finalproject.View;
+package com.example.kwy2868.finalproject.Util;
 
 import android.util.Log;
 
 import com.example.kwy2868.finalproject.Model.Hospital;
-import com.example.kwy2868.finalproject.Util.ParsingHelper;
 import com.google.gson.JsonObject;
 
 import retrofit2.Call;

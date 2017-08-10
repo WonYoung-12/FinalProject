@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <android.support.v7.widget.AppCompatSpinner
+            android:id="@+id/districtSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:entries="@array/district"
-            android:id="@+id/districtSpinner">
+            android:entries="@array/district">
 
         </android.support.v7.widget.AppCompatSpinner>
 
-        <android.support.v7.widget.RecyclerView
+        <com.baoyz.widget.PullRefreshLayout
+            android:id="@+id/districtRefreshLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/districtRecyclerView">
-        </android.support.v7.widget.RecyclerView>
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/districtRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </android.support.v7.widget.RecyclerView>
+        </com.baoyz.widget.PullRefreshLayout>
     </LinearLayout>
-</android.support.v4.widget.NestedScrollView>
+</RelativeLayout>
+

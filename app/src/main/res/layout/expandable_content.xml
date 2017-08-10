@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_marginTop="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!--한줄만 입력 가능-->
+        <EditText
+            android:id="@+id/reviewTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/review_title_hint"
+            android:inputType="text"
+            android:lines="1"
+            android:maxLines="1" />
+
+        <!--한줄만 입력 가능-->
+        <EditText
+            android:id="@+id/reviewCost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/cost_hint"
+            android:inputType="number"
+            android:lines="1"
+            android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/textCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:gravity="right"
+            android:text="@string/text_count" />
+
+        <EditText
+            android:id="@+id/reviewContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/treatment_hint"
+            android:inputType="textMultiLine"
+            android:lines="5"
+            android:maxLength="300" />
+
+        <Button
+            android:id="@+id/writeReviewButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="후기 등록" />
+
+    </LinearLayout>
+</RelativeLayout>

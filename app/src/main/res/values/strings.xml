@@ -24,4 +24,7 @@
 
     <string name="list_review">후기 목록</string>
     <string name="no_review">등록된 후기가 없습니다.</string>
+
+    <string name="header_open">후기를 남기려면 눌러주세요.</string>
+    <string name="header_close">접기</string>
 </resources>
