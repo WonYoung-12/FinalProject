@@ -9,10 +9,10 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.Hospital;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.View.HospitalDetailActivity;
-import com.example.kwy2868.finalproject.View.MainActivity;
 
 import org.parceler.Parcels;
 
@@ -79,13 +79,12 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
         int position = getAdapterPosition();
         Hospital hospital = hospitalList.get(position);
         Parcelable wrappedHospital = Parcels.wrap(hospital);
-        // TODO 야매 아니게 하는 법은 없을까..
-        Parcelable wrappedUser = Parcels.wrap(MainActivity.getUser());
+//        Parcelable wrappedUser = Parcels.wrap(GlobalData.getUser());
 
         Intent intent = new Intent(view.getContext(), HospitalDetailActivity.class);
         intent.putExtra(HOSPITAL_TAG, wrappedHospital);
-        intent.putExtra(USER_TAG, wrappedUser);
-        intent.putExtra(LOCATION_TAG, MainActivity.getLocation());
+//        intent.putExtra(USER_TAG, wrappedUser);
+        intent.putExtra(LOCATION_TAG, GlobalData.getCurrentLocation());
         view.getContext().startActivity(intent);
     }
 }

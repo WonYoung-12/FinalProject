@@ -15,19 +15,16 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.kwy2868.finalproject.Adapter.ViewPagerAdapter;
+import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.UserInfo;
 import com.example.kwy2868.finalproject.R;
 import com.kakao.auth.Session;
-
-import org.parceler.Parcels;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,8 +44,6 @@ public class MainActivity extends AppCompatActivity
     TabLayout tabLayout;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @BindView(R.id.loadingProgressBar)
-    ProgressBar loadingProgressBar;
     @BindView(R.id.viewPager)
     ViewPager viewPager;
 
@@ -78,19 +73,10 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        getDataFromSignUpActivity();
+        currentLocation = GlobalData.getCurrentLocation();
+        viewPagerSetting();
         toolbarSetting();
         drawerSetting();
-    }
-
-    public void getDataFromSignUpActivity() {
-        if (getIntent() != null) {
-            currentLocation = getIntent().getParcelableExtra(LOCATION_TAG);
-            if(currentLocation != null) {
-                loadingProgressBar.setVisibility(View.GONE);
-                viewPagerSetting();
-            }
-        }
     }
 
     public void toolbarSetting() {
@@ -109,18 +95,13 @@ public class MainActivity extends AppCompatActivity
         TextView userNickname = navigationView.getHeaderView(0).findViewById(R.id.userNickname);
         TextView userEmail = navigationView.getHeaderView(0).findViewById(R.id.userEmail);
 
-        if (getIntent() != null) {
-            Intent intent = getIntent();
-            user = Parcels.unwrap(intent.getParcelableExtra(USER));
-            if (user != null) {
-                Glide.with(this).load(user.getThumbnailImagePath())
-                        .centerCrop().bitmapTransform(new CropCircleTransformation(this))
-                        .into(userImage);
-                userNickname.setText(user.getNickname());
-                Log.d("유저 이메일 널 테스트", user.getEmail() + " ");
-                userEmail.setText(user.getEmail());
-            }
-        }
+        user = GlobalData.getUser();
+        Glide.with(this).load(user.getThumbnailImagePath())
+                .centerCrop().bitmapTransform(new CropCircleTransformation(this))
+                .into(userImage);
+        userNickname.setText(user.getNickname());
+        Log.d("유저 이메일 널 테스트", user.getEmail() + " ");
+        userEmail.setText(user.getEmail());
         navigationView.setNavigationItemSelectedListener(this);
     }
 
@@ -147,15 +128,6 @@ public class MainActivity extends AppCompatActivity
                 R.drawable.ic_search_white_24dp};
         for (int i = 0; i < FRAGMENT_COUNT; i++)
             tabLayout.getTabAt(i).setIcon(tabIcons[i]);
-    }
-
-    // TODO 이런식으로 하면 백타 안될 것 같은데...
-    public static UserInfo getUser() {
-        return user;
-    }
-
-    public static Location getLocation() {
-        return currentLocation;
     }
 
     // 앱을 종료하면 로그아웃 처리되서 실행 시마다 로그인을 할 수 있다.
@@ -207,15 +179,15 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_favorite) {
             // Handle the camera action
             Toast.makeText(this, "카메라", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_blacklist) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_mypet) {
 
-        } else if (id == R.id.nav_manage) {
-
+        } else if (id == R.id.nav_mychart) {
+            startActivity(new Intent(this, ChartActivity.class));
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {

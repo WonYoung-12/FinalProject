@@ -31,6 +31,30 @@
             android:value="@string/kakao_app_key"/>
 
         <activity
+            android:theme="@style/AppTheme.NoActionBar"
+            android:name="com.example.kwy2868.finalproject.View.LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+        <!--네이버 로그인-->
+        <activity
+            android:name="com.nhn.android.naverlogin.ui.OAuthLoginActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+        <activity
+            android:name="com.nhn.android.naverlogin.ui.OAuthLoginInAppBrowserActivity"
+            android:label="OAuth2.0 In-app"/>
+
+        <!--카카오 로그인-->
+        <activity android:name="com.example.kwy2868.finalproject.kakao.KakaoSignupActivity">
+
+        </activity>
+
+        <activity
             android:name="com.example.kwy2868.finalproject.View.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
@@ -40,24 +64,15 @@
 
         </activity>
 
-        <activity android:name="com.example.kwy2868.finalproject.kakao.KakaoSignupActivity">
-
-        </activity>
-
-        <activity
-            android:theme="@style/AppTheme.NoActionBar"
-            android:name="com.example.kwy2868.finalproject.kakao.LoginActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
         <activity
             android:name=".View.HospitalDetailActivity"
             android:theme="@style/AppTheme.NoActionBar">
 
+        </activity>
+
+        <activity
+            android:name=".View.ChartActivity"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
     </application>

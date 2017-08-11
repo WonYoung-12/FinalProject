@@ -27,15 +27,24 @@
             android:text="Loading"/>
     </LinearLayout>
 
-
-    <com.kakao.usermgmt.LoginButton
-        android:id="@+id/kakao_login_button"
+    <LinearLayout
+        android:id="@+id/loginButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
         android:layout_marginBottom="30dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp" />
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:gravity="center">
+        <com.nhn.android.naverlogin.ui.view.OAuthLoginButton
+            android:id="@+id/naverLoginButton"
+            android:layout_width="300dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="10dp"/>
 
+        <com.kakao.usermgmt.LoginButton
+            android:id="@+id/kakaoLoginButton"
+            android:layout_width="300dp"
+            android:layout_height="60dp"/>
+    </LinearLayout>
 </RelativeLayout>

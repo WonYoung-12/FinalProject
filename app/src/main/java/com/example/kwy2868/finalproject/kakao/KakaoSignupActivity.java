@@ -3,19 +3,18 @@ package com.example.kwy2868.finalproject.kakao;
 import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.Window;
 import android.widget.Toast;
 
 import com.example.kwy2868.finalproject.Model.BaseResult;
+import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.UserInfo;
-import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
+import com.example.kwy2868.finalproject.View.LoginActivity;
 import com.example.kwy2868.finalproject.View.MainActivity;
 import com.kakao.auth.ErrorCode;
 import com.kakao.network.ErrorResult;
@@ -32,8 +31,6 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static android.os.Build.VERSION_CODES.M;
 
 /**
  * Created by kwy2868 on 2017-07-26.
@@ -54,21 +51,12 @@ public class KakaoSignupActivity extends Activity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getDataFromLoginActivity();
-        setStatusBarColor();
         requestMe();
     }
 
     public void getDataFromLoginActivity(){
         if(getIntent() != null){
             currentLocation = getIntent().getParcelableExtra(LOCATION_TAG);
-        }
-    }
-
-    // 카카오 로그인 화면의 StatusBar 색상도 바꿔주자.
-    public void setStatusBarColor() {
-        if (Build.VERSION.SDK_INT >= M) {
-            Window window = getWindow();
-            window.setStatusBarColor(getColor(R.color.kakaoColor));
         }
     }
 
@@ -116,7 +104,7 @@ public class KakaoSignupActivity extends Activity {
 
                 // 유저 세팅.
                 UserInfo user = new UserInfo(result.getEmail(), result.getId(), result.getNickname(), result.getThumbnailImagePath());
-
+                GlobalData.setUser(user);
                 Log.d("유저", "User : " + user.toString());
                 loginToServer(user);
             }
@@ -131,7 +119,7 @@ public class KakaoSignupActivity extends Activity {
             public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
                 if (response.isSuccessful()) {
                     if (response.body().getResultCode() == 200)
-                        redirectMainActivity(user, currentLocation);
+                        redirectMainActivity(user);
                 }
             }
 
@@ -143,13 +131,13 @@ public class KakaoSignupActivity extends Activity {
         });
     }
 
-    private void redirectMainActivity(UserInfo user ,Location location) {
+    private void redirectMainActivity(UserInfo user) {
 //        Toast.makeText(this, "MainActivity로", Toast.LENGTH_SHORT).show();
         Parcelable wrappedUser = Parcels.wrap(user);
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(USER, wrappedUser);
-        intent.putExtra(LOCATION_TAG, location);
+//        intent.putExtra(LOCATION_TAG, location);
 
         startActivity(intent);
         finish();

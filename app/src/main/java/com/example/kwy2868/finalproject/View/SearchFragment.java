@@ -136,7 +136,6 @@ public class SearchFragment extends Fragment
         if (keyword.equals("") || keyword.trim().equals("")) {
             Snackbar.make(getActivity().getCurrentFocus(), "검색어를 1자 이상 입력해 주세요.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
-            //Toast.makeText(getContext(), "검색어를 1자 이상 입력해 주세요.", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -151,7 +150,6 @@ public class SearchFragment extends Fragment
                 kiNSearch(searchService, keyword);
                 break;
         }
-        searchRefreshLayout.setRefreshing(false);
     }
 
     // 엔터키 눌렀을 때도 검색이 되게 해주자.
@@ -225,6 +223,7 @@ public class SearchFragment extends Fragment
     }
 
     public void recyclerViewSetting(List list) {
+
         if(list == null){
             Toast.makeText(getActivity(), "검색 결과가 없습니다.", Toast.LENGTH_SHORT).show();
             return;
@@ -246,6 +245,7 @@ public class SearchFragment extends Fragment
             KiNContentAdapter kiNContentAdapter = new KiNContentAdapter(list);
             searchRecyclerView.setAdapter(kiNContentAdapter);
         }
+        searchRefreshLayout.setRefreshing(false);
     }
 
     @Override

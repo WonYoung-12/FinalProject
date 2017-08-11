@@ -5,8 +5,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -18,11 +18,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.andexert.expandablelayout.library.ExpandableLayout;
+import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 import com.example.kwy2868.finalproject.Adapter.ReviewAdapter;
 import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.Black;
 import com.example.kwy2868.finalproject.Model.Favorite;
 import com.example.kwy2868.finalproject.Model.GetReviewResult;
+import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.Hospital;
 import com.example.kwy2868.finalproject.Model.Review;
 import com.example.kwy2868.finalproject.Model.UserInfo;
@@ -79,9 +81,10 @@ public class HospitalDetailActivity extends AppCompatActivity
     Button writeReviewButton;
 
     @BindView(R.id.reviewRecyclerView)
-    RecyclerView reviewRecyclerView;
+    ShimmerRecyclerView reviewRecyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private ReviewAdapter reviewAdapter;
+    private static final int COLUMN_SPAN = 2;
 
     @BindView(R.id.noReview)
     TextView noReview;
@@ -128,19 +131,24 @@ public class HospitalDetailActivity extends AppCompatActivity
         setContentView(R.layout.activity_hospitaldetail);
         ButterKnife.bind(this);
 
-        getDataFromMainActivity();
+        dataInit();
         recyclerViewSetting();
         getReviewList();
     }
 
-    public void getDataFromMainActivity(){
+    public void dataInit(){
         Intent intent = getIntent();
         hospital = Parcels.unwrap(intent.getParcelableExtra(HOSPITAL_TAG));
-        user = Parcels.unwrap(intent.getParcelableExtra(USER_TAG));
-        currentLocation = intent.getParcelableExtra(LOCATION_TAG);
-
+        user = GlobalData.getUser();
+        Log.d("유저", user + " ");
+        currentLocation = GlobalData.getCurrentLocation();
         currentLatitude = currentLocation.getLatitude();
         currentLongitude = currentLocation.getLongitude();
+//        user = Parcels.unwrap(intent.getParcelableExtra(USER_TAG));
+//        currentLocation = intent.getParcelableExtra(LOCATION_TAG);
+//
+//        currentLatitude = currentLocation.getLatitude();
+//        currentLongitude = currentLocation.getLongitude();
 
         setHospitalDataOnView();
         mapSetting();
@@ -178,7 +186,7 @@ public class HospitalDetailActivity extends AppCompatActivity
     }
 
     public void recyclerViewSetting(){
-        layoutManager = new LinearLayoutManager(this);
+        layoutManager = new StaggeredGridLayoutManager(COLUMN_SPAN, StaggeredGridLayoutManager.VERTICAL);
         reviewRecyclerView.setLayoutManager(layoutManager);
         reviewRecyclerView.setHasFixedSize(true);
     }
@@ -205,8 +213,20 @@ public class HospitalDetailActivity extends AppCompatActivity
     }
 
     public void refreshRecyclerView(){
-        reviewAdapter = new ReviewAdapter(reviewList);
+        // 로딩중인인 카드 보이게 세팅.
+        reviewAdapter = new ReviewAdapter();
         reviewRecyclerView.setAdapter(reviewAdapter);
+        reviewRecyclerView.showShimmerAdapter();
+
+        // 1초 후에.
+        reviewRecyclerView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                reviewAdapter = new ReviewAdapter(reviewList);
+                reviewRecyclerView.setAdapter(reviewAdapter);
+                reviewRecyclerView.hideShimmerAdapter();
+            }
+        }, 1500);
     }
 
     @OnClick(R.id.writeReviewButton)
@@ -242,6 +262,8 @@ public class HospitalDetailActivity extends AppCompatActivity
         reviewTitle.setText(null);
         reviewCost.setText(null);
         reviewContent.setText(null);
+        // 등록하면 후기 등록창 닫아주자.
+        expandableLayout.hide();
     }
 
     public void sendReviewToServer(final Review review){
@@ -416,11 +438,11 @@ public class HospitalDetailActivity extends AppCompatActivity
                 if(response.isSuccessful()){
                     BaseResult baseResult = response.body();
                     if(baseResult.getResultCode() == 200) {
-                        Log.d("Result Code", baseResult.getResultCode() + " ");
+                        Toast.makeText(HospitalDetailActivity.this, "즐겨찾기 추가 성공.", Toast.LENGTH_SHORT).show();
                         Log.d("즐겨찾기", "즐겨찾기 등록 성공");
                     }
                     else if(response.body().getResultCode() == 2000){
-                        Toast.makeText(HospitalDetailActivity.this, "이미 추가된 병원입니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(HospitalDetailActivity.this, "즐겨찾기에 이미 추가된 병원입니다.", Toast.LENGTH_SHORT).show();
                         Log.d("Result Code", baseResult.getResultCode() + " ");
                     }
                 }
@@ -428,7 +450,7 @@ public class HospitalDetailActivity extends AppCompatActivity
 
             @Override
             public void onFailure(Call<BaseResult> call, Throwable t) {
-                Log.d("즐겨찾기", "즐겨찾기 등록 실패");
+                Toast.makeText(HospitalDetailActivity.this, "네트워크 문제로 즐겨찾기 추가 실패.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -436,7 +458,6 @@ public class HospitalDetailActivity extends AppCompatActivity
     @OnClick(R.id.blackButton)
     public void enrollBlack(){
         Black black = new Black(user.getUserId(), hospital.getNum());
-        Toast.makeText(this, "블랙리스트 등록", Toast.LENGTH_SHORT).show();
         Call<BaseResult> call = networkService.enrollBlackList(black);
         call.enqueue(new Callback<BaseResult>() {
             @Override
@@ -444,6 +465,7 @@ public class HospitalDetailActivity extends AppCompatActivity
                 if(response.isSuccessful()){
                     BaseResult baseResult = response.body();
                     if(baseResult.getResultCode() == 200){
+                        Toast.makeText(HospitalDetailActivity.this, "블랙리스트 추가 성공.", Toast.LENGTH_SHORT).show();
                         Log.d("블랙리스트", "블랙리스트 추가");
                     }
                     else if(baseResult.getResultCode() == 2000){
@@ -454,7 +476,7 @@ public class HospitalDetailActivity extends AppCompatActivity
 
             @Override
             public void onFailure(Call<BaseResult> call, Throwable t) {
-                Log.d("블랙리스트", "네트워크 문제로 블랙리스트 추가 실패");
+                Toast.makeText(HospitalDetailActivity.this, "네트워크 문제로 블랙리스트 추가 실패.", Toast.LENGTH_SHORT).show();
             }
         });
     }

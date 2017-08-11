@@ -1,4 +1,4 @@
-package com.example.kwy2868.finalproject.kakao;
+package com.example.kwy2868.finalproject.View;
 
 import android.Manifest;
 import android.content.Context;
@@ -17,24 +17,37 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
+import com.example.kwy2868.finalproject.Model.BaseResult;
+import com.example.kwy2868.finalproject.Model.GlobalData;
+import com.example.kwy2868.finalproject.Model.UserInfo;
 import com.example.kwy2868.finalproject.R;
+import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
+import com.example.kwy2868.finalproject.Retrofit.NetworkService;
 import com.example.kwy2868.finalproject.Util.LocationHelper;
+import com.example.kwy2868.finalproject.Util.ParsingHelper;
+import com.example.kwy2868.finalproject.kakao.KakaoSignupActivity;
 import com.kakao.auth.ISessionCallback;
 import com.kakao.auth.Session;
 import com.kakao.util.exception.KakaoException;
 import com.kakao.util.helper.log.Logger;
+import com.nhn.android.naverlogin.OAuthLogin;
+import com.nhn.android.naverlogin.OAuthLoginHandler;
+import com.nhn.android.naverlogin.ui.view.OAuthLoginButton;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 import static android.os.Build.VERSION_CODES.M;
 
 /**
@@ -51,7 +64,16 @@ public class LoginActivity extends AppCompatActivity implements LocationHelper {
     @BindView(R.id.loadingText)
     TextView loadingText;
 
-    // 콜백 선언.
+    // 로그인 버튼들 있는 레이아웃.
+    @BindView(R.id.loginButtons)
+    LinearLayout loginButtons;
+    // 네이버 로그인을 위해 필요.
+    @BindView(R.id.naverLoginButton)
+    OAuthLoginButton naverLoginButton;
+    private OAuthLogin oAuthLoginModule;
+    private static final String NAVER_LOGIN_URL = "https://openapi.naver.com/v1/nid/me";
+
+    // 카카오 로그인을 위한 콜백 선언.
     private SessionCallback callback;
 
     private Unbinder unbinder;
@@ -59,7 +81,6 @@ public class LoginActivity extends AppCompatActivity implements LocationHelper {
     private static final String IMG_URL = "";
     private static final int REQUEST_CODE = 0;
 
-    private static final boolean LOCATION_SET = false;
     private static final String LOCATION_TAG = "Current Location";
 
     private Location currentLocation;
@@ -95,6 +116,7 @@ public class LoginActivity extends AppCompatActivity implements LocationHelper {
         // 호출하지 않으면 로그인 버튼 눌러야 다음 화면으로 넘어간다.
 //        Session.getCurrentSession().checkAndImplicitOpen();
         backGroundSetting();
+        naverLoginInit();
 
         YoYo.with(Techniques.FadeIn)
                 .duration(1500).repeat(YoYo.INFINITE)
@@ -102,6 +124,34 @@ public class LoginActivity extends AppCompatActivity implements LocationHelper {
                 .playOn(loadingText);
 
         permissionCheck();
+    }
+
+    public void naverLoginInit(){
+        oAuthLoginModule = OAuthLogin.getInstance();
+        oAuthLoginModule.init(this,
+                getString(R.string.Client_ID),
+                getString(R.string.Client_Secret),
+                getString(R.string.Client_Name));
+
+        naverLoginButton.setOAuthLoginHandler(new OAuthLoginHandler() {
+            @Override
+            public void run(boolean b) {
+                if(b){
+                    final String token = oAuthLoginModule.getAccessToken(LoginActivity.this);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String response = oAuthLoginModule.requestApi( LoginActivity.this, token, NAVER_LOGIN_URL);
+                            Log.d("Naver Response", response);
+                            if(ParsingHelper.naverLoginResponseParsing(response))
+                                loginToServer(GlobalData.getUser());
+                            else
+                                Toast.makeText(LoginActivity.this, "로그인 실패 다시 시도하여 주세요.", Toast.LENGTH_SHORT).show();
+                        }
+                    }).start();
+                }
+            }
+        });
     }
 
     public void permissionCheck() {
@@ -256,9 +306,6 @@ public class LoginActivity extends AppCompatActivity implements LocationHelper {
                 Logger.e(exception);
             }
             setContentView(R.layout.activity_login);
-            if(Build.VERSION.SDK_INT >= L){
-                getWindow().setStatusBarColor(getResources().getColor(R.color.kakaoColor));
-            }
         }
     }
 
@@ -267,29 +314,52 @@ public class LoginActivity extends AppCompatActivity implements LocationHelper {
 //        Toast.makeText(this, "SignupActivity로", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, KakaoSignupActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        intent.putExtra(LOCATION_TAG, location);
+//        intent.putExtra(LOCATION_TAG, location);
 
         startActivity(intent);
         finish();
     }
 
+    public void redirectMainActivity(){
+    }
+
     public void afterLocationUpdated(Location location){
         Toast.makeText(getApplicationContext(), "현재 위치를 받아오는데 성공 했습니다.", Toast.LENGTH_SHORT).show();
 
-        currentLatitude = location.getLatitude();
-        currentLongitude = location.getLongitude();
-        Log.d("Latitude", "Latitude : " + currentLatitude);
-        Log.d("Longitude", "Longitude : " + currentLongitude);
+//        currentLatitude = location.getLatitude();
+//        currentLongitude = location.getLongitude();
+//        Log.d("Latitude", "Latitude : " + currentLatitude);
+//        Log.d("Longitude", "Longitude : " + currentLongitude);
         // 일반 쓰레드니까 따로 메소드로 빼주자.
-
-        currentLocation = new Location(LOCATION_TAG);
-        currentLocation.setLatitude(currentLatitude);
-        currentLocation.setLongitude(currentLongitude);
+        currentLocation = location;
+        GlobalData.setCurrentLocation(location);
+//        currentLocation.setLatitude(currentLatitude);
+//        currentLocation.setLongitude(currentLongitude);
         locationManager.removeUpdates(locationListener);
 
         // 여기서 UI 바꿔주자.
         loadingIndicator.setVisibility(View.GONE);
         loadingText.setVisibility(View.GONE);
+        loginButtons.setVisibility(View.VISIBLE);
+    }
+
+    public void loginToServer(final UserInfo user) {
+        NetworkService networkService = NetworkManager.getNetworkService();
+        Call<BaseResult> call = networkService.login(user);
+        call.enqueue(new Callback<BaseResult>() {
+            @Override
+            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+                if (response.isSuccessful()) {
+                    if (response.body().getResultCode() == 200)
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResult> call, Throwable t) {
+                Toast.makeText(LoginActivity.this, "네트워크 문제, 다시 로그인 해주세요.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     // 카카오 디벨로퍼 키 값을 등록하기 위해 자바로 받아오는 메소드.
