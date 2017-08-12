@@ -13,11 +13,11 @@
         <item
             android:id="@+id/nav_mypet"
             android:icon="@drawable/ic_account_box_black_24dp"
-            android:title="My Pet" />
+            android:title="Add Pet" />
         <item
             android:id="@+id/nav_mychart"
             android:icon="@drawable/ic_write_chart_black_24dp"
-            android:title="My Chart" />
+            android:title="Add Chart" />
     </group>
 
     <item android:title="Communicate">

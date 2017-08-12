@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 Copyright 2017 Harish Sridharan
 
 
@@ -18,14 +17,14 @@ limitations under the License.
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:layout_marginBottom="4dp"
-              android:layout_marginLeft="16dp"
-              android:layout_marginRight="16dp"
-              android:layout_marginTop="4dp"
-              android:background="@drawable/bg_card"
-              android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="4dp"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginTop="4dp"
+    android:background="@drawable/bg_card"
+    android:orientation="vertical"
 
 
     >
@@ -37,8 +36,7 @@ limitations under the License.
         android:background="@android:color/white"
         android:orientation="horizontal"
         android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        >
+        android:paddingRight="8dp">
 
 
         <LinearLayout
@@ -46,16 +44,14 @@ limitations under the License.
             android:layout_height="78dp"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingLeft="8dp"
-            >
+            android:paddingLeft="8dp">
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="6dp"
                 android:layout_marginBottom="3dp"
                 android:alpha="0.1"
-                android:background="@android:color/background_dark"
-                />
+                android:background="@android:color/background_dark" />
 
             <View
                 android:layout_width="match_parent"
@@ -63,8 +59,7 @@ limitations under the License.
                 android:layout_marginBottom="3dp"
                 android:layout_marginTop="3dp"
                 android:alpha="0.1"
-                android:background="@android:color/background_dark"
-                />
+                android:background="@android:color/background_dark" />
 
             <View
                 android:layout_width="match_parent"
@@ -72,8 +67,7 @@ limitations under the License.
                 android:layout_marginBottom="3dp"
                 android:layout_marginTop="3dp"
                 android:alpha="0.1"
-                android:background="@android:color/background_dark"
-                />
+                android:background="@android:color/background_dark" />
 
             <View
                 android:layout_width="match_parent"
@@ -81,8 +75,7 @@ limitations under the License.
                 android:layout_marginBottom="3dp"
                 android:layout_marginTop="3dp"
                 android:alpha="0.1"
-                android:background="@android:color/background_dark"
-                />
+                android:background="@android:color/background_dark" />
 
             <View
                 android:layout_width="match_parent"
@@ -90,8 +83,7 @@ limitations under the License.
                 android:layout_marginBottom="3dp"
                 android:layout_marginTop="3dp"
                 android:alpha="0.1"
-                android:background="@android:color/background_dark"
-                />
+                android:background="@android:color/background_dark" />
 
             <View
                 android:layout_width="match_parent"
@@ -99,16 +91,14 @@ limitations under the License.
                 android:layout_marginBottom="3dp"
                 android:layout_marginTop="3dp"
                 android:alpha="0.1"
-                android:background="@android:color/background_dark"
-                />
+                android:background="@android:color/background_dark" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="6dp"
                 android:layout_marginTop="3dp"
                 android:alpha="0.1"
-                android:background="@android:color/background_dark"
-                />
+                android:background="@android:color/background_dark" />
 
         </LinearLayout>
 
@@ -119,8 +109,7 @@ limitations under the License.
             android:layout_marginRight="8dp"
             android:alpha="0.1"
 
-            android:background="@android:color/background_dark"
-            />
+            android:background="@android:color/background_dark" />
 
     </LinearLayout>
 
@@ -130,8 +119,7 @@ limitations under the License.
         android:layout_marginBottom="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <View
             android:layout_width="match_parent"
@@ -139,8 +127,7 @@ limitations under the License.
             android:layout_marginBottom="3dp"
             android:layout_marginTop="6dp"
             android:alpha="0.1"
-            android:background="@android:color/background_dark"
-            />
+            android:background="@android:color/background_dark" />
 
         <View
             android:layout_width="match_parent"
@@ -148,8 +135,7 @@ limitations under the License.
             android:layout_marginBottom="3dp"
             android:layout_marginTop="3dp"
             android:alpha="0.1"
-            android:background="@android:color/background_dark"
-            />
+            android:background="@android:color/background_dark" />
 
         <View
             android:layout_width="match_parent"
@@ -157,8 +143,7 @@ limitations under the License.
             android:layout_marginBottom="3dp"
             android:layout_marginTop="3dp"
             android:alpha="0.1"
-            android:background="@android:color/background_dark"
-            />
+            android:background="@android:color/background_dark" />
 
 
     </LinearLayout>

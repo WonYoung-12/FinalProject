@@ -185,8 +185,10 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_blacklist) {
 
         } else if (id == R.id.nav_mypet) {
+            startActivity(new Intent(this, PetActivity.class));
 
         } else if (id == R.id.nav_mychart) {
+            // 메인은 종료 되지는 않는다.
             startActivity(new Intent(this, ChartActivity.class));
         } else if (id == R.id.nav_share) {
 

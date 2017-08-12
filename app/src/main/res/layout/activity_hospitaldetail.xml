@@ -13,7 +13,7 @@
             android:layout_height="match_parent">
 
             <LinearLayout
-                android:id="@+id/deteailContent"
+                android:id="@+id/detailContent"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -31,6 +31,13 @@
 
                 <!--여기는 사용자가 남기는 부분-->
                 <include layout="@layout/hospital_review" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:background="@color/colorPrimary"
+                    android:layout_margin="10dp"/>
+
                 <!--사용자 후기 보는 부분-->
                 <include layout="@layout/list_review"/>
 

@@ -177,6 +177,7 @@ public class SearchFragment extends Fragment
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
+                searchRefreshLayout.setRefreshing(false);
                 Log.d("실패", "실패");
             }
         });
@@ -197,6 +198,7 @@ public class SearchFragment extends Fragment
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
+                searchRefreshLayout.setRefreshing(false);
                 Log.d("실패", "실패");
             }
         });
@@ -217,6 +219,7 @@ public class SearchFragment extends Fragment
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
+                searchRefreshLayout.setRefreshing(false);
                 Log.d("실패", "실패");
             }
         });
