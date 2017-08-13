@@ -2,6 +2,7 @@ package com.example.kwy2868.finalproject.ViewHolder;
 
 import android.content.Intent;
 import android.os.Parcelable;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -13,6 +14,7 @@ import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.Hospital;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.View.HospitalDetailActivity;
+import com.example.kwy2868.finalproject.kakao.GlobalApplication;
 
 import org.parceler.Parcels;
 
@@ -27,6 +29,8 @@ import butterknife.OnClick;
  */
 
 public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    @BindView(R.id.hospitalCardView)
+    CardView hospitalCardView;
     @BindView(R.id.hospitalName)
     TextView hospitalName;
     @BindView(R.id.hospitalImage)
@@ -56,6 +60,9 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
 
     public void bind(int position) {
         Hospital hospital = hospitalList.get(position);
+        // TODO 우선은 테스트 위해 한명이라도 추가하면 배경 색 바꿔주자.
+        if(hospital.getBlackcount() >= 1)
+            hospitalCardView.setBackgroundColor(GlobalApplication.getAppContext().getColor(android.R.color.darker_gray));
         hospitalName.setText(hospital.getName());
         hospitalAddress.setText(hospital.getAddress());
         hospitalTel.setText(hospital.getTel());

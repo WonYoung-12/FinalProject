@@ -1,5 +1,6 @@
 package com.example.kwy2868.finalproject.View;
 
+
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -21,15 +22,24 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.kwy2868.finalproject.Adapter.ViewPagerAdapter;
+import com.example.kwy2868.finalproject.Model.Chart;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.UserInfo;
 import com.example.kwy2868.finalproject.R;
+import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
+import com.example.kwy2868.finalproject.Retrofit.NetworkService;
+import com.example.kwy2868.finalproject.Util.MyAlarmManager;
 import com.kakao.auth.Session;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 // 사실 LocationDelivery를 통해 위치 새로 받아올 필요는 없다..!
 // 그래도 프래그먼트를 가지고 있는 액티비티도 가지고 있어야 할 것 같고, 나중에 혹시 모르니까..!
@@ -74,9 +84,31 @@ public class MainActivity extends AppCompatActivity
         ButterKnife.bind(this);
 
         currentLocation = GlobalData.getCurrentLocation();
+
+        getChartListFromServer();
         viewPagerSetting();
         toolbarSetting();
         drawerSetting();
+    }
+
+    public void getChartListFromServer(){
+        NetworkService networkService = NetworkManager.getNetworkService();
+        Call<List<Chart>> call = networkService.getChartList(GlobalData.getUser().getUserId(), GlobalData.getUser().getFlag());
+        call.enqueue(new Callback<List<Chart>>() {
+            @Override
+            public void onResponse(Call<List<Chart>> call, Response<List<Chart>> response) {
+                if(response.isSuccessful()){
+                    GlobalData.setChartList(response.body());
+                    Log.d("차트리스트", GlobalData.getChartList() + "");
+                    MyAlarmManager.setAlarm();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Chart>> call, Throwable t) {
+
+            }
+        });
     }
 
     public void toolbarSetting() {
@@ -190,8 +222,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_mychart) {
             // 메인은 종료 되지는 않는다.
             startActivity(new Intent(this, ChartActivity.class));
-        } else if (id == R.id.nav_share) {
-
+        } else if (id == R.id.nav_setting) {
+            startActivity(new Intent(this, SettingActivity.class));
         } else if (id == R.id.nav_send) {
 
         }

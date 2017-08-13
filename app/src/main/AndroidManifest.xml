@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.kwy2868.finalproject">
 
     <!--네트워크 사용을 위해서 퍼미션 허용.-->
-    <uses-permission android:name="android.permission.INTERNET"/>
-    
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!--지도 활용을 위한 퍼미션 허용. -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
     <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
 
     <!--&lt;!&ndash;위치정보활용시 추가&ndash;&gt;<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>-->
@@ -28,11 +30,11 @@
 
         <meta-data
             android:name="com.kakao.sdk.AppKey"
-            android:value="@string/kakao_app_key"/>
+            android:value="@string/kakao_app_key" />
 
         <activity
-            android:theme="@style/AppTheme.NoActionBar"
-            android:name="com.example.kwy2868.finalproject.View.LoginActivity">
+            android:name="com.example.kwy2868.finalproject.View.LoginActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -43,10 +45,10 @@
         <!--네이버 로그인-->
         <activity
             android:name="com.nhn.android.naverlogin.ui.OAuthLoginActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name="com.nhn.android.naverlogin.ui.OAuthLoginInAppBrowserActivity"
-            android:label="OAuth2.0 In-app"/>
+            android:label="OAuth2.0 In-app" />
 
         <!--카카오 로그인-->
         <activity android:name="com.example.kwy2868.finalproject.kakao.KakaoSignupActivity">
@@ -55,11 +57,11 @@
 
         <activity
             android:name="com.example.kwy2868.finalproject.View.MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:launchMode="singleTop"
             android:excludeFromRecents="true"
-            android:taskAffinity="">
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:taskAffinity=""
+            android:theme="@style/AppTheme.NoActionBar">
 
         </activity>
 
@@ -81,6 +83,13 @@
 
         </activity>
 
+        <activity
+            android:name=".View.SettingActivity"
+            android:theme="@style/AppTheme">
+
+        </activity>
+
+        <receiver android:name=".Util.AlarmReceiver"/>
     </application>
 
 </manifest>

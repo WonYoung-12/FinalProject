@@ -26,6 +26,9 @@ public class ParsingHelper {
     private static final int CAFE = 1;
     private static final int KIN = 2;
 
+    // 네이버 로그인 것을 위한 flag 값.
+    private static final int NAVER_FLAG = 0;
+
     private static Gson gson = new Gson();
     private static JsonParser jsonParser = new JsonParser();
 
@@ -70,7 +73,7 @@ public class ParsingHelper {
             long userId = jsonObject.get("id").getAsLong();
             String nickname = jsonObject.get("nickname").getAsString();
             String thumbnailImagePath = jsonObject.get("profile_image").getAsString();
-            GlobalData.setUser(new UserInfo(email, userId, nickname, thumbnailImagePath));
+            GlobalData.setUser(new UserInfo(email, userId, nickname, thumbnailImagePath, NAVER_FLAG));
 
             return true;
         }

@@ -87,5 +87,8 @@ dependencies {
     // Float Labeled EditText 사용.
     compile 'com.wrapp.floatlabelededittext:library:0.0.6'
 
+    // Alerter 사용.
+    compile 'com.tapadoo.android:alerter:2.0.0'
+
     testCompile 'junit:junit:4.12'
 }

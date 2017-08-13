@@ -137,7 +137,8 @@ public class DistanceFragment extends Fragment
 
             @Override
             public void onFailure(Call<List<Hospital>> call, Throwable t) {
-                distanceRefreshLayout.setRefreshing(false);
+                if(distanceRefreshLayout != null)
+                    distanceRefreshLayout.setRefreshing(false);
             }
         });
     }
@@ -309,4 +310,11 @@ public class DistanceFragment extends Fragment
 //            });
 //        }
 //    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // 이래야 얘도 블랙리스트 추가했을 때 제대로 반영이 되겠지?
+        getEveryHospitalFromServer();
+    }
 }

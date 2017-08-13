@@ -320,9 +320,6 @@ public class LoginActivity extends AppCompatActivity implements LocationHelper {
         finish();
     }
 
-    public void redirectMainActivity(){
-    }
-
     public void afterLocationUpdated(Location location){
         Toast.makeText(getApplicationContext(), "현재 위치를 받아오는데 성공 했습니다.", Toast.LENGTH_SHORT).show();
 

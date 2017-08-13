@@ -40,6 +40,8 @@ public class KakaoSignupActivity extends Activity {
     private static final String USER = "User";
 
     private static final String LOCATION_TAG = "Current Location";
+    private static final int KAKAO_FLAG = 1;
+
     private Location currentLocation;
     /**
      * Main으로 넘길지 가입 페이지를 그릴지 판단하기 위해 me를 호출한다.
@@ -103,7 +105,7 @@ public class KakaoSignupActivity extends Activity {
                 Log.d("UserImagePath", result.getThumbnailImagePath() + " ");
 
                 // 유저 세팅.
-                UserInfo user = new UserInfo(result.getEmail(), result.getId(), result.getNickname(), result.getThumbnailImagePath());
+                UserInfo user = new UserInfo(result.getEmail(), result.getId(), result.getNickname(), result.getThumbnailImagePath(), KAKAO_FLAG);
                 GlobalData.setUser(user);
                 Log.d("유저", "User : " + user.toString());
                 loginToServer(user);

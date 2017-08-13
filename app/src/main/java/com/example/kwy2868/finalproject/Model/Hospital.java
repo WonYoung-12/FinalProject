@@ -18,6 +18,8 @@ public class Hospital implements Comparable<Hospital>{
     private double latitude;
     // 지도 활용을 위한 경도 값. Naver에서는 X로.
     private double longitude;
+    // 모든 사용자가 등록한 블랙리스트 수.
+    private int blackcount;
 
     // 현재위치부터 병원까지의 거리.
     private float distanceFromCurrentLocation;
@@ -77,6 +79,14 @@ public class Hospital implements Comparable<Hospital>{
     // set 하면서 km 단위로 바꾸어주자.
     public void setDistanceFromCurrentLocation(float distanceFromCurrentLocation) {
         this.distanceFromCurrentLocation = distanceFromCurrentLocation / 1000;
+    }
+
+    public int getBlackcount() {
+        return blackcount;
+    }
+
+    public void setBlackcount(int blackcount) {
+        this.blackcount = blackcount;
     }
 
     @Override

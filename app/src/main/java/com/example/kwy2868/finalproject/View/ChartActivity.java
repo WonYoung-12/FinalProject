@@ -12,9 +12,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.Chart;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.R;
+import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
+import com.example.kwy2868.finalproject.Retrofit.NetworkService;
 import com.kunzisoft.switchdatetime.SwitchDateTimeDialogFragment;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
@@ -30,6 +33,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by kwy2868 on 2017-08-11.
@@ -171,10 +177,27 @@ public class ChartActivity extends AppCompatActivity implements OnDateSelectedLi
         String title = inputChartTitle.getText().toString();
         String description = inputChartDescription.getText().toString();
 
-        Chart chart = new Chart(petName, GlobalData.getUser().getUserId(), treatmentDate, reTreatmentDate, title, description);
+        Chart chart = new Chart(petName, GlobalData.getUser().getUserId(), GlobalData.getUser().getFlag(), treatmentDate, reTreatmentDate, title, description);
         GlobalData.getChartDBHelper().addChart(chart);
         Toast.makeText(this, "정상적으로 차트를 등록하였습니다.", Toast.LENGTH_SHORT).show();
 
+
+        NetworkService networkService = NetworkManager.getNetworkService();
+        Call<BaseResult> call = networkService.writeChart(chart);
+        call.enqueue(new Callback<BaseResult>() {
+            @Override
+            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getResultCode() == 200)
+                        Toast.makeText(ChartActivity.this, "차트 작성 성공", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResult> call, Throwable t) {
+
+            }
+        });
         finish();
     }
 

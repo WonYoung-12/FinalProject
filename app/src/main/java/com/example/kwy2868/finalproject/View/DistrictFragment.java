@@ -133,4 +133,13 @@ public class DistrictFragment extends Fragment implements AdapterView.OnItemSele
         Log.d("갱신하자", "갱신하자");
         getHospitalList(currentDistrict);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(currentDistrict != null){
+            Log.d("Back from detail", "다른 액티비티 다녀옴");
+            getHospitalList(currentDistrict);
+        }
+    }
 }

@@ -6,6 +6,8 @@ import com.example.kwy2868.finalproject.Util.ChartDBHelper;
 import com.example.kwy2868.finalproject.Util.PetDBHelper;
 import com.example.kwy2868.finalproject.kakao.GlobalApplication;
 
+import java.util.List;
+
 /**
  * Created by kwy2868 on 2017-08-11.
  */
@@ -15,6 +17,7 @@ public class GlobalData {
     private static Location currentLocation;
     private static ChartDBHelper chartDBHelper = new ChartDBHelper(GlobalApplication.getAppContext(), null, null, 1);
     private static PetDBHelper petDBHelper = new PetDBHelper(GlobalApplication.getAppContext(), null, null, 1);
+    private static List<Chart> chartList;
 
     public static UserInfo getUser() {
         return user;
@@ -38,5 +41,13 @@ public class GlobalData {
 
     public static PetDBHelper getPetDBHelper() {
         return petDBHelper;
+    }
+
+    public static List<Chart> getChartList() {
+        return chartList;
+    }
+
+    public static void setChartList(List<Chart> chartList) {
+        GlobalData.chartList = chartList;
     }
 }

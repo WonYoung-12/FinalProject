@@ -2,9 +2,11 @@ package com.example.kwy2868.finalproject.Retrofit;
 
 import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.Black;
+import com.example.kwy2868.finalproject.Model.Chart;
 import com.example.kwy2868.finalproject.Model.Favorite;
 import com.example.kwy2868.finalproject.Model.GetReviewResult;
 import com.example.kwy2868.finalproject.Model.Hospital;
+import com.example.kwy2868.finalproject.Model.Pet;
 import com.example.kwy2868.finalproject.Model.Review;
 import com.example.kwy2868.finalproject.Model.UserInfo;
 import com.example.kwy2868.finalproject.Model.WriteResult;
@@ -60,4 +62,17 @@ public interface NetworkService {
 
     @GET("getBlackList")
     Call<List<Black>> getBlackList(@Query("userId") long userId);
+
+    @POST("writeChart")
+    Call<BaseResult> writeChart(@Body Chart chart);
+
+    @POST("enrollPet")
+    Call<BaseResult> enrollPet(@Body Pet pet);
+
+    // 사용자의 알람 세팅이 변경되게 해주자.
+    @POST("changeAlarmSetting")
+    Call<BaseResult> changeAlarmSetting(@Body UserInfo userInfo);
+
+    @GET("getChartList")
+    Call<List<Chart>> getChartList(@Query("userId") long userId, @Query("flag") int flag);
 }
