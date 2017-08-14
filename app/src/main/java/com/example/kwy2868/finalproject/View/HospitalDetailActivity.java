@@ -10,6 +10,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import com.andexert.expandablelayout.library.ExpandableLayout;
 import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
+import com.example.kwy2868.finalproject.Adapter.DialogAdapter;
 import com.example.kwy2868.finalproject.Adapter.ReviewAdapter;
 import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.Black;
@@ -32,9 +34,10 @@ import com.example.kwy2868.finalproject.Model.WriteResult;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
-import com.example.kwy2868.finalproject.Util.CustomDialog;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.OnItemClickListener;
 
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
@@ -301,8 +304,22 @@ public class HospitalDetailActivity extends AppCompatActivity
     @Override
     public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem) {
         if(isSetLocation){
-            CustomDialog customDialog = new CustomDialog(this, currentLatitude, currentLongitude, hospital.getLatitude(), hospital.getLongitude());
-            customDialog.show();
+            DialogPlus dialogPlus = DialogPlus.newDialog(this)
+                    .setAdapter(new DialogAdapter(this))
+                    .setOnItemClickListener(new OnItemClickListener() {
+                        @Override
+                        public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+
+                        }
+                    })
+                    .setExpanded(true)
+                    .setGravity(Gravity.CENTER)
+                    .setCancelable(true)
+                    .create();
+            dialogPlus.show();
+
+//            CustomDialog customDialog = new CustomDialog(this, currentLatitude, currentLongitude, hospital.getLatitude(), hospital.getLongitude());
+//            customDialog.show();
         }
         else{
             Toast.makeText(this, "현재 위치를 가져오는 중입니다. 잠시만 기다려 주세요.", Toast.LENGTH_SHORT).show();

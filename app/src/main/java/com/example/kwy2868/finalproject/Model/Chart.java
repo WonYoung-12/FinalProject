@@ -5,6 +5,7 @@ package com.example.kwy2868.finalproject.Model;
  */
 
 public class Chart {
+    private int num;
     private String petName;
     private long userId;
     // 사용자가 네이버 로그인인지 카카오 로그인인지 구분.
@@ -22,6 +23,14 @@ public class Chart {
         this.reTreatmentDate = reTreatmentDate;
         this.title = title;
         this.description = description;
+    }
+
+    public int getNum() {
+        return num;
+    }
+
+    public void setNum(int num) {
+        this.num = num;
     }
 
     public long getUserId() {

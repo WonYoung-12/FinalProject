@@ -23,8 +23,8 @@ import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.GlobalData;
+import com.example.kwy2868.finalproject.Model.LoginResult;
 import com.example.kwy2868.finalproject.Model.UserInfo;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
@@ -67,6 +67,7 @@ public class LoginActivity extends AppCompatActivity implements LocationHelper {
     // 로그인 버튼들 있는 레이아웃.
     @BindView(R.id.loginButtons)
     LinearLayout loginButtons;
+
     // 네이버 로그인을 위해 필요.
     @BindView(R.id.naverLoginButton)
     OAuthLoginButton naverLoginButton;
@@ -135,13 +136,14 @@ public class LoginActivity extends AppCompatActivity implements LocationHelper {
 
         naverLoginButton.setOAuthLoginHandler(new OAuthLoginHandler() {
             @Override
-            public void run(boolean b) {
-                if(b){
+            public void run(boolean isSuccess) {
+                if(isSuccess){
                     final String token = oAuthLoginModule.getAccessToken(LoginActivity.this);
+
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            String response = oAuthLoginModule.requestApi( LoginActivity.this, token, NAVER_LOGIN_URL);
+                            String response = oAuthLoginModule.requestApi(LoginActivity.this, token, NAVER_LOGIN_URL);
                             Log.d("Naver Response", response);
                             if(ParsingHelper.naverLoginResponseParsing(response))
                                 loginToServer(GlobalData.getUser());
@@ -342,18 +344,20 @@ public class LoginActivity extends AppCompatActivity implements LocationHelper {
 
     public void loginToServer(final UserInfo user) {
         NetworkService networkService = NetworkManager.getNetworkService();
-        Call<BaseResult> call = networkService.login(user);
-        call.enqueue(new Callback<BaseResult>() {
+        Call<LoginResult> call = networkService.login(user);
+        call.enqueue(new Callback<LoginResult>() {
             @Override
-            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+            public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
                 if (response.isSuccessful()) {
-                    if (response.body().getResultCode() == 200)
+                    if (response.body().getResultCode() == 200) {
+                        user.setNotiFlag(response.body().getNotiFlag());
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    }
                 }
             }
 
             @Override
-            public void onFailure(Call<BaseResult> call, Throwable t) {
+            public void onFailure(Call<LoginResult> call, Throwable t) {
                 Toast.makeText(LoginActivity.this, "네트워크 문제, 다시 로그인 해주세요.", Toast.LENGTH_SHORT).show();
             }
         });

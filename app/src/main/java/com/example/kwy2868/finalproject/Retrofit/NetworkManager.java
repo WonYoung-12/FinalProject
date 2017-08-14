@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class NetworkManager extends BaseManager {
-    private static final String IPADDRESS = "192.168.0.13";
+    private static final String IPADDRESS = "203.252.166.230";
     private static final String PORT = "3000";
     private static NetworkService networkService;
 

@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import com.example.kwy2868.finalproject.Model.CafeArticle;
 import com.example.kwy2868.finalproject.R;
+import com.example.kwy2868.finalproject.Util.SearchResultClickListener;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ import butterknife.ButterKnife;
  * Created by kwy2868 on 2017-08-03.
  */
 
-public class CafeArticleViewHolder extends RecyclerView.ViewHolder {
+public class CafeArticleViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
     @BindView(R.id.contentTitle)
     TextView contentTitle;
     @BindView(R.id.contentLink)
@@ -29,11 +30,13 @@ public class CafeArticleViewHolder extends RecyclerView.ViewHolder {
     TextView cafeUrl;
 
     private List<CafeArticle> cafeArticleList;
+    private SearchResultClickListener searchResultClickListener;
 
     public CafeArticleViewHolder(View itemView, List<CafeArticle> cafeArticleList) {
         super(itemView);
         this.cafeArticleList = cafeArticleList;
         ButterKnife.bind(this, itemView);
+        itemView.setOnClickListener(this);
     }
 
     public void bind(int position){
@@ -43,5 +46,12 @@ public class CafeArticleViewHolder extends RecyclerView.ViewHolder {
         contentDescription.setText(cafeArticle.getDescription());
         cafeName.setText(cafeArticle.getCafename());
         cafeUrl.setText(cafeArticle.getCafeurl());
+    }
+
+    @Override
+    public void onClick(View view) {
+        int position = getAdapterPosition();
+        searchResultClickListener = new SearchResultClickListener(cafeArticleList.get(position));
+        searchResultClickListener.itemClick();
     }
 }

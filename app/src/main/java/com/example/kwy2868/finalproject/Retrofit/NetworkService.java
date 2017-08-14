@@ -6,6 +6,7 @@ import com.example.kwy2868.finalproject.Model.Chart;
 import com.example.kwy2868.finalproject.Model.Favorite;
 import com.example.kwy2868.finalproject.Model.GetReviewResult;
 import com.example.kwy2868.finalproject.Model.Hospital;
+import com.example.kwy2868.finalproject.Model.LoginResult;
 import com.example.kwy2868.finalproject.Model.Pet;
 import com.example.kwy2868.finalproject.Model.Review;
 import com.example.kwy2868.finalproject.Model.UserInfo;
@@ -25,7 +26,7 @@ import retrofit2.http.Query;
  */
 public interface NetworkService {
     @POST("login")
-    Call<BaseResult> login(@Body UserInfo userInfo);
+    Call<LoginResult> login(@Body UserInfo userInfo);
 
     // 지역별로 볼 때 인자를 바꿔주자.
     @GET("hospital")

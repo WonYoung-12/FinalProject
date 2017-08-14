@@ -90,5 +90,18 @@ dependencies {
     // Alerter 사용.
     compile 'com.tapadoo.android:alerter:2.0.0'
 
+    // EventBus 사용.
+    compile 'org.greenrobot:eventbus:3.0.0'
+
+    // customtabs 사용.
+    compile 'com.android.support:customtabs:26.+'
+
+    // dialogplus 사용.
+    compile 'com.orhanobut:dialogplus:1.11@aar'
+
+    // Firebase crash
+    compile 'com.google.firebase:firebase-crash:10.0.1'
+
     testCompile 'junit:junit:4.12'
 }
+apply plugin: 'com.google.gms.google-services'

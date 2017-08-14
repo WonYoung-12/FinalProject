@@ -13,6 +13,6 @@
         android:textColor="@color/white"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:background="@color/navHeaderColor"
+        android:background="@color/colorPrimaryDark"
         android:gravity="center"/>
 </RelativeLayout>

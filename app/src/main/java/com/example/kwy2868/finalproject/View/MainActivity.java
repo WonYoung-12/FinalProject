@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.kwy2868.finalproject.Adapter.ViewPagerAdapter;
+import com.example.kwy2868.finalproject.Model.AlarmEvent;
 import com.example.kwy2868.finalproject.Model.Chart;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.UserInfo;
@@ -29,7 +30,11 @@ import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
 import com.example.kwy2868.finalproject.Util.MyAlarmManager;
-import com.kakao.auth.Session;
+import com.tapadoo.alerter.Alerter;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
@@ -84,31 +89,13 @@ public class MainActivity extends AppCompatActivity
         ButterKnife.bind(this);
 
         currentLocation = GlobalData.getCurrentLocation();
+        GlobalData.setContext(this);
 
+        Log.d("Noti Flag", GlobalData.getUser().getNotiFlag() + " ");
         getChartListFromServer();
         viewPagerSetting();
         toolbarSetting();
         drawerSetting();
-    }
-
-    public void getChartListFromServer(){
-        NetworkService networkService = NetworkManager.getNetworkService();
-        Call<List<Chart>> call = networkService.getChartList(GlobalData.getUser().getUserId(), GlobalData.getUser().getFlag());
-        call.enqueue(new Callback<List<Chart>>() {
-            @Override
-            public void onResponse(Call<List<Chart>> call, Response<List<Chart>> response) {
-                if(response.isSuccessful()){
-                    GlobalData.setChartList(response.body());
-                    Log.d("차트리스트", GlobalData.getChartList() + "");
-                    MyAlarmManager.setAlarm();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Chart>> call, Throwable t) {
-
-            }
-        });
     }
 
     public void toolbarSetting() {
@@ -162,15 +149,46 @@ public class MainActivity extends AppCompatActivity
             tabLayout.getTabAt(i).setIcon(tabIcons[i]);
     }
 
-    // 앱을 종료하면 로그아웃 처리되서 실행 시마다 로그인을 할 수 있다.
+    public void getChartListFromServer() {
+        NetworkService networkService = NetworkManager.getNetworkService();
+        Call<List<Chart>> call = networkService.getChartList(GlobalData.getUser().getUserId(), GlobalData.getUser().getFlag());
+        call.enqueue(new Callback<List<Chart>>() {
+            @Override
+            public void onResponse(Call<List<Chart>> call, Response<List<Chart>> response) {
+                if (response.isSuccessful()) {
+                    GlobalData.setChartList(response.body());
+                    Log.d("차트리스트", GlobalData.getChartList() + "");
+                    MyAlarmManager.setAlarm();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Chart>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onAlarmEvent(AlarmEvent alarmEvent) {
+        Log.d("Alerter", "Alerter");
+        Alerter.create(this)
+                .setTitle(alarmEvent.getTitle())
+                .setBackgroundColorInt(R.color.alert_default_icon_color)
+                .setText(alarmEvent.getDescription())
+                .show();
+    }
+
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Toast.makeText(this, "onDestroy()", Toast.LENGTH_SHORT).show();
-        Log.d("Session Test", Session.getCurrentSession() + " ");
-        Session session = Session.getCurrentSession();
-//         이거하면 로그아웃 할때마다?
-//        session.close();
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -285,4 +303,12 @@ public class MainActivity extends AppCompatActivity
         currentLocation.setLatitude(latitude);
         currentLocation.setLongitude(longitude);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getChartListFromServer();
+    }
+
+
 }

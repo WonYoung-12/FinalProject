@@ -9,8 +9,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.GlobalData;
+import com.example.kwy2868.finalproject.Model.LoginResult;
 import com.example.kwy2868.finalproject.Model.UserInfo;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
@@ -115,18 +115,20 @@ public class KakaoSignupActivity extends Activity {
 
     public void loginToServer(final UserInfo user) {
         NetworkService networkService = NetworkManager.getNetworkService();
-        Call<BaseResult> call = networkService.login(user);
-        call.enqueue(new Callback<BaseResult>() {
+        Call<LoginResult> call = networkService.login(user);
+        call.enqueue(new Callback<LoginResult>() {
             @Override
-            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+            public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
                 if (response.isSuccessful()) {
-                    if (response.body().getResultCode() == 200)
+                    if (response.body().getResultCode() == 200){
+                        user.setNotiFlag(response.body().getNotiFlag());
                         redirectMainActivity(user);
+                    }
                 }
             }
 
             @Override
-            public void onFailure(Call<BaseResult> call, Throwable t) {
+            public void onFailure(Call<LoginResult> call, Throwable t) {
                 Toast.makeText(KakaoSignupActivity.this, "네트워크 문제, 다시 로그인 해주세요.", Toast.LENGTH_SHORT).show();
                 redirectLoginActivity();
             }

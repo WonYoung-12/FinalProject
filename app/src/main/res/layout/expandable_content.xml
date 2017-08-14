@@ -16,6 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/review_title_hint"
+            android:textColorHint="@color/white"
             android:inputType="text"
             android:lines="1"
             android:maxLines="1" />
@@ -26,6 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/cost_hint"
+            android:textColorHint="@color/white"
             android:inputType="number"
             android:lines="1"
             android:maxLines="1" />
@@ -44,6 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/treatment_hint"
+            android:textColorHint="@color/white"
             android:inputType="textMultiLine"
             android:lines="5"
             android:maxLength="300" />

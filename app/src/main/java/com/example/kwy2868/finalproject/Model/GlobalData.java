@@ -1,5 +1,6 @@
 package com.example.kwy2868.finalproject.Model;
 
+import android.content.Context;
 import android.location.Location;
 
 import com.example.kwy2868.finalproject.Util.ChartDBHelper;
@@ -13,11 +14,20 @@ import java.util.List;
  */
 
 public class GlobalData {
+    private static Context context;
     private static UserInfo user;
     private static Location currentLocation;
     private static ChartDBHelper chartDBHelper = new ChartDBHelper(GlobalApplication.getAppContext(), null, null, 1);
     private static PetDBHelper petDBHelper = new PetDBHelper(GlobalApplication.getAppContext(), null, null, 1);
     private static List<Chart> chartList;
+
+    public static Context getContext() {
+        return context;
+    }
+
+    public static void setContext(Context context) {
+        GlobalData.context = context;
+    }
 
     public static UserInfo getUser() {
         return user;
