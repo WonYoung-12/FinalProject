@@ -99,6 +99,9 @@ dependencies {
     // dialogplus 사용.
     compile 'com.orhanobut:dialogplus:1.11@aar'
 
+    // circleimageview 사용.
+    compile 'de.hdodenhof:circleimageview:2.1.0'
+
     // Firebase crash
     compile 'com.google.firebase:firebase-crash:10.0.1'
 

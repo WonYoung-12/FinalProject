@@ -55,6 +55,9 @@ public class DistanceFragment extends Fragment
     private RecyclerView.LayoutManager layoutManager;
     private HospitalAdapter hospitalAdapter;
 
+    // 처음 실행되는지 체크하는 함수. 이걸로 처음에 막아야 Refresh에서 현재위치 다시 안받아올 수 있다.
+    private boolean isFirst = true;
+
     private static final int REQUEST_CODE = 0;
     private static final int CLOSEST = 0;
     private static final int FURTHERMOST = 14;
@@ -315,6 +318,12 @@ public class DistanceFragment extends Fragment
     public void onResume() {
         super.onResume();
         // 이래야 얘도 블랙리스트 추가했을 때 제대로 반영이 되겠지?
-        getEveryHospitalFromServer();
+        // 처음 만들어져서 onCreate 타면 두번 호출 되니까 막아주자.
+        if(isFirst) {
+            isFirst = !isFirst;
+        }
+        else{
+            getEveryHospitalFromServer();
+        }
     }
 }

@@ -147,11 +147,7 @@ public class HospitalDetailActivity extends AppCompatActivity
         currentLocation = GlobalData.getCurrentLocation();
         currentLatitude = currentLocation.getLatitude();
         currentLongitude = currentLocation.getLongitude();
-//        user = Parcels.unwrap(intent.getParcelableExtra(USER_TAG));
-//        currentLocation = intent.getParcelableExtra(LOCATION_TAG);
-//
-//        currentLatitude = currentLocation.getLatitude();
-//        currentLongitude = currentLocation.getLongitude();
+        isSetLocation = !isSetLocation;
 
         setHospitalDataOnView();
         mapSetting();

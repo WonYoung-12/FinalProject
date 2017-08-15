@@ -41,8 +41,8 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
     TextView hospitalTel;
     @BindView(R.id.distance)
     TextView distance;
-    @BindView(R.id.checkbox)
-    CheckBox checkBox;
+//    @BindView(R.id.checkbox)
+//    CheckBox checkBox;
 
     private static final String HOSPITAL_TAG = "Hospital";
     private static final String USER_TAG = "User";
@@ -68,17 +68,17 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
         hospitalTel.setText(hospital.getTel());
         // TODO 이 방식 야매인것 같다.. 나중에 고쳐보자
         if(hospital.getDistanceFromCurrentLocation() == 0.0){
-            distance.setVisibility(View.INVISIBLE);
+            distance.setVisibility(View.GONE);
         }
         else{
             distance.setText(hospital.getDistanceFromCurrentLocation() + "");
         }
     }
 
-    @OnClick(R.id.checkbox)
-    public void checkBoxClick() {
-        Log.d("체크박스", "체크박스 설정했다가 풀었다가");
-    }
+//    @OnClick(R.id.checkbox)
+//    public void checkBoxClick() {
+//        Log.d("체크박스", "체크박스 설정했다가 풀었다가");
+//    }
 
     @Override
     public void onClick(View view) {
