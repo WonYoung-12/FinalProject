@@ -4,6 +4,7 @@ package com.example.kwy2868.finalproject.View;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -25,6 +26,7 @@ import com.example.kwy2868.finalproject.Adapter.ViewPagerAdapter;
 import com.example.kwy2868.finalproject.Model.AlarmEvent;
 import com.example.kwy2868.finalproject.Model.Chart;
 import com.example.kwy2868.finalproject.Model.GlobalData;
+import com.example.kwy2868.finalproject.Model.Pet;
 import com.example.kwy2868.finalproject.Model.UserInfo;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
@@ -36,12 +38,17 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -82,6 +89,8 @@ public class MainActivity extends AppCompatActivity
 
     private static final int FRAGMENT_COUNT = 3;
 
+    private boolean isFirst = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,8 +100,8 @@ public class MainActivity extends AppCompatActivity
         currentLocation = GlobalData.getCurrentLocation();
         GlobalData.setContext(this);
 
-        Log.d("Noti Flag", GlobalData.getUser().getNotiFlag() + " ");
         getChartListFromServer();
+        getPetListFromServer();
         viewPagerSetting();
         toolbarSetting();
         drawerSetting();
@@ -110,7 +119,6 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         final ImageView userImage = navigationView.getHeaderView(0).findViewById(R.id.userImage);
-        Log.d("유저 이미지뷰 널 테스트", userImage + " ");
         TextView userNickname = navigationView.getHeaderView(0).findViewById(R.id.userNickname);
         TextView userEmail = navigationView.getHeaderView(0).findViewById(R.id.userEmail);
 
@@ -119,7 +127,6 @@ public class MainActivity extends AppCompatActivity
                 .centerCrop().bitmapTransform(new CropCircleTransformation(this))
                 .into(userImage);
         userNickname.setText(user.getNickname());
-        Log.d("유저 이메일 널 테스트", user.getEmail() + " ");
         userEmail.setText(user.getEmail());
         navigationView.setNavigationItemSelectedListener(this);
     }
@@ -150,6 +157,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void getChartListFromServer() {
+        Log.d("차트 리스트 가져온다", "가져온다");
         NetworkService networkService = NetworkManager.getNetworkService();
         Call<List<Chart>> call = networkService.getChartList(GlobalData.getUser().getUserId(), GlobalData.getUser().getFlag());
         call.enqueue(new Callback<List<Chart>>() {
@@ -169,12 +177,102 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    public void getPetListFromServer(){
+        Log.d("펫 리스트 가져온다", "가져온다");
+        final NetworkService networkService = NetworkManager.getNetworkService();
+        Call<List<Pet>> call = networkService.getPetList(GlobalData.getUser().getUserId(), GlobalData.getUser().getFlag());
+        call.enqueue(new Callback<List<Pet>>() {
+            @Override
+            public void onResponse(Call<List<Pet>> call, Response<List<Pet>> response) {
+                if(response.isSuccessful()){
+                    List<Pet> petList = response.body();
+                    GlobalData.setPetList(petList);
+                    System.out.println("이미지들");
+                    for(int i=0; i<petList.size(); i++){
+                        final Pet pet = petList.get(i);
+                        System.out.println(pet.getImagePath());
+                        // 등록된 경로가 있으면 이미지 받아오자.
+                        if(!(pet.getImagePath() == null || pet.getImagePath().trim().equals(""))){
+                            Call<ResponseBody> imageCall = networkService.getPetImage(pet.getImagePath());
+                            imageCall.enqueue(new Callback<ResponseBody>() {
+                                @Override
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                    if(response.isSuccessful()){
+                                        File imgFile = convertToFile(response.body(), pet.getImagePath());
+                                        pet.setImgFile(imgFile);
+                                        Log.d("이미지 가져옴", "가져왔다");
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                    Log.d("이미지 못 가져옴", "못 가져왔다.");
+                                    t.printStackTrace();
+                                }
+                            });
+                            Log.d("이미지 경로", pet.getImagePath());
+                        }
+                    }
+                    Log.d("펫 리스트 받아옴", "펫 리스트 받아왔다");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Pet>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public File convertToFile(ResponseBody responseBody, String imgPath){
+        try{
+            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            File img = new File(path, "/" + imgPath);
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            int read;
+
+            try{
+                byte[] fileReader = new byte[4096];
+
+                long fileSize = responseBody.contentLength();
+                long fileSizeDownloaded = 0;
+
+                inputStream = responseBody.byteStream();
+                outputStream = new FileOutputStream(img);
+
+                while((read = inputStream.read(fileReader)) != -1){
+
+                    outputStream.write(fileReader, 0, read);
+                    fileSizeDownloaded += read;
+
+                    Log.d("다운로드", "file download : " + fileSizeDownloaded + " of " + fileSize);
+                }
+                outputStream.flush();
+
+                return img;
+            }catch (IOException e){
+                e.printStackTrace();
+                return null;
+            }
+            finally {
+                if(inputStream != null)
+                    inputStream.close();
+                if(outputStream != null)
+                    outputStream.close();
+            }
+        }catch(IOException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onAlarmEvent(AlarmEvent alarmEvent) {
         Log.d("Alerter", "Alerter");
         Alerter.create(this)
                 .setTitle(alarmEvent.getTitle())
-                .setBackgroundColorInt(R.color.alert_default_icon_color)
+                .setBackgroundColorInt(getResources().getColor(R.color.alert_default_icon_color, null))
                 .setText(alarmEvent.getDescription())
                 .show();
     }
@@ -235,11 +333,11 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_blacklist) {
 
         } else if (id == R.id.nav_mypet) {
-            startActivity(new Intent(this, PetActivity.class));
+            startActivity(new Intent(this, AddPetActivity.class));
 
         } else if (id == R.id.nav_mychart) {
             // 메인은 종료 되지는 않는다.
-            startActivity(new Intent(this, ChartActivity.class));
+            startActivity(new Intent(this, AddChartActivity.class));
         } else if (id == R.id.nav_setting) {
             startActivity(new Intent(this, SettingActivity.class));
         } else if (id == R.id.nav_send) {
@@ -291,13 +389,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @OnClick(R.id.fab)
-    public void floatingButtonClick() {
-        Snackbar.make(getCurrentFocus(), "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
-        Toast.makeText(this, "플로팅 버튼 클릭.", Toast.LENGTH_SHORT).show();
-    }
-
     @Override
     public void locationDeliver(Double latitude, Double longitude) {
         currentLocation.setLatitude(latitude);
@@ -307,8 +398,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        getChartListFromServer();
+        // onCreate에서 호출 되고 onResume에서도 호출되는 것을 막아준다.
+        if(isFirst) {
+            isFirst = !isFirst;
+        }
+        else{
+            getChartListFromServer();
+            getPetListFromServer();
+        }
     }
-
-
 }

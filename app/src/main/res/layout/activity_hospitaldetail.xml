@@ -75,5 +75,14 @@
             fab:fab_colorNormal="@color/pink"
             fab:fab_colorPressed="@color/pink_pressed"/>
 
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/ratingButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_title="별점 주기"
+            fab:fab_icon="@mipmap/ic_grade"
+            fab:fab_colorNormal="@color/pink"
+            fab:fab_colorPressed="@color/pink_pressed"/>
+
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 </android.support.design.widget.CoordinatorLayout>

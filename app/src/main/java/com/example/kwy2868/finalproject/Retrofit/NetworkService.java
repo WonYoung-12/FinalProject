@@ -84,5 +84,15 @@ public interface NetworkService {
 
     @Multipart
     @POST("addPetImage")
-    Call<ResponseBody> addPetImage(@Part MultipartBody.Part image, @Part("name") RequestBody name);
+    Call<ResponseBody> addPetImage(@Part MultipartBody.Part image, @Part("json") RequestBody json);
+
+    @GET("ratingHospital")
+    Call<BaseResult> ratingHospital(@Query("num") int num, @Query("rating") float rating);
+
+    @GET("getPetList")
+    Call<List<Pet>> getPetList(@Query("userId") long userId, @Query("flag") int flag);
+
+    // 펫의 사진들 가져오자.
+    @GET("getPetImage")
+    Call<ResponseBody> getPetImage(@Query("filePath") String filePath);
 }

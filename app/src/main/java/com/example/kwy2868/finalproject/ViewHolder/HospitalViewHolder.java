@@ -4,12 +4,13 @@ import android.content.Intent;
 import android.os.Parcelable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.Hospital;
 import com.example.kwy2868.finalproject.R;
@@ -22,7 +23,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 /**
  * Created by kwy2868 on 2017-08-01.
@@ -41,8 +41,8 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
     TextView hospitalTel;
     @BindView(R.id.distance)
     TextView distance;
-//    @BindView(R.id.checkbox)
-//    CheckBox checkBox;
+    @BindView(R.id.hospitalRating)
+    RatingBar hospitalRating;
 
     private static final String HOSPITAL_TAG = "Hospital";
     private static final String USER_TAG = "User";
@@ -60,6 +60,26 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
 
     public void bind(int position) {
         Hospital hospital = hospitalList.get(position);
+        if(hospital.getImgPath() == null || hospital.getImgPath().trim().equals("")){
+                Glide.with(GlobalApplication.getAppContext())
+                        .load(R.drawable.imgready)
+                        .centerCrop().bitmapTransform(new FitCenter(GlobalApplication.getAppContext()))
+                        .into(hospitalImage);
+
+        }
+        else{
+            try {Glide.with(GlobalApplication.getAppContext())
+                    .load(hospital.getImgPath())
+                    .centerCrop().bitmapTransform(new FitCenter(GlobalApplication.getAppContext()))
+                    .into(hospitalImage);
+            }catch(Exception e){
+                Glide.with(GlobalApplication.getAppContext())
+                        .load(hospital.getImgPath())
+                        .centerCrop().bitmapTransform(new FitCenter(GlobalApplication.getAppContext()))
+                        .into(hospitalImage);
+            }
+        }
+
         // TODO 우선은 테스트 위해 한명이라도 추가하면 배경 색 바꿔주자.
         if(hospital.getBlackcount() >= 1)
             hospitalCardView.setBackgroundColor(GlobalApplication.getAppContext().getColor(android.R.color.darker_gray));
@@ -73,6 +93,7 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
         else{
             distance.setText(hospital.getDistanceFromCurrentLocation() + "");
         }
+        hospitalRating.setRating(hospital.getRating_avg());
     }
 
 //    @OnClick(R.id.checkbox)

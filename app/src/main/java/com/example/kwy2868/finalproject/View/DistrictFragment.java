@@ -3,8 +3,8 @@ package com.example.kwy2868.finalproject.View;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +42,7 @@ public class DistrictFragment extends Fragment implements AdapterView.OnItemSele
     RecyclerView districtRecyclerView;
 
     private RecyclerView.LayoutManager layoutManager;
+
     private HospitalAdapter hospitalAdapter;
 
     private Unbinder unbinder;
@@ -68,9 +69,10 @@ public class DistrictFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     public void recyclerViewSetting() {
-        layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         districtRecyclerView.setLayoutManager(layoutManager);
         districtRecyclerView.setHasFixedSize(true);
+        districtRecyclerView.setItemAnimator(null);
         hospitalAdapter = new HospitalAdapter(hospitalList);
         districtRecyclerView.setAdapter(hospitalAdapter);
     }
@@ -86,7 +88,7 @@ public class DistrictFragment extends Fragment implements AdapterView.OnItemSele
                     hospitalList = response.body();
                     Log.d("사이즈", hospitalList.size() + " ");
                     // notify 해주자.
-                    refreshRecyclerView();
+                    recyclerViewSetting();
                     Log.d("HospitalList", hospitalList.get(0).getName() + " ");
                 } else {
 //                    Log.d("씨발", "레트로핏 안된다.");

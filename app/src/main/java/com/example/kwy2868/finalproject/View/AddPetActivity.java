@@ -27,6 +27,9 @@ import com.example.kwy2868.finalproject.Model.Pet;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
+import com.google.gson.Gson;
+
+import org.parceler.Parcels;
 
 import java.io.File;
 
@@ -48,7 +51,7 @@ import retrofit2.Response;
  * Created by kwy2868 on 2017-08-12.
  */
 
-public class PetActivity extends AppCompatActivity {
+public class AddPetActivity extends AppCompatActivity {
     @BindView(R.id.inputPetName)
     EditText inputPetName;
     @BindView(R.id.inputPetAge)
@@ -67,10 +70,12 @@ public class PetActivity extends AppCompatActivity {
     private static final int READ_REQUEST_CODE = 1;
     private Uri selectedImage;
 
+    private String imagePath;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pet);
+        setContentView(R.layout.activity_addpet);
         unbinder = ButterKnife.bind(this);
         setTitle("My Pet 등록");
     }
@@ -121,37 +126,82 @@ public class PetActivity extends AppCompatActivity {
                     .into(petImage);
             Log.d("selected Image", selectedImage + " ");
 
-            String imagePath = getPath(selectedImage);
+            imagePath = getPath(selectedImage);
             Log.d("Image Path", imagePath);
-            File file = new File(imagePath);
 
-            // 이미지를 보내는 거다.
-            RequestBody reqFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-            MultipartBody.Part body = MultipartBody.Part.createFormData("upload", file.getName(), reqFile);
-            Log.d("File name", file.getName());
-            Log.d("reqFile", reqFile.toString() + " ");
-            Log.d("Body", body + " ");
-
-            // 텍스트를 보내는거다.
-            RequestBody name = RequestBody.create(MediaType.parse("multipart/form-data"), "name");
-            Log.d("Name", name + " ");
-
-            NetworkService networkService = NetworkManager.getNetworkService();
-
-            Call<ResponseBody> call = networkService.addPetImage(body, name);
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    Log.d("레트로핏 옴", "옴");
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    t.printStackTrace();
-                    Log.d("레트로핏 안옴", "안옴");
-                }
-            });
         }
+    }
+
+    @OnClick(R.id.enrollPetButton)
+    public void enrollPet(){
+        String name = inputPetName.getText().toString();
+        int age = Integer.parseInt(inputPetAge.getText().toString());
+        String species = inputPetSpecies.getText().toString();
+        long userId = GlobalData.getUser().getUserId();
+        Log.d("Path", imagePath+"");
+        // 이미지 선택 안하면.
+        if(imagePath == null || imagePath.trim().equals("")){
+            enrollPetWithoutImage(name, age, species, userId);
+        }
+        // 이미지와 함께 등록하면.
+        else{
+            enrollPetWithImage(name, age, species, userId);
+        }
+    }
+
+    public void enrollPetWithoutImage(String name, int age, String species, long userId){
+        Pet pet = new Pet(name, age, species, userId, GlobalData.getUser().getFlag());
+        NetworkService networkService = NetworkManager.getNetworkService();
+        Call<BaseResult> call = networkService.enrollPet(pet);
+        call.enqueue(new Callback<BaseResult>() {
+            @Override
+            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getResultCode() == 200) {
+                        Toast.makeText(AddPetActivity.this, "펫 등록 성공!!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResult> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public void enrollPetWithImage(String name, int age, String species, long userId){
+        File file = new File(imagePath);
+
+        // 이미지를 보내는 거다.
+        RequestBody reqFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("upload", file.getName(), reqFile);
+        Log.d("File name", file.getName());
+        Log.d("reqFile", reqFile.toString() + " ");
+        Log.d("Body", body + " ");
+
+        String json = new Gson().toJson(Parcels.wrap(new Pet(name, age, species, userId, GlobalData.getUser().getFlag())));
+
+        // 텍스트를 보내는거다.
+        RequestBody pet = RequestBody.create(MediaType.parse("text/plain"), json);
+
+        NetworkService networkService = NetworkManager.getNetworkService();
+
+        Call<ResponseBody> call = networkService.addPetImage(body, pet);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.d("레트로핏 옴", "옴");
+                finish();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                t.printStackTrace();
+                Log.d("레트로핏 안옴", "안옴");
+            }
+        });
     }
 
     public String getPath(Uri uri){
@@ -181,36 +231,6 @@ public class PetActivity extends AppCompatActivity {
         }
         else
             return "";
-    }
-
-    @OnClick(R.id.enrollPetButton)
-    public void enrollPet(){
-        String name = inputPetName.getText().toString();
-        int age = Integer.parseInt(inputPetAge.getText().toString());
-        String species = inputPetSpecies.getText().toString();
-        long userId = GlobalData.getUser().getUserId();
-
-        Pet pet = new Pet(name, age, species, userId);
-        GlobalData.getPetDBHelper().addPet(pet);
-        Toast.makeText(this, "펫 등록 성공", Toast.LENGTH_SHORT).show();
-
-        NetworkService networkService = NetworkManager.getNetworkService();
-        Call<BaseResult> call = networkService.enrollPet(pet);
-        call.enqueue(new Callback<BaseResult>() {
-            @Override
-            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
-                if(response.isSuccessful()){
-                    if(response.body().getResultCode() == 200)
-                        Toast.makeText(PetActivity.this, "펫 등록 성공!!", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<BaseResult> call, Throwable t) {
-
-            }
-        });
-        finish();
     }
 
     @Override

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/hospitalCardView"
     android:layout_width="match_parent"
-    android:layout_height="150dp"
+    android:layout_height="wrap_content"
     android:layout_margin="5dp"
     android:padding="10dp"
     app:cardCornerRadius="5dp"
@@ -17,14 +17,11 @@
         <ImageView
             android:id="@+id/hospitalImage"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:src="@drawable/ic_menu_camera" />
+            android:layout_height="wrap_content"/>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
@@ -46,6 +43,15 @@
                 android:id="@+id/distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+
+            <RatingBar
+                android:id="@+id/hospitalRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:isIndicator="true"
+                android:numStars="5"
+                android:rating="0"
+                android:max="5"/>
 
         </LinearLayout>
     </LinearLayout>

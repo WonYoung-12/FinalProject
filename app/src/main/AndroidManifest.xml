@@ -77,13 +77,13 @@
         </activity>
 
         <activity
-            android:name=".View.ChartActivity"
+            android:name=".View.AddChartActivity"
             android:theme="@style/AppTheme">
 
         </activity>
 
         <activity
-            android:name=".View.PetActivity"
+            android:name=".View.AddPetActivity"
             android:theme="@style/AppTheme">
 
         </activity>

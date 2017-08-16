@@ -1,9 +1,11 @@
 package com.example.kwy2868.finalproject.View;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -14,6 +16,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,7 +64,8 @@ import retrofit2.Response;
  */
 
 public class HospitalDetailActivity extends AppCompatActivity
-        implements MapView.POIItemEventListener, MapView.CurrentLocationEventListener, MapView.MapViewEventListener, TextWatcher{
+        implements MapView.POIItemEventListener, MapView.CurrentLocationEventListener, MapView.MapViewEventListener, TextWatcher
+                    , RatingBar.OnRatingBarChangeListener{
     @BindView(R.id.hospitalName)
     TextView hospitalName;
     @BindView(R.id.hospitalAddress)
@@ -106,8 +110,10 @@ public class HospitalDetailActivity extends AppCompatActivity
     FloatingActionButton favoriteButton;
     @BindView(R.id.blackButton)
     FloatingActionButton blackButton;
+    @BindView(R.id.ratingButton)
+    FloatingActionButton ratingButton;
 
-    NetworkService networkService = NetworkManager.getNetworkService();
+    private NetworkService networkService = NetworkManager.getNetworkService();
 
     private Location currentLocation;
     private Double currentLatitude;
@@ -127,6 +133,9 @@ public class HospitalDetailActivity extends AppCompatActivity
 
     // 서버에서 받아온 리뷰 리스트들.
     private List<GetReviewResult> reviewList;
+
+    // 사용자가 평가한 점수.
+    private float score;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -492,5 +501,57 @@ public class HospitalDetailActivity extends AppCompatActivity
                 Toast.makeText(HospitalDetailActivity.this, "네트워크 문제로 블랙리스트 추가 실패.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @OnClick(R.id.ratingButton)
+    public void showRatingDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("별점 평가");
+        View mView = getLayoutInflater().inflate(R.layout.rating_bar, null);
+        builder.setView(mView);
+
+        RatingBar ratingBar = (RatingBar) mView.findViewById(R.id.ratingBar);
+        ratingBar.setOnRatingBarChangeListener(this);
+
+        // 평가 완료 했을 때.
+        // 서버에 전송해주자.
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Call<BaseResult> call = networkService.ratingHospital(hospital.getNum(), score);
+                call.enqueue(new Callback<BaseResult>() {
+                    @Override
+                    public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+                        if(response.isSuccessful()){
+                            if(response.body().getResultCode() == 200){
+                                Log.d("평가 완료", "평가 완료");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<BaseResult> call, Throwable t) {
+
+                    }
+                });
+                Log.d("별점 평가", "서버에 전송해주자" + score);
+            }
+        });
+
+        // 취소 했을 때.
+        builder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        builder.create();
+        builder.show();
+    }
+
+    @Override
+    public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+        score = rating;
     }
 }

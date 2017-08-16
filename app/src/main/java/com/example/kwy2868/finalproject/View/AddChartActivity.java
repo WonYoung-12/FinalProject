@@ -41,7 +41,7 @@ import retrofit2.Response;
  * Created by kwy2868 on 2017-08-11.
  */
 
-public class ChartActivity extends AppCompatActivity implements OnDateSelectedListener, EditText.OnFocusChangeListener{
+public class AddChartActivity extends AppCompatActivity implements OnDateSelectedListener, EditText.OnFocusChangeListener{
     @BindView(R.id.materialCalendar)
     MaterialCalendarView materialCalendar;
     @BindView(R.id.treatmentDate)
@@ -74,7 +74,7 @@ public class ChartActivity extends AppCompatActivity implements OnDateSelectedLi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chart);
+        setContentView(R.layout.activity_addchart);
         unbinder = ButterKnife.bind(this);
         setTitle("진료 내역 차트 작성");
         setFocusChangeListener();
@@ -189,7 +189,7 @@ public class ChartActivity extends AppCompatActivity implements OnDateSelectedLi
             public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
                 if(response.isSuccessful()){
                     if(response.body().getResultCode() == 200)
-                        Toast.makeText(ChartActivity.this, "차트 작성 성공", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddChartActivity.this, "차트 작성 성공", Toast.LENGTH_SHORT).show();
                 }
             }
 

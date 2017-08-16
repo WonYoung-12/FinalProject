@@ -20,6 +20,7 @@ public class GlobalData {
     private static ChartDBHelper chartDBHelper = new ChartDBHelper(GlobalApplication.getAppContext(), null, null, 1);
     private static PetDBHelper petDBHelper = new PetDBHelper(GlobalApplication.getAppContext(), null, null, 1);
     private static List<Chart> chartList;
+    private static List<Pet> petList;
 
     public static Context getContext() {
         return context;
@@ -59,5 +60,13 @@ public class GlobalData {
 
     public static void setChartList(List<Chart> chartList) {
         GlobalData.chartList = chartList;
+    }
+
+    public static List<Pet> getPetList() {
+        return petList;
+    }
+
+    public static void setPetList(List<Pet> petList) {
+        GlobalData.petList = petList;
     }
 }

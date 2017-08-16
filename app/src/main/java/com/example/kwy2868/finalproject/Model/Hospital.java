@@ -24,6 +24,12 @@ public class Hospital implements Comparable<Hospital>{
     // 현재위치부터 병원까지의 거리.
     private float distanceFromCurrentLocation;
 
+    private int rating_count;
+    private int rating_sum;
+    private float rating_avg;
+
+    private String imgPath;
+
     public int getNum() {
         return num;
     }
@@ -87,6 +93,34 @@ public class Hospital implements Comparable<Hospital>{
 
     public void setBlackcount(int blackcount) {
         this.blackcount = blackcount;
+    }
+
+    public int getRating_count() {
+        return rating_count;
+    }
+
+    public void setRating_count(int rating_count) {
+        this.rating_count = rating_count;
+    }
+
+    public int getRating_sum() {
+        return rating_sum;
+    }
+
+    public void setRating_sum(int rating_sum) {
+        this.rating_sum = rating_sum;
+    }
+
+    public float getRating_avg() {
+        return rating_avg;
+    }
+
+    public void setRating_avg(float rating_avg) {
+        this.rating_avg = rating_avg;
+    }
+
+    public String getImgPath() {
+        return imgPath;
     }
 
     @Override
