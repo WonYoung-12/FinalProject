@@ -41,6 +41,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         // 전달.
         EventBus.getDefault().post(new AlarmEvent(title, description));
 
-        notificationManager.notify(111, builder.build());
+//        notificationManager.notify(111, builder.build());
     }
 }

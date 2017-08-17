@@ -8,13 +8,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.Chart;
 import com.example.kwy2868.finalproject.Model.GlobalData;
+import com.example.kwy2868.finalproject.Model.Pet;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
@@ -25,8 +28,10 @@ import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -48,6 +53,8 @@ public class AddChartActivity extends AppCompatActivity implements OnDateSelecte
     EditText inputTreatmentDate;
     @BindView(R.id.reTreatmentDate)
     EditText inputReTreatmentDate;
+    @BindView(R.id.spinner)
+    Spinner spinner;
     @BindView(R.id.inputPetName)
     EditText inputPetName;
     @BindView(R.id.inputChartTitle)
@@ -71,12 +78,17 @@ public class AddChartActivity extends AppCompatActivity implements OnDateSelecte
     private Calendar minDate;
     private Calendar maxDate;
 
+    private List<Pet> petList;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_addchart);
         unbinder = ButterKnife.bind(this);
         setTitle("진료 내역 차트 작성");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        getPetListFromServer();
         setFocusChangeListener();
         initCalendar();
     }
@@ -84,6 +96,17 @@ public class AddChartActivity extends AppCompatActivity implements OnDateSelecte
     public void setFocusChangeListener(){
         inputTreatmentDate.setOnFocusChangeListener(this);
         inputReTreatmentDate.setOnFocusChangeListener(this);
+    }
+
+    public void initSpinnerItem(){
+        ArrayList<String> petNameList = new ArrayList<String>();
+        for(int i=0; i<GlobalData.getPetList().size(); i++){
+            Pet pet = GlobalData.getPetList().get(i);
+            petNameList.add(pet.getName() + "(" + pet.getAge() + ", " + pet.getSpecies() + ")");
+        }
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, petNameList);
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(arrayAdapter);
     }
 
     public void initCalendar(){
@@ -115,51 +138,47 @@ public class AddChartActivity extends AppCompatActivity implements OnDateSelecte
                     = SwitchDateTimeDialogFragment.newInstance(getString(R.string.label_datetime_dialog),
                     getString(android.R.string.ok),
                     getString(android.R.string.cancel));
-        }
-        else{
-            dateTimeDialogFragment
-                    = SwitchDateTimeDialogFragment.newInstance(getString(R.string.label_datetime_dialog),
-                    getString(android.R.string.ok),
-                    getString(android.R.string.cancel));
-        }
+            dateTimeDialogFragment.startAtCalendarView();
+            dateTimeDialogFragment.set24HoursMode(false);
+            dateTimeDialogFragment.setMinimumDateTime(minDate.getTime());
+            dateTimeDialogFragment.setMaximumDateTime(maxDate.getTime());
+            dateTimeDialogFragment.setDefaultDateTime(nowDate.getTime());
 
-        dateTimeDialogFragment.startAtCalendarView();
-        dateTimeDialogFragment.set24HoursMode(false);
-        dateTimeDialogFragment.setMinimumDateTime(minDate.getTime());
-        dateTimeDialogFragment.setMaximumDateTime(maxDate.getTime());
-        dateTimeDialogFragment.setDefaultDateTime(nowDate.getTime());
-
-        try {
-            dateTimeDialogFragment.setSimpleDateMonthAndDayFormat(new SimpleDateFormat("dd MMMM", Locale.getDefault()));
-        } catch (SwitchDateTimeDialogFragment.SimpleDateMonthAndDayFormatException e) {
-            Log.e("Error", e.getMessage());
-        }
-        dateTimeDialogFragment.setOnButtonClickListener(new SwitchDateTimeDialogFragment.OnButtonClickListener() {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-
-            // 셋 해주자.
-            @Override
-            public void onPositiveButtonClick(Date date) {
-                if(flag == TREATMENT_FLAG){
-                    inputTreatmentDate.setText(sdf.format(date));
-                    hideKeyBoard(inputTreatmentDate);
-                }
-                else{
-                    inputReTreatmentDate.setText(sdf.format(date));
-                    hideKeyBoard(inputReTreatmentDate);
-                }
-                // 선택한 날짜로 위의 달력이 이동하면서 선택됨.
-                materialCalendar.setCurrentDate(CalendarDay.from(date), true);
-                materialCalendar.setSelectedDate(date);
+            try {
+                dateTimeDialogFragment.setSimpleDateMonthAndDayFormat(new SimpleDateFormat("dd MMMM", Locale.getDefault()));
+            } catch (SwitchDateTimeDialogFragment.SimpleDateMonthAndDayFormatException e) {
+                Log.e("Error", e.getMessage());
             }
+            dateTimeDialogFragment.setOnButtonClickListener(new SwitchDateTimeDialogFragment.OnButtonClickListener() {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
-            // 아무것도 안해줘도 됨.
-            @Override
-            public void onNegativeButtonClick(Date date) {
+                // 셋 해주자.
+                @Override
+                public void onPositiveButtonClick(Date date) {
+                    if(flag == TREATMENT_FLAG){
+                        inputTreatmentDate.setText(sdf.format(date));
+                        hideKeyBoard(inputTreatmentDate);
+                    }
+                    else{
+                        inputReTreatmentDate.setText(sdf.format(date));
+                        hideKeyBoard(inputReTreatmentDate);
+                    }
+                    // 선택한 날짜로 위의 달력이 이동하면서 선택됨.
+                    materialCalendar.setCurrentDate(CalendarDay.from(date), true);
+                    materialCalendar.setSelectedDate(date);
+                    inputTreatmentDate.clearFocus();
+                    inputReTreatmentDate.clearFocus();
+                }
 
-            }
-        });
-        dateTimeDialogFragment.show(getSupportFragmentManager(), TAG_DATETIME_FRAGMENT);
+                // 아무것도 안해줘도 됨.
+                @Override
+                public void onNegativeButtonClick(Date date) {
+                    inputTreatmentDate.clearFocus();
+                    inputReTreatmentDate.clearFocus();
+                }
+            });
+            dateTimeDialogFragment.show(getSupportFragmentManager(), TAG_DATETIME_FRAGMENT);
+        }
     }
 
     public void hideKeyBoard(EditText editText){
@@ -171,7 +190,9 @@ public class AddChartActivity extends AppCompatActivity implements OnDateSelecte
     // 작성 버튼 누르면 호출. DB에 써주자.
     @OnClick(R.id.writeChartButton)
     public void writeChart(){
-        String petName = inputPetName.getText().toString();
+        String tempPetName = spinner.getSelectedItem().toString();
+        int index = tempPetName.indexOf("(");
+        String petName = tempPetName.substring(0, index);
         String treatmentDate = inputTreatmentDate.getText().toString();
         String reTreatmentDate = inputReTreatmentDate.getText().toString();
         String title = inputChartTitle.getText().toString();
@@ -230,5 +251,27 @@ public class AddChartActivity extends AppCompatActivity implements OnDateSelecte
     public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
         Log.d("달",date+" ");
 //        constructDateTimeDialog(date);
+    }
+
+    public void getPetListFromServer(){
+        Log.d("펫 리스트 가져온다", "가져온다");
+        final NetworkService networkService = NetworkManager.getNetworkService();
+        Call<List<Pet>> call = networkService.getPetList(GlobalData.getUser().getUserId(), GlobalData.getUser().getFlag());
+        call.enqueue(new Callback<List<Pet>>() {
+            @Override
+            public void onResponse(Call<List<Pet>> call, Response<List<Pet>> response) {
+                if(response.isSuccessful()){
+                    petList = response.body();
+                    GlobalData.setPetList(petList);
+                    initSpinnerItem();
+                    Log.d("펫 리스트 받아옴", "펫 리스트 받아왔다");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Pet>> call, Throwable t) {
+
+            }
+        });
     }
 }

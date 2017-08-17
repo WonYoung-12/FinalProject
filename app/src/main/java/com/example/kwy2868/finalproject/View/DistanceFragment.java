@@ -60,7 +60,7 @@ public class DistanceFragment extends Fragment
 
     private static final int REQUEST_CODE = 0;
     private static final int CLOSEST = 0;
-    private static final int FURTHERMOST = 14;
+    private static final int FURTHERMOST = 15;
     private static final String LOCATION_TAG = "Current Location";
 
     // 이걸로 안 막아두면 가만히 있어도 계속 위치 바껴서 refresh 된다..!

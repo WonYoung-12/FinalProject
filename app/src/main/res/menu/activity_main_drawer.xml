@@ -11,13 +11,21 @@
             android:icon="@drawable/ic_black_list_24dp"
             android:title="BlackList" />
         <item
-            android:id="@+id/nav_mypet"
-            android:icon="@drawable/ic_account_box_black_24dp"
+            android:id="@+id/nav_addpet"
+            android:icon="@drawable/ic_add_box_black_24dp"
             android:title="Add Pet" />
         <item
-            android:id="@+id/nav_mychart"
+            android:id="@+id/nav_addchart"
             android:icon="@drawable/ic_write_chart_black_24dp"
             android:title="Add Chart" />
+        <item
+            android:id="@+id/nav_mypet"
+            android:icon="@drawable/ic_pets_black_24dp"
+            android:title="My Pet" />
+        <item
+            android:id="@+id/nav_mychart"
+            android:icon="@drawable/ic_my_chart24dp"
+            android:title="My Chart" />
     </group>
 
     <item android:title="Settings">

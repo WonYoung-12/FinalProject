@@ -1,10 +1,22 @@
 package com.example.kwy2868.finalproject.View;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -12,18 +24,20 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.andexert.expandablelayout.library.ExpandableLayout;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
-import com.example.kwy2868.finalproject.Adapter.DialogAdapter;
 import com.example.kwy2868.finalproject.Adapter.ReviewAdapter;
 import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.Black;
@@ -37,10 +51,10 @@ import com.example.kwy2868.finalproject.Model.WriteResult;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
+import com.example.kwy2868.finalproject.Util.LocationHelper;
+import com.example.kwy2868.finalproject.Util.NavigationDialog;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.orhanobut.dialogplus.DialogPlus;
-import com.orhanobut.dialogplus.OnItemClickListener;
 
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
@@ -59,13 +73,18 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.os.Build.VERSION_CODES.M;
+import static com.example.kwy2868.finalproject.Model.GlobalData.getContext;
+
 /**
  * Created by kwy2868 on 2017-08-08.
  */
 
 public class HospitalDetailActivity extends AppCompatActivity
-        implements MapView.POIItemEventListener, MapView.CurrentLocationEventListener, MapView.MapViewEventListener, TextWatcher
-                    , RatingBar.OnRatingBarChangeListener{
+        implements MapView.POIItemEventListener, MapView.MapViewEventListener, TextWatcher
+                    , RatingBar.OnRatingBarChangeListener, LocationHelper{
+    @BindView(R.id.detailHospitalImage)
+    ImageView hospitalImage;
     @BindView(R.id.hospitalName)
     TextView hospitalName;
     @BindView(R.id.hospitalAddress)
@@ -92,6 +111,7 @@ public class HospitalDetailActivity extends AppCompatActivity
     private RecyclerView.LayoutManager layoutManager;
     private ReviewAdapter reviewAdapter;
     private static final int COLUMN_SPAN = 2;
+    private static final int REQUEST_CODE = 0;
 
     @BindView(R.id.noReview)
     TextView noReview;
@@ -120,8 +140,6 @@ public class HospitalDetailActivity extends AppCompatActivity
     private Double currentLongitude;
 
     private static final String HOSPITAL_TAG = "Hospital";
-    private static final String USER_TAG = "User";
-    private static final String LOCATION_TAG = "Location";
 
     // 현재 보고 있는 화면에 해당하는 병원.
     private Hospital hospital;
@@ -129,7 +147,8 @@ public class HospitalDetailActivity extends AppCompatActivity
     private UserInfo user;
     private MapPoint hospitalMapPoint;
 
-    private boolean isSetLocation = false;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
 
     // 서버에서 받아온 리뷰 리스트들.
     private List<GetReviewResult> reviewList;
@@ -143,6 +162,7 @@ public class HospitalDetailActivity extends AppCompatActivity
         setContentView(R.layout.activity_hospitaldetail);
         ButterKnife.bind(this);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         dataInit();
         recyclerViewSetting();
         getReviewList();
@@ -151,18 +171,18 @@ public class HospitalDetailActivity extends AppCompatActivity
     public void dataInit(){
         Intent intent = getIntent();
         hospital = Parcels.unwrap(intent.getParcelableExtra(HOSPITAL_TAG));
+        setTitle(hospital.getName());
         user = GlobalData.getUser();
         Log.d("유저", user + " ");
-        currentLocation = GlobalData.getCurrentLocation();
-        currentLatitude = currentLocation.getLatitude();
-        currentLongitude = currentLocation.getLongitude();
-        isSetLocation = !isSetLocation;
 
         setHospitalDataOnView();
         mapSetting();
     }
 
     public void setHospitalDataOnView(){
+        Glide.with(this).load(hospital.getImgPath())
+                .centerCrop().bitmapTransform(new CenterCrop(this))
+                .into(hospitalImage);
         hospitalName.setText(hospital.getName());
         hospitalAddress.setText(hospital.getAddress());
         hospitalTel.setText(hospital.getTel());
@@ -174,7 +194,6 @@ public class HospitalDetailActivity extends AppCompatActivity
         mapView.setPOIItemEventListener(this);
         // 사용자 위치 받아올 수 있지만 맵 이동은 안됨.
         mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
-        mapView.setCurrentLocationEventListener(this);
         mapView.setMapViewEventListener(this);
 
         hospitalMapPoint = MapPoint.mapPointWithGeoCoord(hospital.getLatitude(), hospital.getLongitude());
@@ -308,27 +327,10 @@ public class HospitalDetailActivity extends AppCompatActivity
     // 마커의 병원 이름 클릭 했을 때 호출.
     @Override
     public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem) {
-        if(isSetLocation){
-            DialogPlus dialogPlus = DialogPlus.newDialog(this)
-                    .setAdapter(new DialogAdapter(this))
-                    .setOnItemClickListener(new OnItemClickListener() {
-                        @Override
-                        public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-
-                        }
-                    })
-                    .setExpanded(true)
-                    .setGravity(Gravity.CENTER)
-                    .setCancelable(true)
-                    .create();
-            dialogPlus.show();
-
-//            CustomDialog customDialog = new CustomDialog(this, currentLatitude, currentLongitude, hospital.getLatitude(), hospital.getLongitude());
-//            customDialog.show();
-        }
-        else{
-            Toast.makeText(this, "현재 위치를 가져오는 중입니다. 잠시만 기다려 주세요.", Toast.LENGTH_SHORT).show();
-        }
+        Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content),
+                "현재 위치를 받아옵니다.", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+        permissionCheck();
     }
 
     @Override
@@ -342,37 +344,9 @@ public class HospitalDetailActivity extends AppCompatActivity
     }
 
     @Override
-    public void onCurrentLocationUpdate(MapView mapView, MapPoint mapPoint, float v) {
-        if(!isSetLocation){
-            currentLatitude = mapPoint.getMapPointGeoCoord().latitude;
-            currentLongitude = mapPoint.getMapPointGeoCoord().longitude;
-//            Toast.makeText(this, "다음맵에서 정상적으로 현재 위치 받아옴.", Toast.LENGTH_SHORT).show();
-            isSetLocation = !isSetLocation;
-        }
-        else
-            return;
-    }
-
-    @Override
-    public void onCurrentLocationDeviceHeadingUpdate(MapView mapView, float v) {
-
-    }
-
-    @Override
-    public void onCurrentLocationUpdateFailed(MapView mapView) {
-        Toast.makeText(this, "다음맵에서 현재위치 받아오지 못함.", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onCurrentLocationUpdateCancelled(MapView mapView) {
-
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
         // 다른 액티비티 갔다가 오면 (다음 지도 앱 갔다가 오면) 현재 위치 세팅해주도록 하자.
-        isSetLocation = false;
     }
 
     @Override
@@ -553,5 +527,163 @@ public class HospitalDetailActivity extends AppCompatActivity
     @Override
     public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
         score = rating;
+    }
+
+    public void permissionCheck() {
+        // 퍼미션 체크. 권한이 있는 경우.
+        // 현재 안드로이드 버전이 마시멜로 이상인 경우 퍼미션 체크가 추가로 필요함.
+        Log.d("내 버전 정보", Build.VERSION.SDK_INT + " ");
+        Log.d("마시멜로 정보", M + " ");
+        if (Build.VERSION.SDK_INT >= M) {
+            // 퍼미션이 없는 경우 퍼미션을 요구해야겠지?
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_DENIED) {
+                // 사용자가 다시 보지 않기에 체크 하지 않고, 퍼미션 체크를 거절한 이력이 있는 경우. (처음 거절한 경우에도 들어감.)
+                // 최초 요청시에는 false를 리턴해서 아래 else에 들어간다.
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    Log.d("다시 물어본다", "다시 물어본다.");
+                }
+                // 사용자가 다시 보지 않기에 체크하고, 퍼미션 체크를 거절한 이력이 있는 경우.
+                // 퍼미션을 요구하는 새로운 창을 띄워줘야 겠지.
+                // 최초 요청시에도 들어가게 됨. 다시 보지 않기에 체크하는 창은 물어보지 않음.
+                else {
+                    Log.d("다시 물어보지 않는다", "다시 물어보지 않는다.");
+                }
+                // 액티비티, permission String 배열, requestCode를 인자로 받음.
+                // 퍼미션을 요구하는 다이얼로그 창을 띄운다.
+                // requestCode 다르게 하면 다르게 처리할 수 있을듯?
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+            }
+            // 퍼미션이 있는 경우.
+            else {
+                getCurrentLocation();
+            }
+        }
+        // 버전 낮은거.
+        else {
+            getCurrentLocation();
+        }
+    }
+
+    @Override
+    public void getCurrentLocation() {
+        Log.d("현재 위치 받아오자.", "받아오자");
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                afterLocationUpdated(location);
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+                Log.d("onStatusChanged", "onStatusChanged");
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+                Log.d("onProviderEnabled", "onProviderEnabled");
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+                Log.d("onProviderDisabled", "onProviderDisabled");
+                Toast.makeText(getContext(), "현재 위치를 받아오는데 실패 했습니다.", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        // 0.1초마다, 1m 변하면 업데이트.
+//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 1, locationListener);
+    }
+
+    // 위치 받아왔으니 계산해주자.
+    public void afterLocationUpdated(Location location){
+        Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content),
+                "현재 위치를 받아왔습니다. 길찾기 방법을 선택하세요.", Snackbar.LENGTH_SHORT)
+                .setAction("Action", null).show();
+
+        try{
+            Thread.sleep(1000);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        currentLocation = location;
+        GlobalData.setCurrentLocation(currentLocation);
+        currentLatitude = location.getLatitude();
+        currentLongitude = location.getLongitude();
+        makeDialog();
+    }
+
+    public void makeDialog(){
+//        DialogPlus dialogPlus = DialogPlus.newDialog(this)
+//                .setAdapter(new DialogAdapter(this))
+//                .setOnItemClickListener(new OnItemClickListener() {
+//                    @Override
+//                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+//
+//                    }
+//                })
+//                .setExpanded(true)
+//                .setGravity(Gravity.CENTER)
+//                .setCancelable(true)
+//                .create();
+//        dialogPlus.show();
+        NavigationDialog navigationDialogdialog = new NavigationDialog(this, currentLatitude, currentLongitude, hospital.getLatitude(), hospital.getLongitude());
+        navigationDialogdialog.show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // requestPermission 메소드의 requestCode와 일치하는지 확인.
+        if (requestCode == REQUEST_CODE) {
+            Log.d("퍼미션 요구", "퍼미션 요구");
+            // 요구하는 퍼미션이 한개이기 때문에 하나만 확인한다.
+            // 해당 퍼미션이 승낙된 경우.
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d("퍼미션 승인", "퍼미션 승인");
+                getCurrentLocation();
+            }
+            // 해당 퍼미션이 거절된 경우.
+            else {
+                Log.d("퍼미션 거절", "퍼미션 거절");
+                Toast.makeText(this, "퍼미션을 승인 해주셔야 이용이 가능합니다", Toast.LENGTH_SHORT).show();
+                // 앱 정보 화면을 통해 퍼미션을 다시 요구해보자.
+                requestPermissionInSettings();
+            }
+        }
+    }
+
+    // 사용자에게 설정 창으로 넘어가게 하여 퍼미션 설정하도록 유도.
+    public void requestPermissionInSettings() {
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        intent.setData(Uri.parse("package:" + this.getPackageName()));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        startActivityForResult(intent, REQUEST_CODE);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

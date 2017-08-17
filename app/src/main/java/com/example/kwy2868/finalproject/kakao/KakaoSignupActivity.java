@@ -2,9 +2,7 @@ package com.example.kwy2868.finalproject.kakao;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
@@ -23,8 +21,6 @@ import com.kakao.usermgmt.callback.MeResponseCallback;
 import com.kakao.usermgmt.response.model.UserProfile;
 import com.kakao.util.helper.log.Logger;
 
-import org.parceler.Parcels;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,12 +33,9 @@ import retrofit2.Response;
  */
 
 public class KakaoSignupActivity extends Activity {
-    private static final String USER = "User";
 
-    private static final String LOCATION_TAG = "Current Location";
     private static final int KAKAO_FLAG = 1;
 
-    private Location currentLocation;
     /**
      * Main으로 넘길지 가입 페이지를 그릴지 판단하기 위해 me를 호출한다.
      *
@@ -52,14 +45,7 @@ public class KakaoSignupActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getDataFromLoginActivity();
         requestMe();
-    }
-
-    public void getDataFromLoginActivity(){
-        if(getIntent() != null){
-            currentLocation = getIntent().getParcelableExtra(LOCATION_TAG);
-        }
     }
 
     // 유저의 정보를 받아오는 함수.
@@ -122,7 +108,7 @@ public class KakaoSignupActivity extends Activity {
                 if (response.isSuccessful()) {
                     if (response.body().getResultCode() == 200){
                         user.setNotiFlag(response.body().getNotiFlag());
-                        redirectMainActivity(user);
+                        redirectMainActivity();
                     }
                 }
             }
@@ -135,23 +121,15 @@ public class KakaoSignupActivity extends Activity {
         });
     }
 
-    private void redirectMainActivity(UserInfo user) {
-//        Toast.makeText(this, "MainActivity로", Toast.LENGTH_SHORT).show();
-        Parcelable wrappedUser = Parcels.wrap(user);
-
+    private void redirectMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(USER, wrappedUser);
-//        intent.putExtra(LOCATION_TAG, location);
-
         startActivity(intent);
         finish();
     }
 
     protected void redirectLoginActivity() {
-//        Toast.makeText(this, "LoginActivity로", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        intent.putExtra("Login", true);
         startActivity(intent);
         finish();
     }

@@ -6,57 +6,49 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
         android:orientation="vertical">
-        <!--focusable 속성 두개로 EditText focus 막는다.-->
 
         <LinearLayout
-            android:id="@+id/header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <android.support.v7.widget.AppCompatSpinner
-                android:id="@+id/searchSpinner"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:entries="@array/search">
-
-            </android.support.v7.widget.AppCompatSpinner>
-
-            <!--엔터 눌렀을 때도 이벤트 발생 시키자.-->
-            <EditText
-                android:id="@+id/search_EditText"
+                android:id="@+id/districtSpinner"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:hint="@string/search_hint"
-                android:imeOptions="actionSearch"
-                android:inputType="text" />
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:entries="@array/district">
 
-            <Button
-                android:id="@+id/searchButton"
+            </android.support.v7.widget.AppCompatSpinner>
+
+            <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/search" />
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="거리 순으로 정렬"/>
+
+            <CheckBox
+                android:id="@+id/byDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
         </LinearLayout>
 
         <com.baoyz.widget.PullRefreshLayout
-            android:id="@+id/searchRefreshLayout"
+            android:id="@+id/districtRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/searchRecyclerView"
+                android:id="@+id/districtRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
             </android.support.v7.widget.RecyclerView>
-
         </com.baoyz.widget.PullRefreshLayout>
-
     </LinearLayout>
-
 </RelativeLayout>
+

@@ -8,8 +8,8 @@
 
     <!--지도 활용을 위한 퍼미션 허용. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -72,7 +72,7 @@
 
         <activity
             android:name=".View.HospitalDetailActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme">
 
         </activity>
 
@@ -94,7 +94,31 @@
 
         </activity>
 
-        <receiver android:name=".Util.AlarmReceiver"/>
+        <activity
+            android:name=".View.MyPetActivity"
+            android:theme="@style/AppTheme">
+
+        </activity>
+
+        <activity
+            android:name=".View.MyChartActivity"
+            android:theme="@style/AppTheme">
+
+        </activity>
+
+        <activity
+            android:name=".View.BlackActivity"
+            android:theme="@style/AppTheme">
+
+        </activity>
+
+        <activity
+            android:name=".View.FavoriteActivity"
+            android:theme="@style/AppTheme">
+
+        </activity>
+
+        <receiver android:name=".Util.AlarmReceiver" />
     </application>
 
 </manifest>

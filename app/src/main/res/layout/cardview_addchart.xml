@@ -50,7 +50,6 @@
         <com.wrapp.floatlabelededittext.FloatLabeledEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
             android:layout_marginLeft="50dp"
             android:layout_marginRight="50dp"
             app:fletPadding="10dp">
@@ -59,10 +58,20 @@
                 android:id="@+id/inputPetName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Pet Name"
+                android:hint="Pet"
+                android:focusable="false"
                 android:lines="1"
                 android:maxLines="1" />
         </com.wrapp.floatlabelededittext.FloatLabeledEditText>
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp">
+        </Spinner>
 
         <com.wrapp.floatlabelededittext.FloatLabeledEditText
             android:layout_width="match_parent"

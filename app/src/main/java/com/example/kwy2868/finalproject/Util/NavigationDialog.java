@@ -22,7 +22,7 @@ import butterknife.OnClick;
  * Created by kwy2868 on 2017-07-26.
  */
 
-public class CustomDialog extends Dialog {
+public class NavigationDialog extends Dialog {
     @BindView(R.id.dialogCar)
     TextView dialogCar;
     @BindView(R.id.dialogPublic)
@@ -39,7 +39,7 @@ public class CustomDialog extends Dialog {
     private static final String BASE_URI = "daummaps://route?";
     private static final String MARKET_URI = "market://details?id=net.daum.android.map";
 
-    public CustomDialog(@NonNull Context context, Double startLatitude, Double startLongitude, Double endLatitude, Double endLongitude) {
+    public NavigationDialog(@NonNull Context context, Double startLatitude, Double startLongitude, Double endLatitude, Double endLongitude) {
         super(context);
         this.startLatitude = startLatitude;
         this.startLongitude = startLongitude;

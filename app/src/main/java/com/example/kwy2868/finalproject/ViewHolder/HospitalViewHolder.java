@@ -111,7 +111,6 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
 
         Intent intent = new Intent(view.getContext(), HospitalDetailActivity.class);
         intent.putExtra(HOSPITAL_TAG, wrappedHospital);
-//        intent.putExtra(USER_TAG, wrappedUser);
         intent.putExtra(LOCATION_TAG, GlobalData.getCurrentLocation());
         view.getContext().startActivity(intent);
     }

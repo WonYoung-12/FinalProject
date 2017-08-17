@@ -20,7 +20,7 @@ public class Pet {
     private long userId;
     // 안드로이드 로컬에 펫 이미지가 저장된 파일 이름.
     private String imagePath;
-    // 네이버, 카카오 구분을 위한 플래그
+    // 주인이 네이버 유저인지 카카오 유저인지 구분을 위한 플래그.
     private int flag;
 
     // 서버에서 가져온 이미지 파일.

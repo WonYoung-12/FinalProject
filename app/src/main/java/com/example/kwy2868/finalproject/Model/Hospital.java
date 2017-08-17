@@ -123,6 +123,10 @@ public class Hospital implements Comparable<Hospital>{
         return imgPath;
     }
 
+    public void setImgPath(String imgPath) {
+        this.imgPath = imgPath;
+    }
+
     @Override
     public int compareTo(@NonNull Hospital hospital) {
         if(this.getDistanceFromCurrentLocation() > hospital.getDistanceFromCurrentLocation())

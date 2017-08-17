@@ -1,12 +1,10 @@
 package com.example.kwy2868.finalproject.Adapter;
 
-import android.location.Location;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.example.kwy2868.finalproject.View.DistanceFragment;
-import com.example.kwy2868.finalproject.View.DistrictFragment;
+import com.example.kwy2868.finalproject.View.HospitalFragment;
 import com.example.kwy2868.finalproject.View.SearchFragment;
 
 /**
@@ -14,15 +12,12 @@ import com.example.kwy2868.finalproject.View.SearchFragment;
  */
 
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {
-    private String[] tabTitles = new String[]{"지역별", "거리순", "검색"};
+    private String[] tabTitles = new String[]{"Hospital", "Search", "My Info"};
 
     private static final int ITEM_COUNT = 3;
 
-    private Location location;
-
-    public ViewPagerAdapter(FragmentManager fm, Location location) {
+    public ViewPagerAdapter(FragmentManager fm) {
         super(fm);
-        this.location = location;
     }
 
     @Override
@@ -35,14 +30,14 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                DistrictFragment districtFragment = new DistrictFragment();
+                HospitalFragment districtFragment = new HospitalFragment();
                 return districtFragment;
             case 1:
-                DistanceFragment distanceFragment = DistanceFragment.newInstance(location);
-                return distanceFragment;
-            case 2:
                 SearchFragment searchFragment = new SearchFragment();
                 return searchFragment;
+            case 2:
+                SearchFragment searchFragment2 = new SearchFragment();
+                return searchFragment2;
             default:
                 return null;
         }

@@ -1,9 +1,14 @@
 package com.example.kwy2868.finalproject.Adapter;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.kwy2868.finalproject.Model.Pet;
+import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.ViewHolder.PetViewHolder;
 
 import java.util.List;
@@ -16,12 +21,22 @@ public class PetAdapter extends RecyclerView.Adapter<PetViewHolder> {
     private List<Pet> petList;
 
     public PetAdapter(List<Pet> petList) {
+        Log.i("펫 어댑터 생성", "생성");
         this.petList = petList;
     }
 
     @Override
     public PetViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return null;
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
+        boolean shouldAttachToParentImmediately = false;
+
+        View view = inflater.inflate(R.layout.cardview_mypet, parent, shouldAttachToParentImmediately);
+        PetViewHolder petViewHolder = new PetViewHolder(view, petList);
+
+        Log.i("onCreateViewHolder 생성", "생성");
+
+        return petViewHolder;
     }
 
     @Override

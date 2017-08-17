@@ -2,9 +2,7 @@ package com.example.kwy2868.finalproject.View;
 
 
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -15,48 +13,45 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.kwy2868.finalproject.Adapter.ViewPagerAdapter;
 import com.example.kwy2868.finalproject.Model.AlarmEvent;
+import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.Chart;
 import com.example.kwy2868.finalproject.Model.GlobalData;
-import com.example.kwy2868.finalproject.Model.Pet;
 import com.example.kwy2868.finalproject.Model.UserInfo;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
 import com.example.kwy2868.finalproject.Util.MyAlarmManager;
+import com.kakao.auth.Session;
+import com.nhn.android.naverlogin.OAuthLogin;
 import com.tapadoo.alerter.Alerter;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-// 사실 LocationDelivery를 통해 위치 새로 받아올 필요는 없다..!
 // 그래도 프래그먼트를 가지고 있는 액티비티도 가지고 있어야 할 것 같고, 나중에 혹시 모르니까..!
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, TabLayout.OnTabSelectedListener, DistanceFragment.LocationDelivery {
+        implements NavigationView.OnNavigationItemSelectedListener, TabLayout.OnTabSelectedListener{
 
     @BindView(R.id.drawer_layout)
     DrawerLayout drawer;
@@ -68,8 +63,11 @@ public class MainActivity extends AppCompatActivity
     Toolbar toolbar;
     @BindView(R.id.viewPager)
     ViewPager viewPager;
+    @BindView(R.id.notiSwitch)
+    Switch notiSwitch;
+    @BindView(R.id.logoutButton)
+    Button logoutButton;
 
-    private static final String USER = "User";
     private static final int DISTRICT = 0;
     private static final int DISTANCE = 1;
     private static final int SEARCH = 2;
@@ -82,8 +80,6 @@ public class MainActivity extends AppCompatActivity
 
     private static UserInfo user;
 
-    private static final String LOCATION_TAG = "Current Location";
-    private static Location currentLocation;
 
     private ViewPagerAdapter viewPagerAdapter;
 
@@ -91,20 +87,23 @@ public class MainActivity extends AppCompatActivity
 
     private boolean isFirst = true;
 
+    private static final int NOTIFICATION_OFF = 0;
+    private static final int NOTIFICATION_ON = 1;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        currentLocation = GlobalData.getCurrentLocation();
         GlobalData.setContext(this);
 
         getChartListFromServer();
-        getPetListFromServer();
         viewPagerSetting();
         toolbarSetting();
         drawerSetting();
+        initNotiButton();
     }
 
     public void toolbarSetting() {
@@ -133,7 +132,7 @@ public class MainActivity extends AppCompatActivity
 
     public void viewPagerSetting() {
         // TabLayout과 ViewPager 연동을 하자.
-        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), currentLocation);
+        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);
         // 미리 3개를 만들어 놓는다.
         viewPager.setOffscreenPageLimit(FRAGMENT_COUNT);
@@ -150,7 +149,7 @@ public class MainActivity extends AppCompatActivity
     public void tabLayoutSetting() {
         tabLayout.addOnTabSelectedListener(this);
         // 아이콘 설정.
-        int[] tabIcons = new int[]{R.drawable.ic_room_white_24dp, R.drawable.ic_transfer_within_a_station_white_24dp,
+        int[] tabIcons = new int[]{R.drawable.ic_room_white_24dp, R.drawable.ic_search_white_24dp,
                 R.drawable.ic_search_white_24dp};
         for (int i = 0; i < FRAGMENT_COUNT; i++)
             tabLayout.getTabAt(i).setIcon(tabIcons[i]);
@@ -177,104 +176,16 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    public void getPetListFromServer(){
-        Log.d("펫 리스트 가져온다", "가져온다");
-        final NetworkService networkService = NetworkManager.getNetworkService();
-        Call<List<Pet>> call = networkService.getPetList(GlobalData.getUser().getUserId(), GlobalData.getUser().getFlag());
-        call.enqueue(new Callback<List<Pet>>() {
-            @Override
-            public void onResponse(Call<List<Pet>> call, Response<List<Pet>> response) {
-                if(response.isSuccessful()){
-                    List<Pet> petList = response.body();
-                    GlobalData.setPetList(petList);
-                    System.out.println("이미지들");
-                    for(int i=0; i<petList.size(); i++){
-                        final Pet pet = petList.get(i);
-                        System.out.println(pet.getImagePath());
-                        // 등록된 경로가 있으면 이미지 받아오자.
-                        if(!(pet.getImagePath() == null || pet.getImagePath().trim().equals(""))){
-                            Call<ResponseBody> imageCall = networkService.getPetImage(pet.getImagePath());
-                            imageCall.enqueue(new Callback<ResponseBody>() {
-                                @Override
-                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                    if(response.isSuccessful()){
-                                        File imgFile = convertToFile(response.body(), pet.getImagePath());
-                                        pet.setImgFile(imgFile);
-                                        Log.d("이미지 가져옴", "가져왔다");
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                    Log.d("이미지 못 가져옴", "못 가져왔다.");
-                                    t.printStackTrace();
-                                }
-                            });
-                            Log.d("이미지 경로", pet.getImagePath());
-                        }
-                    }
-                    Log.d("펫 리스트 받아옴", "펫 리스트 받아왔다");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Pet>> call, Throwable t) {
-
-            }
-        });
-    }
-
-    public File convertToFile(ResponseBody responseBody, String imgPath){
-        try{
-            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-            File img = new File(path, "/" + imgPath);
-            InputStream inputStream = null;
-            OutputStream outputStream = null;
-            int read;
-
-            try{
-                byte[] fileReader = new byte[4096];
-
-                long fileSize = responseBody.contentLength();
-                long fileSizeDownloaded = 0;
-
-                inputStream = responseBody.byteStream();
-                outputStream = new FileOutputStream(img);
-
-                while((read = inputStream.read(fileReader)) != -1){
-
-                    outputStream.write(fileReader, 0, read);
-                    fileSizeDownloaded += read;
-
-                    Log.d("다운로드", "file download : " + fileSizeDownloaded + " of " + fileSize);
-                }
-                outputStream.flush();
-
-                return img;
-            }catch (IOException e){
-                e.printStackTrace();
-                return null;
-            }
-            finally {
-                if(inputStream != null)
-                    inputStream.close();
-                if(outputStream != null)
-                    outputStream.close();
-            }
-        }catch(IOException e){
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onAlarmEvent(AlarmEvent alarmEvent) {
         Log.d("Alerter", "Alerter");
         Alerter.create(this)
                 .setTitle(alarmEvent.getTitle())
-                .setBackgroundColorInt(getResources().getColor(R.color.alert_default_icon_color, null))
                 .setText(alarmEvent.getDescription())
                 .show();
+        Log.d("Alerter 보여주자", "보여주자");
+        Log.d("Title", alarmEvent.getTitle());
+        Log.d("Text", alarmEvent.getDescription());
     }
 
     @Override
@@ -329,17 +240,21 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_favorite) {
             // Handle the camera action
-            Toast.makeText(this, "카메라", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, FavoriteActivity.class));
+            Toast.makeText(this, "즐겨찾기", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_blacklist) {
-
-        } else if (id == R.id.nav_mypet) {
+            startActivity(new Intent(this, BlackActivity.class));
+        } else if (id == R.id.nav_addpet) {
             startActivity(new Intent(this, AddPetActivity.class));
-
-        } else if (id == R.id.nav_mychart) {
+        } else if (id == R.id.nav_addchart) {
             // 메인은 종료 되지는 않는다.
             startActivity(new Intent(this, AddChartActivity.class));
+        } else if (id == R.id.nav_mypet) {
+            startActivity(new Intent(this, MyPetActivity.class));
+        } else if (id == R.id.nav_mychart) {
+            startActivity(new Intent(this, MyChartActivity.class));
         } else if (id == R.id.nav_setting) {
-            startActivity(new Intent(this, SettingActivity.class));
+//            startActivity(new Intent(this, SettingActivity.class));
         } else if (id == R.id.nav_send) {
 
         }
@@ -368,34 +283,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void locationDeliver(Double latitude, Double longitude) {
-        currentLocation.setLatitude(latitude);
-        currentLocation.setLongitude(longitude);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         // onCreate에서 호출 되고 onResume에서도 호출되는 것을 막아준다.
@@ -404,7 +291,71 @@ public class MainActivity extends AppCompatActivity
         }
         else{
             getChartListFromServer();
-            getPetListFromServer();
         }
+    }
+
+    public void initNotiButton(){
+        Log.d("노티 플래그", GlobalData.getUser().getNotiFlag() + "");
+        // 알람을 받지 않는 상태이면.
+        if(GlobalData.getUser().getNotiFlag() == 0){
+            notiSwitch.setChecked(false);
+        }
+        else{
+            notiSwitch.setChecked(true);
+        }
+    }
+
+    @OnClick(R.id.notiSwitch)
+    public void notiSetting(){
+        if(!notiSwitch.isChecked()){
+            GlobalData.getUser().setNotiFlag(NOTIFICATION_OFF);
+            Log.d("알람 OFF", GlobalData.getUser().getNotiFlag() + "");
+        }
+        else{
+            GlobalData.getUser().setNotiFlag(NOTIFICATION_ON);
+            Log.d("알람 On", GlobalData.getUser().getNotiFlag() + "");
+        }
+        // 서버에도 써주자.
+        NetworkService networkService = NetworkManager.getNetworkService();
+        Call<BaseResult> call = networkService.changeAlarmSetting(GlobalData.getUser());
+        call.enqueue(new Callback<BaseResult>() {
+            @Override
+            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getResultCode() == 200){
+                        Toast.makeText(MainActivity.this, "알람 세팅 변경 완료", Toast.LENGTH_SHORT).show();
+                        // 바뀌었을 테니 화면에서도 바꿔줘야지!
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResult> call, Throwable t) {
+
+            }
+        });
+    }
+
+    @OnClick(R.id.logoutButton)
+    public void logout(){
+        // 네이버 로그인한 경우.
+        if(GlobalData.getUser().getFlag() == 0){
+            OAuthLogin oAuthLoginModule = OAuthLogin.getInstance();
+            oAuthLoginModule.logoutAndDeleteToken(this);
+        }
+        // 사용자가 카카오 로그인한 경우 세션 해제해주고 다시 로그인 액티비티로 가게 해주자.
+        else{
+            Session session = Session.getCurrentSession();
+            // 이거하면 로그아웃 할때마다?
+            session.close();
+        }
+
+        // 로그아웃 되었으니 해제해주자.
+            GlobalData.setUser(null);
+
+            Intent intent = new Intent(this, LoginActivity.class);
+            // 모든 액티비티 스택을 지워준다.
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
     }
 }

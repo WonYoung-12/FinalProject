@@ -24,7 +24,7 @@
 
         </com.prolificinteractive.materialcalendarview.MaterialCalendarView>
 
-        <include layout="@layout/cardview_chart"/>
+        <include layout="@layout/cardview_addchart"/>
     </LinearLayout>
 
 </android.support.v4.widget.NestedScrollView>
