@@ -60,14 +60,14 @@ public interface NetworkService {
 
     // TODO 유저 아이디에 해당하는 즐겨찾기를 가져온다.
     @GET("getFavoriteList")
-    Call<List<Favorite>> getFavoriteList(@Query("userId") long userId);
+    Call<List<Favorite>> getFavoriteList(@Query("userId") long userId, @Query("flag") int flag);
 
     // 유저가 선택한 병원을 블랙리스트에 추가한다.
-    @POST("enrollBlackList")
-    Call<BaseResult> enrollBlackList(@Body Black black);
+    @POST("enrollBlack")
+    Call<BaseResult> enrollBlack(@Body Black black);
 
     @GET("getBlackList")
-    Call<List<Black>> getBlackList(@Query("userId") long userId);
+    Call<List<Black>> getBlackList(@Query("userId") long userId, @Query("flag") int flag);
 
     @POST("writeChart")
     Call<BaseResult> writeChart(@Body Chart chart);

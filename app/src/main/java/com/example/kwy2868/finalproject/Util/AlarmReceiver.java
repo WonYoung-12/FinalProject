@@ -37,7 +37,6 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setLights(0xff00ff00, 500, 500);
         builder.setAutoCancel(true);
 
-        // TODO 여기서 액티비티에 대한 정보를 받고 싶은데 자꾸 Casting 오류난다 context는 receiverrestricted? 이상한거 나옴.
         // 전달.
         EventBus.getDefault().post(new AlarmEvent(title, description));
 

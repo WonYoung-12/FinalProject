@@ -79,7 +79,6 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
         hospitalName.setText(hospital.getName());
         hospitalAddress.setText(hospital.getAddress());
         hospitalTel.setText(hospital.getTel());
-        // TODO 이 방식 야매인것 같다.. 나중에 고쳐보자
         if (hospital.getDistanceFromCurrentLocation() == 0.0) {
             hospitalDistance.setVisibility(View.GONE);
         } else {

@@ -195,9 +195,18 @@ public class HospitalDetailActivity extends AppCompatActivity
     }
 
     public void setHospitalDataOnView(){
-        Glide.with(this).load(hospital.getImgPath())
-                .centerCrop().bitmapTransform(new CenterCrop(this))
-                .into(hospitalImage);
+        Log.d("이미지 패스", hospital.getImgPath() + "");
+        if(hospital.getImgPath() == null || hospital.getImgPath().trim().equals("")){
+            Glide.with(this).load(R.drawable.imgready)
+                    .centerCrop().bitmapTransform(new CenterCrop(this))
+                    .into(hospitalImage);
+        }
+        else{
+            Glide.with(this).load(hospital.getImgPath())
+                    .centerCrop().bitmapTransform(new CenterCrop(this))
+                    .into(hospitalImage);
+        }
+
         hospitalName.setText(hospital.getName());
         hospitalAddress.setText(hospital.getAddress());
         hospitalTel.setText(hospital.getTel());
@@ -457,7 +466,7 @@ public class HospitalDetailActivity extends AppCompatActivity
     
     @OnClick(R.id.favoriteButton)
     public void enrollFavorite(){
-        Favorite favorite = new Favorite(user.getUserId(), hospital.getNum());
+        Favorite favorite = new Favorite(hospital.getNum(), user.getUserId(), user.getFlag());
         Call<BaseResult> call = networkService.enrollFavorite(favorite);
         call.enqueue(new Callback<BaseResult>() {
             @Override
@@ -484,8 +493,8 @@ public class HospitalDetailActivity extends AppCompatActivity
     
     @OnClick(R.id.blackButton)
     public void enrollBlack(){
-        Black black = new Black(user.getUserId(), hospital.getNum());
-        Call<BaseResult> call = networkService.enrollBlackList(black);
+        Black black = new Black(hospital.getNum(), user.getUserId(), user.getFlag());
+        Call<BaseResult> call = networkService.enrollBlack(black);
         call.enqueue(new Callback<BaseResult>() {
             @Override
             public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
@@ -653,6 +662,7 @@ public class HospitalDetailActivity extends AppCompatActivity
 
         currentLocation = location;
         GlobalData.setCurrentLocation(currentLocation);
+        isSetLocation = true;
         currentLatitude = location.getLatitude();
         currentLongitude = location.getLongitude();
 
@@ -674,7 +684,8 @@ public class HospitalDetailActivity extends AppCompatActivity
 //                .create();
 //        dialogPlus.show();
         NavigationDialog navigationDialog = new NavigationDialog(this, currentLatitude, currentLongitude, hospital.getLatitude(), hospital.getLongitude());
-        navigationDialog.show();
+        if(!this.isFinishing())
+            navigationDialog.show();
     }
 
     @Override

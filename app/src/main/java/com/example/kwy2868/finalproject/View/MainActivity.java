@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity
     public void tabLayoutSetting() {
         tabLayout.addOnTabSelectedListener(this);
         // 아이콘 설정.
-        int[] tabIcons = new int[]{R.drawable.ic_room_white_24dp, R.drawable.ic_search_white_24dp,
+        int[] tabIcons = new int[]{R.drawable.ic_local_hospital_white_24dp, R.drawable.ic_search_white_24dp,
                 R.drawable.ic_account_circle_white_24dp};
         for (int i = 0; i < FRAGMENT_COUNT; i++)
             tabLayout.getTabAt(i).setIcon(tabIcons[i]);

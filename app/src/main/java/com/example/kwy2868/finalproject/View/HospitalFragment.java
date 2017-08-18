@@ -186,10 +186,25 @@ public class HospitalFragment extends Fragment
         if (isChecked) {
             Log.d("체크되었다.", isChecked + "");
             if (isSetLocation) {
-                recyclerViewSetting(sortedHospitalList);
+                if(sortedHospitalList == null){
+                    calcDistance(hospitalList);
+                    // 이제 거리 순으로 리스트를 정렬해보자.
+                    sortedHospitalList = new ArrayList<>();
+                    sortedHospitalList.addAll(hospitalList);
+                    Collections.sort(sortedHospitalList);
+                    recyclerViewSetting(sortedHospitalList);
+                }
+                else{
+                    recyclerViewSetting(sortedHospitalList);
+                }
             } else {
                 Toast.makeText(getContext(), "현재 위치를 가져옵니다", Toast.LENGTH_SHORT).show();
-                permissionCheck();
+                if(GlobalData.getCurrentLocation() == null) {
+                    permissionCheck();
+                }
+                else{
+                    recyclerViewSetting(sortedHospitalList);
+                }
             }
         } else {
             Log.d("체크해제되었다.", isChecked + "");
@@ -369,5 +384,14 @@ public class HospitalFragment extends Fragment
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         startActivityForResult(intent, REQUEST_CODE);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(GlobalData.getCurrentLocation() != null) {
+            isSetLocation = true;
+            currentLocation = GlobalData.getCurrentLocation();
+        }
     }
 }
