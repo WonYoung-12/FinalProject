@@ -18,26 +18,14 @@
             android:id="@+id/nav_addchart"
             android:icon="@drawable/ic_write_chart_black_24dp"
             android:title="Add Chart" />
-        <item
-            android:id="@+id/nav_mypet"
-            android:icon="@drawable/ic_pets_black_24dp"
-            android:title="My Pet" />
-        <item
-            android:id="@+id/nav_mychart"
-            android:icon="@drawable/ic_my_chart24dp"
-            android:title="My Chart" />
     </group>
 
-    <item android:title="Settings">
+    <item android:title="Etc">
         <menu>
             <item
-                android:id="@+id/nav_setting"
-                android:icon="@drawable/ic_settings_black_24dp"
-                android:title="My Settings" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:id="@+id/nav_opensource"
+                android:icon="@drawable/ic_info_black_24dp"
+                android:title="Open Source" />
         </menu>
     </item>
 

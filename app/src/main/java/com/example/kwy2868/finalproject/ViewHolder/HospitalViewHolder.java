@@ -67,22 +67,15 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
                     .into(hospitalImage);
 
         } else {
-            try {
-                Glide.with(GlobalApplication.getAppContext())
-                        .load(hospital.getImgPath())
-                        .centerCrop().bitmapTransform(new FitCenter(GlobalApplication.getAppContext()))
-                        .into(hospitalImage);
-            } catch (Exception e) {
-                Glide.with(GlobalApplication.getAppContext())
-                        .load(hospital.getImgPath())
-                        .centerCrop().bitmapTransform(new FitCenter(GlobalApplication.getAppContext()))
-                        .into(hospitalImage);
-            }
+            Glide.with(GlobalApplication.getAppContext())
+                    .load(hospital.getImgPath())
+                    .centerCrop().bitmapTransform(new FitCenter(GlobalApplication.getAppContext()))
+                    .into(hospitalImage);
         }
 
         // TODO 우선은 테스트 위해 한명이라도 추가하면 배경 색 바꿔주자.
         if (hospital.getBlackcount() >= 1)
-            hospitalCardView.setBackgroundColor(GlobalApplication.getAppContext().getColor(android.R.color.darker_gray));
+            hospitalCardView.setBackgroundColor(GlobalApplication.getAppContext().getColor(R.color.blackColor));
         hospitalName.setText(hospital.getName());
         hospitalAddress.setText(hospital.getAddress());
         hospitalTel.setText(hospital.getTel());

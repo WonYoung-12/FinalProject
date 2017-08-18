@@ -19,6 +19,7 @@ import com.example.kwy2868.finalproject.Model.Pet;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
+import com.example.kwy2868.finalproject.Util.MyAlarmManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -53,8 +54,10 @@ public class MyInfoFragment extends Fragment {
     private ChartAdapter chartAdapter;
     private List<Chart> chartList;
 
-    private static final int COLUMN_SPAN = 2;
+    private static final int COLUMN_SPAN = 3;
     private Unbinder unbinder;
+
+    private boolean isFirst = true;
 
     @Nullable
     @Override
@@ -70,6 +73,7 @@ public class MyInfoFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         getPetListFromServer();
+        getChartListFromServer();
     }
 
     public void getPetListFromServer(){
@@ -90,7 +94,6 @@ public class MyInfoFragment extends Fragment {
                         if(!(pet.getImagePath() == null || pet.getImagePath().trim().equals(""))){
                             Call<ResponseBody> imageCall = networkService.getPetImage(pet.getImagePath());
                             Log.i("이미지 세팅", "세팅 해주자");
-                            final int position = i;
 
                             imageCall.enqueue(new Callback<ResponseBody>() {
                                 @Override
@@ -123,12 +126,45 @@ public class MyInfoFragment extends Fragment {
         });
     }
 
+    public void getChartListFromServer() {
+        Log.d("차트 리스트 가져온다", "가져온다");
+        NetworkService networkService = NetworkManager.getNetworkService();
+        Call<List<Chart>> call = networkService.getChartList(GlobalData.getUser().getUserId(), GlobalData.getUser().getFlag());
+        call.enqueue(new Callback<List<Chart>>() {
+            @Override
+            public void onResponse(Call<List<Chart>> call, Response<List<Chart>> response) {
+                if (response.isSuccessful()) {
+                    chartList = response.body();
+                    GlobalData.setChartList(response.body());
+                    Log.d("차트리스트", GlobalData.getChartList() + "");
+                    MyAlarmManager.setAlarm();
+                    chartRecyclerViewSetting();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Chart>> call, Throwable t) {
+
+            }
+        });
+    }
+
     public void petRecyclerViewSetting(){
         petLayoutManager= new StaggeredGridLayoutManager(COLUMN_SPAN, StaggeredGridLayoutManager.VERTICAL);
         myPetRecyclerView.setLayoutManager(petLayoutManager);
         myPetRecyclerView.setItemAnimator(null);
+        myPetRecyclerView.setNestedScrollingEnabled(false);
         petAdapter = new PetAdapter(petList);
         myPetRecyclerView.setAdapter(petAdapter);
+    }
+
+    public void chartRecyclerViewSetting(){
+        chartLayoutManager= new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        myChartRecyclerView.setLayoutManager(chartLayoutManager);
+        myChartRecyclerView.setItemAnimator(null);
+        myChartRecyclerView.setNestedScrollingEnabled(false);
+        chartAdapter = new ChartAdapter(chartList);
+        myChartRecyclerView.setAdapter(chartAdapter);
     }
 
     public File convertToFile(ResponseBody responseBody, String imgPath){
@@ -168,6 +204,18 @@ public class MyInfoFragment extends Fragment {
         }catch(IOException e){
             e.printStackTrace();
             return null;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(isFirst){
+            isFirst = !isFirst;
+        }
+        else{
+            getPetListFromServer();
+            getChartListFromServer();
         }
     }
 

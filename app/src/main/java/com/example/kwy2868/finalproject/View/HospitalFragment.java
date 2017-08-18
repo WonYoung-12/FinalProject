@@ -36,7 +36,6 @@ import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
 import com.example.kwy2868.finalproject.Util.LocationHelper;
-import com.example.kwy2868.finalproject.ViewHolder.HospitalViewHolder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,7 +67,7 @@ public class HospitalFragment extends Fragment
     @BindView(R.id.byDistance)
     CheckBox checkBox;
 
-    private RecyclerView.LayoutManager layoutManager;
+    private StaggeredGridLayoutManager layoutManager;
 
     private HospitalAdapter hospitalAdapter;
 
@@ -115,6 +114,7 @@ public class HospitalFragment extends Fragment
         hospitalRecyclerView.setItemAnimator(null);
         hospitalAdapter = new HospitalAdapter(hospitalList);
         hospitalRecyclerView.setAdapter(hospitalAdapter);
+        hideDistance();
     }
 
     // 거리 구할때 직선거리 말고는 없나..?
@@ -185,27 +185,33 @@ public class HospitalFragment extends Fragment
         // 체크해서 현재 위치 기준으로 정렬하려 할 때.
         if (isChecked) {
             Log.d("체크되었다.", isChecked + "");
-            if(isSetLocation){
+            if (isSetLocation) {
                 recyclerViewSetting(sortedHospitalList);
-            }
-            else{
+            } else {
                 Toast.makeText(getContext(), "현재 위치를 가져옵니다", Toast.LENGTH_SHORT).show();
                 permissionCheck();
             }
         } else {
             Log.d("체크해제되었다.", isChecked + "");
             recyclerViewSetting(hospitalList);
-            hideDistance();
         }
     }
 
     public void hideDistance() {
-        for (int i = 0; i < hospitalRecyclerView.getChildCount(); i++) {
-            HospitalViewHolder holder = (HospitalViewHolder) hospitalRecyclerView.getChildViewHolder(hospitalRecyclerView.getChildAt(i));
-            if (holder != null) {
-                holder.hideDistance();
-            }
-        }
+//        Log.d("distance 숨기자", "숨기자");
+        int[] viewIds = layoutManager.findFirstCompletelyVisibleItemPositions(null);
+        int[] start = layoutManager.findFirstVisibleItemPositions(viewIds);
+//        Log.d("start size", start.length + "");
+//        Log.d("start 1", start[0] + " ");
+//        Log.d("start 2", start[1] + " ");
+
+        int[] viewIds2 = layoutManager.findLastCompletelyVisibleItemPositions(null);
+        int[] end = layoutManager.findLastVisibleItemPositions(viewIds2);
+//        HospitalViewHolder holder = (HospitalViewHolder) hospitalRecyclerView.getChildViewHolder(hospitalRecyclerView.getChildAt(i))
+//        Log.d("holder 널 테스트", holder + " ");
+//        if (holder != null) {
+//            holder.hideDistance();
+//        }
     }
 
     public void permissionCheck() {
@@ -309,7 +315,7 @@ public class HospitalFragment extends Fragment
         // 화면에도 뿌려주자.
         // 중간에 체크 해제하는 예외처리?
 
-        if(checkBox.isChecked()){
+        if (checkBox.isChecked()) {
             recyclerViewSetting(sortedHospitalList);
         }
         districtRefreshLayout.setRefreshing(false);

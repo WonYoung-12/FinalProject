@@ -1,9 +1,12 @@
 package com.example.kwy2868.finalproject.Model;
 
+import org.parceler.Parcel;
+import org.parceler.ParcelConstructor;
+
 /**
  * Created by kwy2868 on 2017-08-12.
  */
-
+@Parcel(Parcel.Serialization.BEAN)
 public class Chart {
     private int num;
     private String petName;
@@ -15,6 +18,7 @@ public class Chart {
     private String title;
     private String description;
 
+    @ParcelConstructor
     public Chart(String petName, long userId, int flag, String treatmentDate, String reTreatmentDate, String title, String description) {
         this.petName = petName;
         this.userId = userId;
@@ -33,14 +37,6 @@ public class Chart {
         this.num = num;
     }
 
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
-
     public String getPetName() {
         return petName;
     }
@@ -49,12 +45,20 @@ public class Chart {
         this.petName = petName;
     }
 
-    public String getReTreatmentDate() {
-        return reTreatmentDate;
+    public long getUserId() {
+        return userId;
     }
 
-    public void setReTreatmentDate(String reTreatmentDate) {
-        this.reTreatmentDate = reTreatmentDate;
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
+    public int getFlag() {
+        return flag;
+    }
+
+    public void setFlag(int flag) {
+        this.flag = flag;
     }
 
     public String getTreatmentDate() {
@@ -63,6 +67,14 @@ public class Chart {
 
     public void setTreatmentDate(String treatmentDate) {
         this.treatmentDate = treatmentDate;
+    }
+
+    public String getReTreatmentDate() {
+        return reTreatmentDate;
+    }
+
+    public void setReTreatmentDate(String reTreatmentDate) {
+        this.reTreatmentDate = reTreatmentDate;
     }
 
     public String getTitle() {

@@ -241,9 +241,18 @@ public class HospitalDetailActivity extends AppCompatActivity
             public void onResponse(Call<List<GetReviewResult>> call, Response<List<GetReviewResult>> response) {
                 if(response.isSuccessful()){
                     reviewList = response.body();
-                    if(reviewList != null)
-                        noReview.setVisibility(View.GONE);
-                    refreshRecyclerView();
+                    // 받아온 리스트가 있으면.
+                    if(reviewList.size() > 0) {
+                        refreshRecyclerView();
+                    }
+                    else{
+                        reviewRecyclerView.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                reviewRecyclerView.hideShimmerAdapter();
+                            }
+                        }, 1500);
+                    }
                 }
             }
 
@@ -260,13 +269,14 @@ public class HospitalDetailActivity extends AppCompatActivity
         reviewRecyclerView.setAdapter(reviewAdapter);
         reviewRecyclerView.showShimmerAdapter();
 
-        // 1초 후에.
+        // 1.5초 후에.
         reviewRecyclerView.postDelayed(new Runnable() {
             @Override
             public void run() {
                 reviewAdapter = new ReviewAdapter(reviewList);
                 reviewRecyclerView.setAdapter(reviewAdapter);
                 reviewRecyclerView.hideShimmerAdapter();
+                noReview.setVisibility(View.GONE);
             }
         }, 1500);
     }

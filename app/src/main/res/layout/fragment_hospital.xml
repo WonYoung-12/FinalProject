@@ -45,7 +45,8 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/hospitalRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:animateLayoutChanges="false">
 
             </android.support.v7.widget.RecyclerView>
         </com.baoyz.widget.PullRefreshLayout>

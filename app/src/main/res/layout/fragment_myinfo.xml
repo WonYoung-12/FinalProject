@@ -1,27 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/myPetRecyclerView"
+        <TextView
+            android:id="@+id/petInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:drawableLeft="@drawable/ic_pets_black_24dp"
+            android:drawablePadding="5dp"
+            android:text="My Pet"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/myPet"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/petInfo"
+            android:layout_margin="10dp"
+            android:background="@drawable/layout_border"
+            android:orientation="vertical"
+            android:padding="10dp">
 
-        </android.support.v7.widget.RecyclerView>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/myPetRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/myChartRecyclerView"
+            </android.support.v7.widget.RecyclerView>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/chartInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/myPet"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:drawableLeft="@drawable/ic_my_chart24dp"
+            android:drawablePadding="5dp"
+            android:text="My Chart"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/myChart"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/chartInfo"
+            android:layout_margin="10dp"
+            android:background="@drawable/layout_border"
+            android:orientation="vertical"
+            android:padding="10dp">
 
-        </android.support.v7.widget.RecyclerView>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/myChartRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-    </LinearLayout>
+            </android.support.v7.widget.RecyclerView>
+        </LinearLayout>
 
-</RelativeLayout>
+    </RelativeLayout>
+
+</android.support.v4.widget.NestedScrollView>

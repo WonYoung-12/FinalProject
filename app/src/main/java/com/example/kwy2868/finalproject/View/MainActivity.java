@@ -24,13 +24,11 @@ import com.bumptech.glide.Glide;
 import com.example.kwy2868.finalproject.Adapter.ViewPagerAdapter;
 import com.example.kwy2868.finalproject.Model.AlarmEvent;
 import com.example.kwy2868.finalproject.Model.BaseResult;
-import com.example.kwy2868.finalproject.Model.Chart;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.UserInfo;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
-import com.example.kwy2868.finalproject.Util.MyAlarmManager;
 import com.kakao.auth.Session;
 import com.nhn.android.naverlogin.OAuthLogin;
 import com.tapadoo.alerter.Alerter;
@@ -38,8 +36,6 @@ import com.tapadoo.alerter.Alerter;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -99,7 +95,6 @@ public class MainActivity extends AppCompatActivity
 
         GlobalData.setContext(this);
 
-        getChartListFromServer();
         viewPagerSetting();
         toolbarSetting();
         drawerSetting();
@@ -153,27 +148,6 @@ public class MainActivity extends AppCompatActivity
                 R.drawable.ic_account_circle_white_24dp};
         for (int i = 0; i < FRAGMENT_COUNT; i++)
             tabLayout.getTabAt(i).setIcon(tabIcons[i]);
-    }
-
-    public void getChartListFromServer() {
-        Log.d("차트 리스트 가져온다", "가져온다");
-        NetworkService networkService = NetworkManager.getNetworkService();
-        Call<List<Chart>> call = networkService.getChartList(GlobalData.getUser().getUserId(), GlobalData.getUser().getFlag());
-        call.enqueue(new Callback<List<Chart>>() {
-            @Override
-            public void onResponse(Call<List<Chart>> call, Response<List<Chart>> response) {
-                if (response.isSuccessful()) {
-                    GlobalData.setChartList(response.body());
-                    Log.d("차트리스트", GlobalData.getChartList() + "");
-                    MyAlarmManager.setAlarm();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Chart>> call, Throwable t) {
-
-            }
-        });
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -249,14 +223,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_addchart) {
             // 메인은 종료 되지는 않는다.
             startActivity(new Intent(this, AddChartActivity.class));
-        } else if (id == R.id.nav_mypet) {
-            startActivity(new Intent(this, MyPetActivity.class));
-        } else if (id == R.id.nav_mychart) {
-            startActivity(new Intent(this, MyChartActivity.class));
-        } else if (id == R.id.nav_setting) {
+        } else if (id == R.id.nav_opensource) {
 //            startActivity(new Intent(this, SettingActivity.class));
-        } else if (id == R.id.nav_send) {
-
         }
 
         drawer.closeDrawer(GravityCompat.START);
@@ -290,7 +258,6 @@ public class MainActivity extends AppCompatActivity
             isFirst = !isFirst;
         }
         else{
-            getChartListFromServer();
         }
     }
 

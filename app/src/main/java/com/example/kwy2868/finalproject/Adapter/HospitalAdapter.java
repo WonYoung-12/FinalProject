@@ -46,8 +46,4 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalViewHolder> {
         else
             return -1;
     }
-
-    public void setHospitalList(List hospitalList) {
-        this.hospitalList = hospitalList;
-    }
 }

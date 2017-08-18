@@ -57,7 +57,7 @@ public class PetViewHolder extends RecyclerView.ViewHolder{
                     .into(petImage);
         }
         petName.setText("이름 : " + pet.getName());
-        petAge.setText(pet.getAge() + "살");
+        petAge.setText("나이 : " + pet.getAge() + "살");
         petSpecies.setText("종 : " + pet.getSpecies());
     }
 }

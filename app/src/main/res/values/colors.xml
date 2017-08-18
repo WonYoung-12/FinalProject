@@ -8,7 +8,9 @@
     <color name="tabSelectedTextColor">#09ca03</color>
     <color name="navHeaderColor">#8b8b8b</color>
 
-    <color name="colorPrimaryBlur">#33455a64</color>
+    <color name="blackColor">#C0C0C0</color>
+
+    <color name="colorPrimaryBlur">#6affc000</color>
     <color name="dialogColor">#1b1abc9c</color>
 
     <color name="black_semi_transparent">#B2000000</color>

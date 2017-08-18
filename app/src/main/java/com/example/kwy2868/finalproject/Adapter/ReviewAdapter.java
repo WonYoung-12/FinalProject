@@ -47,8 +47,4 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewViewHolder> {
     public int getItemCount() {
         return reviewList.size();
     }
-
-    public void setReviewList(List<GetReviewResult> reviewList) {
-        this.reviewList = reviewList;
-    }
 }

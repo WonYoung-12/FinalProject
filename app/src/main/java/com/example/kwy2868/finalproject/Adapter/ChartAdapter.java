@@ -3,9 +3,11 @@ package com.example.kwy2868.finalproject.Adapter;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.kwy2868.finalproject.Model.Chart;
+import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.ViewHolder.ChartViewHolder;
 
 import java.util.List;
@@ -27,7 +29,10 @@ public class ChartAdapter extends RecyclerView.Adapter<ChartViewHolder>{
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
 
-        return null;
+        View view = inflater.inflate(R.layout.cardview_mychart, parent, shouldAttachToParentImmediately);
+        ChartViewHolder chartViewHolder = new ChartViewHolder(view, chartList);
+
+        return chartViewHolder;
     }
 
     @Override
