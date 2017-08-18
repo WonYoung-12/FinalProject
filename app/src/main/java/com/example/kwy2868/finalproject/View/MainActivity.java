@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity
         tabLayout.addOnTabSelectedListener(this);
         // 아이콘 설정.
         int[] tabIcons = new int[]{R.drawable.ic_room_white_24dp, R.drawable.ic_search_white_24dp,
-                R.drawable.ic_search_white_24dp};
+                R.drawable.ic_account_circle_white_24dp};
         for (int i = 0; i < FRAGMENT_COUNT; i++)
             tabLayout.getTabAt(i).setIcon(tabIcons[i]);
     }
@@ -206,17 +206,17 @@ public class MainActivity extends AppCompatActivity
         switch (tab.getPosition()) {
             case DISTRICT:
                 Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content),
-                        "서울시 구별로 동물 병원을 조회할 수 있습니다.", Snackbar.LENGTH_LONG)
+                        "서울시 내의 동물 병원을 조회할 수 있습니다.", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 break;
             case DISTANCE:
                 Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content),
-                        "현재 위치 기준으로 가까운 동물 병원을 15개 조회할 수 있습니다.", Snackbar.LENGTH_LONG)
+                        "네이버 블로그, 카페, 지식iN에서 유사한 20가지의 결과를 검색 할 수 있습니다.", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 break;
             case SEARCH:
                 Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content),
-                        "네이버 블로그, 카페, 지식iN에서 유사한 20가지의 결과를 검색 할 수 있습니다.", Snackbar.LENGTH_LONG)
+                        "등록한 반려 동물과 진료 기록들을 볼 수 있습니다.", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 break;
         }

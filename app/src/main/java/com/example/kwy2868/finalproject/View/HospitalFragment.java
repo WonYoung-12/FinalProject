@@ -36,6 +36,7 @@ import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
 import com.example.kwy2868.finalproject.Util.LocationHelper;
+import com.example.kwy2868.finalproject.ViewHolder.HospitalViewHolder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,8 +62,8 @@ public class HospitalFragment extends Fragment
 
     @BindView(R.id.districtRefreshLayout)
     PullRefreshLayout districtRefreshLayout;
-    @BindView(R.id.districtRecyclerView)
-    RecyclerView districtRecyclerView;
+    @BindView(R.id.hospitalRecyclerView)
+    RecyclerView hospitalRecyclerView;
 
     @BindView(R.id.byDistance)
     CheckBox checkBox;
@@ -77,6 +78,7 @@ public class HospitalFragment extends Fragment
     private LocationManager locationManager;
     private LocationListener locationListener;
 
+    private boolean isSetLocation = false;
     private Location currentLocation;
     private double currentLatitude;
     private double currentLongitude;
@@ -85,6 +87,7 @@ public class HospitalFragment extends Fragment
     private List<Hospital> sortedHospitalList;
 
     private static final int REQUEST_CODE = 0;
+    private static final int COLUMN_SPAN = 2;
 
     @Nullable
     @Override
@@ -106,12 +109,12 @@ public class HospitalFragment extends Fragment
     }
 
     public void recyclerViewSetting(List<Hospital> hospitalList) {
-        layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-        districtRecyclerView.setLayoutManager(layoutManager);
-        districtRecyclerView.setHasFixedSize(true);
-        districtRecyclerView.setItemAnimator(null);
+        layoutManager = new StaggeredGridLayoutManager(COLUMN_SPAN, StaggeredGridLayoutManager.VERTICAL);
+        hospitalRecyclerView.setLayoutManager(layoutManager);
+        hospitalRecyclerView.setHasFixedSize(true);
+        hospitalRecyclerView.setItemAnimator(null);
         hospitalAdapter = new HospitalAdapter(hospitalList);
-        districtRecyclerView.setAdapter(hospitalAdapter);
+        hospitalRecyclerView.setAdapter(hospitalAdapter);
     }
 
     // 거리 구할때 직선거리 말고는 없나..?
@@ -144,7 +147,7 @@ public class HospitalFragment extends Fragment
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         // 강동구도 뜸.
         // 가만히 냅둬도 호출되니까 이렇게 하면 여러번 호출이 안되겠지
-        if(currentDistrict == null || !currentDistrict.equals((String) adapterView.getItemAtPosition(i))){
+        if (currentDistrict == null || !currentDistrict.equals((String) adapterView.getItemAtPosition(i))) {
             currentDistrict = (String) adapterView.getItemAtPosition(i);
 //            Toast.makeText(getContext(), adapterView.getItemAtPosition(i) + " ", Toast.LENGTH_SHORT).show();
             // 거리순으로 보고자할때.
@@ -168,11 +171,11 @@ public class HospitalFragment extends Fragment
     public void onRefresh() {
         Log.d("갱신하자", "갱신하자");
         // 거리순으로 보는상태면.
-        if(checkBox.isChecked()){
+        if (checkBox.isChecked()) {
             permissionCheck();
         }
         // 아니면.
-        else{
+        else {
             getHospitalList(currentDistrict);
         }
     }
@@ -180,14 +183,28 @@ public class HospitalFragment extends Fragment
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
         // 체크해서 현재 위치 기준으로 정렬하려 할 때.
-        if(isChecked){
-            Toast.makeText(getContext(), "현재 위치를 가져옵니다", Toast.LENGTH_SHORT).show();
+        if (isChecked) {
             Log.d("체크되었다.", isChecked + "");
-            permissionCheck();
-        }
-        else{
+            if(isSetLocation){
+                recyclerViewSetting(sortedHospitalList);
+            }
+            else{
+                Toast.makeText(getContext(), "현재 위치를 가져옵니다", Toast.LENGTH_SHORT).show();
+                permissionCheck();
+            }
+        } else {
             Log.d("체크해제되었다.", isChecked + "");
             recyclerViewSetting(hospitalList);
+            hideDistance();
+        }
+    }
+
+    public void hideDistance() {
+        for (int i = 0; i < hospitalRecyclerView.getChildCount(); i++) {
+            HospitalViewHolder holder = (HospitalViewHolder) hospitalRecyclerView.getChildViewHolder(hospitalRecyclerView.getChildAt(i));
+            if (holder != null) {
+                holder.hideDistance();
+            }
         }
     }
 
@@ -271,10 +288,14 @@ public class HospitalFragment extends Fragment
     }
 
     // 위치 받아왔으니 계산해주자.
-    public void afterLocationUpdated(Location location){
+    public void afterLocationUpdated(Location location) {
         Toast.makeText(getContext(), "현재 위치를 받아오는데 성공 했습니다.", Toast.LENGTH_SHORT).show();
         currentLocation = location;
+
+        isSetLocation = true;
+        // 이거 세팅이 되어 있으면 다른 액티비티에서 또 위치 받아오는 거 생략해주게 해주자.
         GlobalData.setCurrentLocation(currentLocation);
+
         currentLatitude = location.getLatitude();
         currentLongitude = location.getLongitude();
         // 일반 쓰레드니까 따로 메소드로 빼주자.
@@ -286,7 +307,11 @@ public class HospitalFragment extends Fragment
         sortedHospitalList.addAll(hospitalList);
         Collections.sort(sortedHospitalList);
         // 화면에도 뿌려주자.
-        recyclerViewSetting(sortedHospitalList);
+        // 중간에 체크 해제하는 예외처리?
+
+        if(checkBox.isChecked()){
+            recyclerViewSetting(sortedHospitalList);
+        }
         districtRefreshLayout.setRefreshing(false);
     }
 

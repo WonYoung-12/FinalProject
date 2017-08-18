@@ -28,7 +28,7 @@ import butterknife.ButterKnife;
  * Created by kwy2868 on 2017-08-01.
  */
 
-public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
     @BindView(R.id.hospitalCardView)
     CardView hospitalCardView;
     @BindView(R.id.hospitalName)
@@ -39,8 +39,8 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
     TextView hospitalAddress;
     @BindView(R.id.hospitalTel)
     TextView hospitalTel;
-    @BindView(R.id.distance)
-    TextView distance;
+    @BindView(R.id.hospitalDistance)
+    TextView hospitalDistance;
     @BindView(R.id.hospitalRating)
     RatingBar hospitalRating;
 
@@ -60,19 +60,19 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
 
     public void bind(int position) {
         Hospital hospital = hospitalList.get(position);
-        if(hospital.getImgPath() == null || hospital.getImgPath().trim().equals("")){
-                Glide.with(GlobalApplication.getAppContext())
-                        .load(R.drawable.imgready)
-                        .centerCrop().bitmapTransform(new FitCenter(GlobalApplication.getAppContext()))
-                        .into(hospitalImage);
-
-        }
-        else{
-            try {Glide.with(GlobalApplication.getAppContext())
-                    .load(hospital.getImgPath())
+        if (hospital.getImgPath() == null || hospital.getImgPath().trim().equals("")) {
+            Glide.with(GlobalApplication.getAppContext())
+                    .load(R.drawable.imgready)
                     .centerCrop().bitmapTransform(new FitCenter(GlobalApplication.getAppContext()))
                     .into(hospitalImage);
-            }catch(Exception e){
+
+        } else {
+            try {
+                Glide.with(GlobalApplication.getAppContext())
+                        .load(hospital.getImgPath())
+                        .centerCrop().bitmapTransform(new FitCenter(GlobalApplication.getAppContext()))
+                        .into(hospitalImage);
+            } catch (Exception e) {
                 Glide.with(GlobalApplication.getAppContext())
                         .load(hospital.getImgPath())
                         .centerCrop().bitmapTransform(new FitCenter(GlobalApplication.getAppContext()))
@@ -81,17 +81,16 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
         }
 
         // TODO 우선은 테스트 위해 한명이라도 추가하면 배경 색 바꿔주자.
-        if(hospital.getBlackcount() >= 1)
+        if (hospital.getBlackcount() >= 1)
             hospitalCardView.setBackgroundColor(GlobalApplication.getAppContext().getColor(android.R.color.darker_gray));
         hospitalName.setText(hospital.getName());
         hospitalAddress.setText(hospital.getAddress());
         hospitalTel.setText(hospital.getTel());
         // TODO 이 방식 야매인것 같다.. 나중에 고쳐보자
-        if(hospital.getDistanceFromCurrentLocation() == 0.0){
-            distance.setVisibility(View.GONE);
-        }
-        else{
-            distance.setText(hospital.getDistanceFromCurrentLocation() + "");
+        if (hospital.getDistanceFromCurrentLocation() == 0.0) {
+            hospitalDistance.setVisibility(View.GONE);
+        } else {
+            hospitalDistance.setText(hospital.getDistanceFromCurrentLocation() + "");
         }
         hospitalRating.setRating(hospital.getRating_avg());
     }
@@ -113,5 +112,10 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
         intent.putExtra(HOSPITAL_TAG, wrappedHospital);
         intent.putExtra(LOCATION_TAG, GlobalData.getCurrentLocation());
         view.getContext().startActivity(intent);
+    }
+
+    public void hideDistance() {
+        if (hospitalDistance != null)
+            hospitalDistance.setVisibility(View.GONE);
     }
 }

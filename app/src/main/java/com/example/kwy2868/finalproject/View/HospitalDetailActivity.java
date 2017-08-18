@@ -141,6 +141,9 @@ public class HospitalDetailActivity extends AppCompatActivity
 
     private static final String HOSPITAL_TAG = "Hospital";
 
+    // 현재 위치 값을 이미 갖고 있는지.
+    private boolean isSetLocation = false;
+
     // 현재 보고 있는 화면에 해당하는 병원.
     private Hospital hospital;
     // 현재 사용중인 유저.
@@ -163,9 +166,21 @@ public class HospitalDetailActivity extends AppCompatActivity
         ButterKnife.bind(this);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        checkLocation();
         dataInit();
         recyclerViewSetting();
         getReviewList();
+    }
+
+    public void checkLocation(){
+        Location location = GlobalData.getCurrentLocation();
+        // 이전 액티비티에서 현재 위치가 설정 되어 있는 경우.
+        if(location != null){
+            isSetLocation = true;
+            currentLocation = location;
+            currentLatitude = location.getLatitude();
+            currentLongitude = location.getLongitude();
+        }
     }
 
     public void dataInit(){
@@ -327,10 +342,16 @@ public class HospitalDetailActivity extends AppCompatActivity
     // 마커의 병원 이름 클릭 했을 때 호출.
     @Override
     public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem) {
-        Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content),
-                "현재 위치를 받아옵니다.", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
-        permissionCheck();
+        if(isSetLocation) {
+            NavigationDialog navigationDialog = new NavigationDialog(this, currentLatitude, currentLongitude, hospital.getLatitude(), hospital.getLongitude());
+            navigationDialog.show();;
+        }
+        else {
+            permissionCheck();
+            Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content),
+                    "현재 위치를 받아옵니다.", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
     }
 
     @Override
@@ -624,6 +645,7 @@ public class HospitalDetailActivity extends AppCompatActivity
         GlobalData.setCurrentLocation(currentLocation);
         currentLatitude = location.getLatitude();
         currentLongitude = location.getLongitude();
+
         makeDialog();
     }
 
@@ -641,8 +663,8 @@ public class HospitalDetailActivity extends AppCompatActivity
 //                .setCancelable(true)
 //                .create();
 //        dialogPlus.show();
-        NavigationDialog navigationDialogdialog = new NavigationDialog(this, currentLatitude, currentLongitude, hospital.getLatitude(), hospital.getLongitude());
-        navigationDialogdialog.show();
+        NavigationDialog navigationDialog = new NavigationDialog(this, currentLatitude, currentLongitude, hospital.getLatitude(), hospital.getLongitude());
+        navigationDialog.show();
     }
 
     @Override

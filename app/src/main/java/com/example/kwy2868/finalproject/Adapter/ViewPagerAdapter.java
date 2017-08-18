@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.example.kwy2868.finalproject.View.HospitalFragment;
+import com.example.kwy2868.finalproject.View.MyInfoFragment;
 import com.example.kwy2868.finalproject.View.SearchFragment;
 
 /**
@@ -36,8 +37,8 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
                 SearchFragment searchFragment = new SearchFragment();
                 return searchFragment;
             case 2:
-                SearchFragment searchFragment2 = new SearchFragment();
-                return searchFragment2;
+                MyInfoFragment myInfoFragment = new MyInfoFragment();
+                return myInfoFragment;
             default:
                 return null;
         }
