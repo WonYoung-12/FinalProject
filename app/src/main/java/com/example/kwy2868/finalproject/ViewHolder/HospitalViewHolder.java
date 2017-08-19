@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.Hospital;
+import com.example.kwy2868.finalproject.Model.SpeciesResult;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.View.HospitalDetailActivity;
 import com.example.kwy2868.finalproject.kakao.GlobalApplication;
@@ -23,6 +24,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 /**
  * Created by kwy2868 on 2017-08-01.
@@ -39,13 +42,14 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
     TextView hospitalAddress;
     @BindView(R.id.hospitalTel)
     TextView hospitalTel;
+    @BindView(R.id.hospitalSpecies)
+    TextView hospitalSpecies;
     @BindView(R.id.hospitalDistance)
     TextView hospitalDistance;
     @BindView(R.id.hospitalRating)
     RatingBar hospitalRating;
 
     private static final String HOSPITAL_TAG = "Hospital";
-    private static final String USER_TAG = "User";
     private static final String LOCATION_TAG = "Location";
 
     private List<Hospital> hospitalList;
@@ -79,6 +83,20 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
         hospitalName.setText(hospital.getName());
         hospitalAddress.setText(hospital.getAddress());
         hospitalTel.setText(hospital.getTel());
+
+        List<String> department = hospital.getSpecies();
+        if (department == null) {
+            hospitalSpecies.setVisibility(View.GONE);
+        } else {
+            for (int i = 0; i < department.size(); i++) {
+                if (i == 0)
+                    hospitalSpecies.setText(department.get(i));
+                else {
+                    hospitalSpecies.append(", " + department.get(i));
+                }
+            }
+        }
+
         if (hospital.getDistanceFromCurrentLocation() == 0.0) {
             hospitalDistance.setVisibility(View.GONE);
         } else {

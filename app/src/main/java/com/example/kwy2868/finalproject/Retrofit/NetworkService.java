@@ -95,4 +95,7 @@ public interface NetworkService {
     // 펫의 사진들 가져오자.
     @GET("getPetImage")
     Call<ResponseBody> getPetImage(@Query("filePath") String filePath);
+
+    @GET("getSpecies")
+    Call<JsonObject> getSpecies(@Query("num") int num);
 }

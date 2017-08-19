@@ -217,7 +217,7 @@ public class HospitalDetailActivity extends AppCompatActivity
     public void mapSetting(){
         mapView.setPOIItemEventListener(this);
         // 사용자 위치 받아올 수 있지만 맵 이동은 안됨.
-        mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
+//        mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
         mapView.setMapViewEventListener(this);
 
         hospitalMapPoint = MapPoint.mapPointWithGeoCoord(hospital.getLatitude(), hospital.getLongitude());

@@ -107,7 +107,8 @@ public class AddChartActivity extends AppCompatActivity implements OnDateSelecte
         }
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, petNameList);
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(arrayAdapter);
+        if(spinner != null)
+            spinner.setAdapter(arrayAdapter);
     }
 
     public void initCalendar(){

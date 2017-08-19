@@ -36,6 +36,8 @@ import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
 import com.example.kwy2868.finalproject.Util.LocationHelper;
+import com.example.kwy2868.finalproject.Util.ParsingHelper;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,6 +80,7 @@ public class HospitalFragment extends Fragment
     private LocationListener locationListener;
 
     private boolean isSetLocation = false;
+    private boolean isFirst = true;
     private Location currentLocation;
     private double currentLatitude;
     private double currentLongitude;
@@ -119,17 +122,37 @@ public class HospitalFragment extends Fragment
 
     // 거리 구할때 직선거리 말고는 없나..?
     public void getHospitalList(String district) {
-        NetworkService networkService = NetworkManager.getNetworkService();
+        final NetworkService networkService = NetworkManager.getNetworkService();
         Call<List<Hospital>> call = networkService.getHospitalList(district);
         call.enqueue(new Callback<List<Hospital>>() {
             @Override
             public void onResponse(Call<List<Hospital>> call, Response<List<Hospital>> response) {
                 if (response.isSuccessful()) {
                     hospitalList = response.body();
-                    Log.d("사이즈", hospitalList.size() + " ");
                     // notify 해주자.
                     recyclerViewSetting(hospitalList);
                     Log.d("HospitalList", hospitalList.get(0).getName() + " ");
+
+                    // TODO 여기서 진료과목들도 받아오자.
+                    for(int i=0; i<hospitalList.size(); i++){
+                        final Hospital hospital = hospitalList.get(i);
+                        Call<JsonObject> speciesCall = networkService.getSpecies(hospital.getNum());
+                        speciesCall.enqueue(new Callback<JsonObject>() {
+                            @Override
+                            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                                if(response.isSuccessful()){
+                                    ParsingHelper.speciesParsing(hospital, response.body());
+                                    recyclerViewSetting(hospitalList);
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<JsonObject> call, Throwable t) {
+
+                            }
+                        });
+                    }
+
                 } else {
 //                    Log.d("씨발", "레트로핏 안된다.");
                 }
@@ -393,5 +416,11 @@ public class HospitalFragment extends Fragment
             isSetLocation = true;
             currentLocation = GlobalData.getCurrentLocation();
         }
+//        if(isFirst){
+//            isFirst = !isFirst;
+//        }
+//        else{
+//            getHospitalList(currentDistrict);
+//        }
     }
 }
