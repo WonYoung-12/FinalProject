@@ -118,8 +118,7 @@ public class AddPetActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == PHOTO_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null){
-            checkPermission();
-
+//            checkPermission();
             imageNavigation.setVisibility(View.GONE);
 
             selectedImage = data.getData();
@@ -130,7 +129,6 @@ public class AddPetActivity extends AppCompatActivity {
 
             imagePath = getPath(selectedImage);
             Log.d("Image Path", imagePath);
-
         }
     }
 

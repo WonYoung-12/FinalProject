@@ -29,6 +29,7 @@ import com.example.kwy2868.finalproject.Model.UserInfo;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
 import com.example.kwy2868.finalproject.Retrofit.NetworkService;
+import com.example.kwy2868.finalproject.Util.MyAlarmManager;
 import com.kakao.auth.Session;
 import com.nhn.android.naverlogin.OAuthLogin;
 import com.tapadoo.alerter.Alerter;
@@ -85,7 +86,6 @@ public class MainActivity extends AppCompatActivity
 
     private static final int NOTIFICATION_OFF = 0;
     private static final int NOTIFICATION_ON = 1;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -274,10 +274,13 @@ public class MainActivity extends AppCompatActivity
 
     @OnClick(R.id.notiSwitch)
     public void notiSetting(){
+        // 등록된 알람을 취소해주자.
         if(!notiSwitch.isChecked()){
             GlobalData.getUser().setNotiFlag(NOTIFICATION_OFF);
+            MyAlarmManager.cancelAlarm();
             Log.d("알람 OFF", GlobalData.getUser().getNotiFlag() + "");
         }
+        // 알람을 등록해주자.
         else{
             GlobalData.getUser().setNotiFlag(NOTIFICATION_ON);
             Log.d("알람 On", GlobalData.getUser().getNotiFlag() + "");
