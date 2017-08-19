@@ -37,7 +37,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         builder.setPriority(Notification.PRIORITY_MAX);
         builder.setAutoCancel(true);
 
-        // 전달.
+        // 전달. 그런데 EventBus는 앱 꺼지면 유지가 안됨..!
 //        EventBus.getDefault().post(new AlarmEvent(title, description));
 
         notificationManager.notify(111, builder.build());

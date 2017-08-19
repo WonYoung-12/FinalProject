@@ -59,8 +59,8 @@ public class HospitalFragment extends Fragment
     @BindView(R.id.districtSpinner)
     Spinner districtSpinner;
 
-    @BindView(R.id.districtRefreshLayout)
-    PullRefreshLayout districtRefreshLayout;
+    @BindView(R.id.hospitalRefreshLayout)
+    PullRefreshLayout hospitalRefreshLayout;
     @BindView(R.id.hospitalRecyclerView)
     RecyclerView hospitalRecyclerView;
 
@@ -94,7 +94,7 @@ public class HospitalFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_hospital, container, false);
         unbinder = ButterKnife.bind(this, view);
         districtSpinner.setOnItemSelectedListener(this);
-        districtRefreshLayout.setOnRefreshListener(this);
+        hospitalRefreshLayout.setOnRefreshListener(this);
 //        enrollLatLngToDB();
 
         return view;
@@ -140,7 +140,7 @@ public class HospitalFragment extends Fragment
                 Log.d("Network Error", "레트로핏 못 받아옴.");
             }
         });
-        districtRefreshLayout.setRefreshing(false);
+        hospitalRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -333,7 +333,7 @@ public class HospitalFragment extends Fragment
         if (checkBox.isChecked()) {
             recyclerViewSetting(sortedHospitalList);
         }
-        districtRefreshLayout.setRefreshing(false);
+        hospitalRefreshLayout.setRefreshing(false);
     }
 
     public void calcDistance(List<Hospital> hospitalList) {

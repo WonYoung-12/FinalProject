@@ -38,7 +38,7 @@
         </LinearLayout>
 
         <com.baoyz.widget.PullRefreshLayout
-            android:id="@+id/districtRefreshLayout"
+            android:id="@+id/hospitalRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 

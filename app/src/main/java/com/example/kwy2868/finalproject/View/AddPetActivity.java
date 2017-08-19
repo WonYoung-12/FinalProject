@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -48,6 +50,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.os.Build.VERSION_CODES.M;
+import static com.example.kwy2868.finalproject.Model.GlobalData.getContext;
+
 /**
  * Created by kwy2868 on 2017-08-12.
  */
@@ -69,6 +74,9 @@ public class AddPetActivity extends AppCompatActivity {
     private Unbinder unbinder;
     private static final int PHOTO_REQUEST = 1;
     private static final int READ_REQUEST_CODE = 1;
+
+    private static final int REQUEST_CODE = 0;
+
     private Uri selectedImage;
 
     private String imagePath;
@@ -84,34 +92,80 @@ public class AddPetActivity extends AppCompatActivity {
 
     @OnClick(R.id.petImage)
     public void addPetImage(){
+        imagePermissionCheck();
+    }
+
+    public void imagePermissionCheck() {
+        // 현재 안드로이드 버전이 마시멜로 이상인 경우 퍼미션 체크가 추가로 필요함.
+        if (Build.VERSION.SDK_INT >= M) {
+            // 퍼미션이 없는 경우 퍼미션을 요구해야겠지?
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_DENIED) {
+                // 사용자가 다시 보지 않기에 체크 하지 않고, 퍼미션 체크를 거절한 이력이 있는 경우. (처음 거절한 경우에도 들어감.)
+                // 최초 요청시에는 false를 리턴해서 아래 else에 들어간다.
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    Log.d("다시 물어본다", "다시 물어본다.");
+                }
+                // 사용자가 다시 보지 않기에 체크하고, 퍼미션 체크를 거절한 이력이 있는 경우.
+                // 퍼미션을 요구하는 새로운 창을 띄워줘야 겠지.
+                // 최초 요청시에도 들어가게 됨. 다시 보지 않기에 체크하는 창은 물어보지 않음.
+                else {
+                    Log.d("다시 물어보지 않는다", "다시 물어보지 않는다.");
+                }
+                // 액티비티, permission String 배열, requestCode를 인자로 받음.
+                // 퍼미션을 요구하는 다이얼로그 창을 띄운다.
+                // requestCode 다르게 하면 다르게 처리할 수 있을듯?
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
+            }
+            // 퍼미션이 있는 경우.
+            else {
+                selectImage();
+            }
+        }
+        // 버전 낮은거.
+        else {
+            selectImage();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE) {
+            Log.d("퍼미션 요구", "퍼미션 요구");
+            // 요구하는 퍼미션이 한개이기 때문에 하나만 확인한다.
+            // 해당 퍼미션이 승낙된 경우.
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d("퍼미션 승인", "퍼미션 승인");
+                selectImage();
+            }
+            // 해당 퍼미션이 거절된 경우.
+            else {
+                Log.d("퍼미션 거절", "퍼미션 거절");
+                Toast.makeText(getContext(), "퍼미션을 승인 해주셔야 알람 이용이 가능합니다", Toast.LENGTH_SHORT).show();
+                // 앱 정보 화면을 통해 퍼미션을 다시 요구해보자.
+                requestPermissionInSettings();
+            }
+        }
+    }
+
+    public void selectImage(){
         Intent photoPickIntent = new Intent(Intent.ACTION_GET_CONTENT);
         photoPickIntent.setType("image/*");
         startActivityForResult(photoPickIntent, PHOTO_REQUEST);
     }
 
-    public void checkPermission(){
-        int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-        if(permission != PackageManager.PERMISSION_GRANTED){
-            Log.i("Permission Denied", "Denied");
-            requestPermission();
-        }
+    public void requestPermissionInSettings() {
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        intent.setData(Uri.parse("package:" + getPackageName()));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        startActivityForResult(intent, REQUEST_CODE);
     }
 
-    public void requestPermission(){
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_REQUEST_CODE);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == READ_REQUEST_CODE){
-            if(grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED){
-                Log.i("Permission Denied", "Permission Denied by user");
-            }
-            else {
-                Log.i("Permission Granted", "Permission Granted by user");
-            }
-        }
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
