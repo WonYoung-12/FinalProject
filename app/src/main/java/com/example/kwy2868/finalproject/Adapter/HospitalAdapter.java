@@ -40,6 +40,10 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalViewHolder> {
         holder.bind(position);
     }
 
+    public void setHospitalList(List hospitalList) {
+        this.hospitalList = hospitalList;
+    }
+
     @Override
     public int getItemCount() {
         if(hospitalList == null)

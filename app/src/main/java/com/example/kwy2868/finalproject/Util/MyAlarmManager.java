@@ -92,7 +92,6 @@ public class MyAlarmManager {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, chart.getNum(), intent, 0);
         Log.d("Chart Number", chart.getNum() + " ");
 
-        // TODO 등록된 알람이 있는 경우 취소해주자.
         if(pendingIntent != null){
             Log.d("등록된 알람 있다.", "있으니까 취소하자");
             alarmManager.cancel(pendingIntent);

@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.kwy2868.finalproject.Adapter.FavoriteAdapter;
+import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.Favorite;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.R;
@@ -35,7 +36,7 @@ import retrofit2.Response;
  * Created by kwy2868 on 2017-08-17.
  */
 
-public class FavoriteActivity extends AppCompatActivity {
+public class MyFavoriteActivity extends AppCompatActivity {
     @BindView(R.id.favoriteRecyclerView)
     RecyclerView favoriteRecyclerView;
 
@@ -72,7 +73,7 @@ public class FavoriteActivity extends AppCompatActivity {
                         recyclerViewSetting();
                     }
                     else{
-                        Toast.makeText(FavoriteActivity.this, "등록한 즐겨찾기가 없습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MyFavoriteActivity.this, "등록한 즐겨찾기가 없습니다.", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -95,7 +96,7 @@ public class FavoriteActivity extends AppCompatActivity {
         swipeToAction = new SwipeToAction(favoriteRecyclerView, new SwipeToAction.SwipeListener<Favorite>() {
             @Override
             public boolean swipeLeft(Favorite itemData) {
-                showDeleteFavoriteDialog();
+                showDeleteFavoriteDialog(itemData);
                 displaySnackbar(itemData.getName() + " removed", "Undo", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -135,7 +136,7 @@ public class FavoriteActivity extends AppCompatActivity {
         snack.show();
     }
 
-    public void showDeleteFavoriteDialog(){
+    public void showDeleteFavoriteDialog(final Favorite favorite){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("즐겨찾기 삭제")
                 .setMessage("즐겨찾기에서 삭제하시겠습니까?")
@@ -144,7 +145,7 @@ public class FavoriteActivity extends AppCompatActivity {
                 .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
+                        deleteFavorite(favorite);
                     }
                 })
                 .setNegativeButton("취소", new DialogInterface.OnClickListener() {
@@ -155,6 +156,29 @@ public class FavoriteActivity extends AppCompatActivity {
                 });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    public void deleteFavorite(final Favorite favorite){
+        final int position = favoriteList.indexOf(favorite);
+        NetworkService networkService = NetworkManager.getNetworkService();
+        Call<BaseResult> call = networkService.deleteFavorite(favorite.getNum(), favorite.getUserId(), favorite.getFlag());
+        call.enqueue(new Callback<BaseResult>() {
+            @Override
+            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getResultCode() == 200){
+                        Toast.makeText(MyFavoriteActivity.this, "정상적으로 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                        favoriteList.remove(position);
+                        favoriteAdapter.notifyItemRemoved(position);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResult> call, Throwable t) {
+                Toast.makeText(MyFavoriteActivity.this, "네트워크 오류.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

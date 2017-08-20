@@ -214,9 +214,9 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_favorite) {
             // Handle the camera action
-            startActivity(new Intent(this, FavoriteActivity.class));
+            startActivity(new Intent(this, MyFavoriteActivity.class));
         } else if (id == R.id.nav_blacklist) {
-            startActivity(new Intent(this, BlackActivity.class));
+            startActivity(new Intent(this, MyBlackActivity.class));
         } else if (id == R.id.nav_addpet) {
             startActivity(new Intent(this, AddPetActivity.class));
         } else if (id == R.id.nav_addchart) {

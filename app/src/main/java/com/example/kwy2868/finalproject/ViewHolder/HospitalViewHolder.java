@@ -13,7 +13,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.Hospital;
-import com.example.kwy2868.finalproject.Model.SpeciesResult;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.View.HospitalDetailActivity;
 import com.example.kwy2868.finalproject.kakao.GlobalApplication;
@@ -24,8 +23,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 /**
  * Created by kwy2868 on 2017-08-01.
@@ -79,9 +76,9 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
 
         // TODO 우선은 테스트 위해 한명이라도 추가하면 배경 색 바꿔주자.
         if (hospital.getBlackcount() >= 1)
-            hospitalCardView.setCardBackgroundColor(R.color.blackColor);
+            hospitalCardView.setCardBackgroundColor(GlobalData.getContext().getResources().getColor(R.color.blackColor));
         else
-            hospitalCardView.setCardBackgroundColor(android.R.color.white);
+            hospitalCardView.setCardBackgroundColor(GlobalData.getContext().getResources().getColor(android.R.color.white));
 
         hospitalName.setText(hospital.getName());
         hospitalAddress.setText(hospital.getAddress());
@@ -101,9 +98,9 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
         }
 
         if (hospital.getDistanceFromCurrentLocation() == 0.0) {
-            hospitalDistance.setVisibility(View.GONE);
+            hospitalDistance.setText("현재위치 파악이 필요합니다.");
         } else {
-            hospitalDistance.setText(hospital.getDistanceFromCurrentLocation() + "");
+            hospitalDistance.setText(hospital.getDistanceFromCurrentLocation() + "km");
         }
         hospitalRating.setRating(hospital.getRating_avg());
     }

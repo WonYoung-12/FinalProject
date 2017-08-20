@@ -52,13 +52,10 @@ public interface NetworkService {
     @GET("review")
     Call<List<GetReviewResult>> getReviewList(@Query("num") int num);
 
-    // TODO 그런데 즐겨찾기랑 블랙리스트를 동시에 추가할 수 없게 디테일한 내용까지 지금 잡아줄 여유가 있을까...?
-
     // 유저 아이디와 병원 번호를 가지고 즐겨찾기를 등록한다.
     @POST("enrollFavorite")
     Call<BaseResult> enrollFavorite(@Body Favorite favorite);
 
-    // TODO 유저 아이디에 해당하는 즐겨찾기를 가져온다.
     @GET("getFavoriteList")
     Call<List<Favorite>> getFavoriteList(@Query("userId") long userId, @Query("flag") int flag);
 
@@ -105,4 +102,10 @@ public interface NetworkService {
 
     @GET("checkAddedBlack")
     Call<BaseResult> checkAddedBlack(@Query("num") int num, @Query("userId") long userId, @Query("flag") int flag);
+
+    @GET("deleteFavorite")
+    Call<BaseResult> deleteFavorite(@Query("num") int num, @Query("userId") long userId, @Query("flag") int flag);
+
+    @GET("deleteBlack")
+    Call<BaseResult> deleteBlack(@Query("num") int num, @Query("userId") long userId, @Query("flag") int flag);
 }

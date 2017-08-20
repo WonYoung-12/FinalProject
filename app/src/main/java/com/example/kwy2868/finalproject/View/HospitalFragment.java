@@ -116,11 +116,9 @@ public class HospitalFragment extends Fragment
     public void recyclerViewSetting() {
         layoutManager = new StaggeredGridLayoutManager(COLUMN_SPAN, StaggeredGridLayoutManager.VERTICAL);
         hospitalRecyclerView.setLayoutManager(layoutManager);
-        hospitalRecyclerView.setHasFixedSize(true);
-        hospitalRecyclerView.setItemAnimator(null);
         hospitalAdapter = new HospitalAdapter(hospitalList);
         hospitalRecyclerView.setAdapter(hospitalAdapter);
-        hideDistance();
+//        hideDistance();
     }
 
     public void refreshRecyclerView(List<Hospital> hospitalList){
@@ -142,8 +140,7 @@ public class HospitalFragment extends Fragment
             public void onResponse(Call<List<Hospital>> call, Response<List<Hospital>> response) {
                 if (response.isSuccessful()) {
                     hospitalList = response.body();
-                    // notify 해주자.
-                    refreshRecyclerView(hospitalList);
+                    hospitalAdapter.notifyItemRangeChanged(0, hospitalList.size());
                     getSpecies();
                 } else {
 //                    Log.d("씨발", "레트로핏 안된다.");
@@ -418,7 +415,7 @@ public class HospitalFragment extends Fragment
 
     public void getSpecies(){
         NetworkService networkService = NetworkManager.getNetworkService();
-        // TODO 여기서 진료과목들도 받아오자.
+        // 진료 가능한 동물들 받아온다.
         for(int i=0; i<hospitalList.size(); i++){
             final Hospital hospital = hospitalList.get(i);
             Call<JsonObject> speciesCall = networkService.getSpecies(hospital.getNum());
@@ -428,7 +425,6 @@ public class HospitalFragment extends Fragment
                     if(response.isSuccessful()){
                         ParsingHelper.speciesParsing(hospital, response.body());
                         speciesCount++;
-
                         // 리스트에 대한 모든 아이템을 받아오고 화면 갱신해 주어야 효율적이겠지.
                         if(speciesCount == hospitalList.size()){
                             refreshRecyclerView(hospitalList);

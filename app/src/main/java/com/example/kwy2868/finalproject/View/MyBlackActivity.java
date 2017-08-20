@@ -11,11 +11,12 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.kwy2868.finalproject.Adapter.BlackAdapter;
+import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.Black;
 import com.example.kwy2868.finalproject.Model.GlobalData;
-import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Network.NetworkManager;
 import com.example.kwy2868.finalproject.Network.NetworkService;
+import com.example.kwy2868.finalproject.R;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ import retrofit2.Response;
  * Created by kwy2868 on 2017-08-17.
  */
 
-public class BlackActivity extends AppCompatActivity {
+public class MyBlackActivity extends AppCompatActivity {
     @BindView(R.id.blackRecyclerView)
     RecyclerView blackRecyclerView;
 
@@ -67,7 +68,7 @@ public class BlackActivity extends AppCompatActivity {
                         recyclerViewSetting();
                     }
                     else{
-                        Toast.makeText(BlackActivity.this, "등록한 블랙리스트가 없습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MyBlackActivity.this, "등록한 블랙리스트가 없습니다.", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -90,7 +91,7 @@ public class BlackActivity extends AppCompatActivity {
         swipeToAction = new SwipeToAction(blackRecyclerView, new SwipeToAction.SwipeListener<Black>() {
             @Override
             public boolean swipeLeft(Black itemData) {
-                showDeleteBlackDialog();
+                showDeleteBlackDialog(itemData);
                 return true;
             }
 
@@ -111,7 +112,7 @@ public class BlackActivity extends AppCompatActivity {
         });
     }
 
-    public void showDeleteBlackDialog(){
+    public void showDeleteBlackDialog(final Black black){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("블랙리스트 삭제")
                 .setMessage("블랙리스트에서 해제하시겠습니까?")
@@ -119,7 +120,7 @@ public class BlackActivity extends AppCompatActivity {
                 .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
+                        deleteBlack(black);
                     }
                 })
                 .setNegativeButton("취소", new DialogInterface.OnClickListener() {
@@ -130,6 +131,29 @@ public class BlackActivity extends AppCompatActivity {
                 });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    public void deleteBlack(final Black black){
+        final int position = blackList.indexOf(black);
+        NetworkService networkService = NetworkManager.getNetworkService();
+        Call<BaseResult> call = networkService.deleteBlack(black.getNum(), black.getUserId(), black.getFlag());
+        call.enqueue(new Callback<BaseResult>() {
+            @Override
+            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getResultCode() == 200){
+                        Toast.makeText(MyBlackActivity.this, "정상적으로 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                        blackList.remove(position);
+                        blackAdapter.notifyItemRemoved(position);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResult> call, Throwable t) {
+                Toast.makeText(MyBlackActivity.this, "네트워크 오류.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
