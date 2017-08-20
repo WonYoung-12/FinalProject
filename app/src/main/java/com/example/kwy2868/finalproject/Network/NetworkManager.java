@@ -1,4 +1,4 @@
-package com.example.kwy2868.finalproject.Retrofit;
+package com.example.kwy2868.finalproject.Network;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

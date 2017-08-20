@@ -1,6 +1,6 @@
-package com.example.kwy2868.finalproject.Retrofit.NaverAPI;
+package com.example.kwy2868.finalproject.Network.NaverAPI;
 
-import com.example.kwy2868.finalproject.Retrofit.BaseManager;
+import com.example.kwy2868.finalproject.Network.BaseManager;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

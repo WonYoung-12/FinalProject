@@ -21,7 +21,7 @@ import co.dift.ui.SwipeToAction;
  * Created by kwy2868 on 2017-08-18.
  */
 
-public class FavoriteViewHolder extends SwipeToAction.ViewHolder<Favorite> {
+public class FavoriteViewHolder extends SwipeToAction.ViewHolder<Favorite>{
     @BindView(R.id.hospitalName)
     TextView hospitalName;
     @BindView(R.id.hospitalImage)

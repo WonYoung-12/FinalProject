@@ -1,7 +1,9 @@
 package com.example.kwy2868.finalproject.View;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,14 +14,15 @@ import com.example.kwy2868.finalproject.Adapter.BlackAdapter;
 import com.example.kwy2868.finalproject.Model.Black;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.R;
-import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
-import com.example.kwy2868.finalproject.Retrofit.NetworkService;
+import com.example.kwy2868.finalproject.Network.NetworkManager;
+import com.example.kwy2868.finalproject.Network.NetworkService;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import co.dift.ui.SwipeToAction;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -36,6 +39,8 @@ public class BlackActivity extends AppCompatActivity {
     private BlackAdapter blackAdapter;
     private LinearLayoutManager layoutManager;
     private static final int COLUMN_SPAN = 2;
+
+    private SwipeToAction swipeToAction;
 
     private Unbinder unbinder;
 
@@ -81,6 +86,50 @@ public class BlackActivity extends AppCompatActivity {
         blackRecyclerView.setItemAnimator(null);
         blackAdapter = new BlackAdapter(blackList);
         blackRecyclerView.setAdapter(blackAdapter);
+
+        swipeToAction = new SwipeToAction(blackRecyclerView, new SwipeToAction.SwipeListener<Black>() {
+            @Override
+            public boolean swipeLeft(Black itemData) {
+                showDeleteBlackDialog();
+                return true;
+            }
+
+            @Override
+            public boolean swipeRight(Black itemData) {
+                return true;
+            }
+
+            @Override
+            public void onClick(Black itemData) {
+
+            }
+
+            @Override
+            public void onLongClick(Black itemData) {
+
+            }
+        });
+    }
+
+    public void showDeleteBlackDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("블랙리스트 삭제")
+                .setMessage("블랙리스트에서 해제하시겠습니까?")
+                .setCancelable(true)
+                .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     @Override
@@ -89,5 +138,11 @@ public class BlackActivity extends AppCompatActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbinder.unbind();
     }
 }

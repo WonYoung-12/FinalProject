@@ -49,8 +49,8 @@ import com.example.kwy2868.finalproject.Model.Review;
 import com.example.kwy2868.finalproject.Model.UserInfo;
 import com.example.kwy2868.finalproject.Model.WriteResult;
 import com.example.kwy2868.finalproject.R;
-import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
-import com.example.kwy2868.finalproject.Retrofit.NetworkService;
+import com.example.kwy2868.finalproject.Network.NetworkManager;
+import com.example.kwy2868.finalproject.Network.NetworkService;
 import com.example.kwy2868.finalproject.Util.LocationHelper;
 import com.example.kwy2868.finalproject.Util.NavigationDialog;
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -170,6 +170,8 @@ public class HospitalDetailActivity extends AppCompatActivity
         dataInit();
         recyclerViewSetting();
         getReviewList();
+        // 보고 있는 병원이 즐겨찾기 또는 블랙리스트에 추가 되어 있는지 확인.
+        checkAdded();
     }
 
     public void checkLocation(){
@@ -268,6 +270,51 @@ public class HospitalDetailActivity extends AppCompatActivity
             @Override
             public void onFailure(Call<List<GetReviewResult>> call, Throwable t) {
 //                Toast.makeText(HospitalDetailActivity.this, "네트워크 오류", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void checkAdded(){
+        Call<BaseResult> favoriteCheck = networkService.checkAddedFavorite(hospital.getNum(), user.getUserId(), user.getFlag());
+        favoriteCheck.enqueue(new Callback<BaseResult>() {
+            @Override
+            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+                if (response.isSuccessful()){
+                    // 이미 추가 되어 있는 병원.
+                    if(response.body().getResultCode() == 200){
+                        favoriteButton.setTitle("즐겨 찾기 해제");
+                    }
+                    // 추가 되어 있지 않은 병원.
+                    else if(response.body().getResultCode() == 300){
+                        favoriteButton.setTitle("즐겨 찾기 등록");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResult> call, Throwable t) {
+                Toast.makeText(HospitalDetailActivity.this, "네트워크 오류입니다", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        Call<BaseResult> blackCheck = networkService.checkAddedBlack(hospital.getNum(), user.getUserId(), user.getFlag());
+        blackCheck.enqueue(new Callback<BaseResult>() {
+            @Override
+            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+                if (response.isSuccessful()){
+                    if(response.body().getResultCode() == 200){
+                        blackButton.setTitle("블랙 리스트 해제");
+                    }
+                    // 추가 되어 있지 않은 병원.
+                    else if(response.body().getResultCode() == 300){
+                        blackButton.setTitle("블랙 리스트 등록");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResult> call, Throwable t) {
+                Toast.makeText(HospitalDetailActivity.this, "네트워크 오류입니다", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -477,6 +524,9 @@ public class HospitalDetailActivity extends AppCompatActivity
                         Toast.makeText(HospitalDetailActivity.this, "즐겨찾기 추가 성공.", Toast.LENGTH_SHORT).show();
                         Log.d("즐겨찾기", "즐겨찾기 등록 성공");
                     }
+                    else if(baseResult.getResultCode() == 300){
+                        Toast.makeText(HospitalDetailActivity.this, "블랙 리스트에 추가된 병원입니다. 블랙리스트에서 해제 후에 추가 해주세요.", Toast.LENGTH_SHORT).show();
+                    }
                     else if(response.body().getResultCode() == 2000){
                         Toast.makeText(HospitalDetailActivity.this, "즐겨찾기에 이미 추가된 병원입니다.", Toast.LENGTH_SHORT).show();
                         Log.d("Result Code", baseResult.getResultCode() + " ");
@@ -503,6 +553,9 @@ public class HospitalDetailActivity extends AppCompatActivity
                     if(baseResult.getResultCode() == 200){
                         Toast.makeText(HospitalDetailActivity.this, "블랙리스트 추가 성공.", Toast.LENGTH_SHORT).show();
                         Log.d("블랙리스트", "블랙리스트 추가");
+                    }
+                    else if(baseResult.getResultCode() == 300){
+                        Toast.makeText(HospitalDetailActivity.this, "즐겨 찾기에 추가된 병원입니다. 즐겨 찾기에서 해제 후에 추가 해주세요.", Toast.LENGTH_SHORT).show();
                     }
                     else if(baseResult.getResultCode() == 2000){
                         Toast.makeText(HospitalDetailActivity.this, "이미 블랙 리스트에 추가된 병원입니다.", Toast.LENGTH_SHORT).show();

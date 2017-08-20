@@ -33,8 +33,8 @@ import com.example.kwy2868.finalproject.Adapter.HospitalAdapter;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.Hospital;
 import com.example.kwy2868.finalproject.R;
-import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
-import com.example.kwy2868.finalproject.Retrofit.NetworkService;
+import com.example.kwy2868.finalproject.Network.NetworkManager;
+import com.example.kwy2868.finalproject.Network.NetworkService;
 import com.example.kwy2868.finalproject.Util.LocationHelper;
 import com.example.kwy2868.finalproject.Util.ParsingHelper;
 import com.google.gson.JsonObject;
@@ -126,6 +126,8 @@ public class HospitalFragment extends Fragment
     public void refreshRecyclerView(List<Hospital> hospitalList){
         layoutManager = new StaggeredGridLayoutManager(COLUMN_SPAN, StaggeredGridLayoutManager.VERTICAL);
         hospitalRecyclerView.setLayoutManager(layoutManager);
+        hospitalRecyclerView.setHasFixedSize(true);
+        hospitalRecyclerView.setItemAnimator(null);
         hospitalAdapter = new HospitalAdapter(hospitalList);
         hospitalRecyclerView.setAdapter(hospitalAdapter);
     }
@@ -142,8 +144,6 @@ public class HospitalFragment extends Fragment
                     hospitalList = response.body();
                     // notify 해주자.
                     refreshRecyclerView(hospitalList);
-                    Log.d("HospitalList", hospitalList.get(0).getName() + " ");
-
                     getSpecies();
                 } else {
 //                    Log.d("씨발", "레트로핏 안된다.");
@@ -365,7 +365,7 @@ public class HospitalFragment extends Fragment
             float distance = currentLocation.distanceTo(hospitalLocation);
             hospital.setDistanceFromCurrentLocation(distance);
         }
-    }
+}
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -428,10 +428,11 @@ public class HospitalFragment extends Fragment
                     if(response.isSuccessful()){
                         ParsingHelper.speciesParsing(hospital, response.body());
                         speciesCount++;
+
                         // 리스트에 대한 모든 아이템을 받아오고 화면 갱신해 주어야 효율적이겠지.
                         if(speciesCount == hospitalList.size()){
-                            speciesCount = 0;
                             refreshRecyclerView(hospitalList);
+                            speciesCount = 0;
                         }
                     }
                 }

@@ -36,14 +36,15 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalViewHolder> {
 
     @Override
     public void onBindViewHolder(HospitalViewHolder holder, int position) {
+//        holder.setIsRecyclable(false);
         holder.bind(position);
     }
 
     @Override
     public int getItemCount() {
-        if(hospitalList != null)
-            return hospitalList.size();
+        if(hospitalList == null)
+            return 0;
         else
-            return -1;
+            return hospitalList.size();
     }
 }

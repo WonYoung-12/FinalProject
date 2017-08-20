@@ -26,8 +26,8 @@ import com.example.kwy2868.finalproject.Adapter.KiNContentAdapter;
 import com.example.kwy2868.finalproject.Model.BlogContent;
 import com.example.kwy2868.finalproject.Model.CafeArticle;
 import com.example.kwy2868.finalproject.R;
-import com.example.kwy2868.finalproject.Retrofit.NaverAPI.NaverAPIManager;
-import com.example.kwy2868.finalproject.Retrofit.NaverAPI.SearchService;
+import com.example.kwy2868.finalproject.Network.NaverAPI.NaverAPIManager;
+import com.example.kwy2868.finalproject.Network.NaverAPI.SearchService;
 import com.example.kwy2868.finalproject.Util.ParsingHelper;
 import com.google.gson.JsonObject;
 

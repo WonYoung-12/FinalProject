@@ -1,4 +1,4 @@
-package com.example.kwy2868.finalproject.Retrofit;
+package com.example.kwy2868.finalproject.Network;
 
 import java.util.concurrent.TimeUnit;
 

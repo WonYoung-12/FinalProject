@@ -79,20 +79,23 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
 
         // TODO 우선은 테스트 위해 한명이라도 추가하면 배경 색 바꿔주자.
         if (hospital.getBlackcount() >= 1)
-            hospitalCardView.setBackgroundColor(GlobalApplication.getAppContext().getColor(R.color.blackColor));
+            hospitalCardView.setCardBackgroundColor(R.color.blackColor);
+        else
+            hospitalCardView.setCardBackgroundColor(android.R.color.white);
+
         hospitalName.setText(hospital.getName());
         hospitalAddress.setText(hospital.getAddress());
         hospitalTel.setText(hospital.getTel());
 
-        List<String> department = hospital.getSpecies();
-        if (department == null) {
+        List<String> speciesList = hospital.getSpecies();
+        if (speciesList == null || speciesList.size() == 0) {
             hospitalSpecies.setVisibility(View.GONE);
         } else {
-            for (int i = 0; i < department.size(); i++) {
+            for (int i = 0; i < speciesList.size(); i++) {
                 if (i == 0)
-                    hospitalSpecies.setText(department.get(i));
+                    hospitalSpecies.setText(speciesList.get(i));
                 else {
-                    hospitalSpecies.append(", " + department.get(i));
+                    hospitalSpecies.append(", " + speciesList.get(i));
                 }
             }
         }

@@ -27,8 +27,8 @@ import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.UserInfo;
 import com.example.kwy2868.finalproject.R;
-import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
-import com.example.kwy2868.finalproject.Retrofit.NetworkService;
+import com.example.kwy2868.finalproject.Network.NetworkManager;
+import com.example.kwy2868.finalproject.Network.NetworkService;
 import com.example.kwy2868.finalproject.Util.MyAlarmManager;
 import com.kakao.auth.Session;
 import com.nhn.android.naverlogin.OAuthLogin;
@@ -215,7 +215,6 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_favorite) {
             // Handle the camera action
             startActivity(new Intent(this, FavoriteActivity.class));
-            Toast.makeText(this, "즐겨찾기", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_blacklist) {
             startActivity(new Intent(this, BlackActivity.class));
         } else if (id == R.id.nav_addpet) {
@@ -223,7 +222,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_addchart) {
             // 메인은 종료 되지는 않는다.
             startActivity(new Intent(this, AddChartActivity.class));
-        } else if (id == R.id.nav_opensource) {
+        }
+        // TODO 오픈소스 소개하는 거 만들어야해 ㅎㅎ.
+        else if (id == R.id.nav_opensource) {
 //            startActivity(new Intent(this, SettingActivity.class));
         }
 

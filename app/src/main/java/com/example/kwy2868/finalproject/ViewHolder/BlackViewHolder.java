@@ -1,6 +1,5 @@
 package com.example.kwy2868.finalproject.ViewHolder;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -16,12 +15,13 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import co.dift.ui.SwipeToAction;
 
 /**
  * Created by kwy2868 on 2017-08-18.
  */
 
-public class BlackViewHolder extends RecyclerView.ViewHolder {
+public class BlackViewHolder extends SwipeToAction.ViewHolder<Black> {
     @BindView(R.id.hospitalName)
     TextView hospitalName;
     @BindView(R.id.hospitalImage)

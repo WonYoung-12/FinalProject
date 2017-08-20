@@ -27,8 +27,8 @@ import com.example.kwy2868.finalproject.Model.Chart;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.Pet;
 import com.example.kwy2868.finalproject.R;
-import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
-import com.example.kwy2868.finalproject.Retrofit.NetworkService;
+import com.example.kwy2868.finalproject.Network.NetworkManager;
+import com.example.kwy2868.finalproject.Network.NetworkService;
 import com.example.kwy2868.finalproject.Util.MyAlarmManager;
 
 import java.io.File;

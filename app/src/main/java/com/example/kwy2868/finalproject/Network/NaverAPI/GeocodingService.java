@@ -1,4 +1,4 @@
-package com.example.kwy2868.finalproject.Retrofit.NaverAPI;
+package com.example.kwy2868.finalproject.Network.NaverAPI;
 
 import com.google.gson.JsonObject;
 

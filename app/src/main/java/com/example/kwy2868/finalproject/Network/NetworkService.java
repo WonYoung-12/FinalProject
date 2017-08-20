@@ -1,4 +1,4 @@
-package com.example.kwy2868.finalproject.Retrofit;
+package com.example.kwy2868.finalproject.Network;
 
 import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.Black;
@@ -98,4 +98,11 @@ public interface NetworkService {
 
     @GET("getSpecies")
     Call<JsonObject> getSpecies(@Query("num") int num);
+
+    // 병원 번호, 유저 아이디, 유저 플래그 보내주자.
+    @GET("checkAddedFavorite")
+    Call<BaseResult> checkAddedFavorite(@Query("num") int num, @Query("userId") long userId, @Query("flag") int flag);
+
+    @GET("checkAddedBlack")
+    Call<BaseResult> checkAddedBlack(@Query("num") int num, @Query("userId") long userId, @Query("flag") int flag);
 }

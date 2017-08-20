@@ -1,9 +1,11 @@
 package com.example.kwy2868.finalproject.View;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,8 +18,8 @@ import com.example.kwy2868.finalproject.Adapter.FavoriteAdapter;
 import com.example.kwy2868.finalproject.Model.Favorite;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.R;
-import com.example.kwy2868.finalproject.Retrofit.NetworkManager;
-import com.example.kwy2868.finalproject.Retrofit.NetworkService;
+import com.example.kwy2868.finalproject.Network.NetworkManager;
+import com.example.kwy2868.finalproject.Network.NetworkService;
 
 import java.util.List;
 
@@ -93,6 +95,7 @@ public class FavoriteActivity extends AppCompatActivity {
         swipeToAction = new SwipeToAction(favoriteRecyclerView, new SwipeToAction.SwipeListener<Favorite>() {
             @Override
             public boolean swipeLeft(Favorite itemData) {
+                showDeleteFavoriteDialog();
                 displaySnackbar(itemData.getName() + " removed", "Undo", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -132,11 +135,39 @@ public class FavoriteActivity extends AppCompatActivity {
         snack.show();
     }
 
+    public void showDeleteFavoriteDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("즐겨찾기 삭제")
+                .setMessage("즐겨찾기에서 삭제하시겠습니까?")
+                .setCancelable(true)
+                // 여기서 서버에 보내서 삭제해주자.
+                .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbinder.unbind();
     }
 }

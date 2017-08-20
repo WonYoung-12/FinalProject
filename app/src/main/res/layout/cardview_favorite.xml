@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="150dp"
@@ -15,11 +14,11 @@
 
         <!-- this view reveals when swipe right -->
         <RelativeLayout
-            android:tag="reveal-right"
-            android:background="#33b5e5"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="16dp">
+            android:background="#33b5e5"
+            android:padding="16dp"
+            android:tag="reveal-right">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -27,33 +26,34 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="20dp"
-                android:tint="@color/icons"
-                android:src="@mipmap/ic_star_black"/>
+                android:src="@mipmap/ic_star_black"
+                android:tint="@color/icons" />
         </RelativeLayout>
 
         <!-- this view reveals when swipe left -->
         <RelativeLayout
-            android:tag="reveal-left"
-            android:background="@color/colorPrimaryDark"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"            android:padding="16dp">
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimaryDark"
+            android:padding="16dp"
+            android:tag="reveal-left">
 
 
-        <ImageView
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="20dp"
-                android:tint="@color/icons"
-                android:src="@mipmap/ic_delete_black_24dp"/>
+                android:src="@mipmap/ic_delete_black_24dp"
+                android:tint="@color/icons" />
         </RelativeLayout>
 
         <RelativeLayout
-            android:tag="front"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white">
+            android:background="@color/white"
+            android:tag="front">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -65,13 +65,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:adjustViewBounds="true"
-                    android:scaleType="fitCenter"/>
+                    android:scaleType="fitCenter" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="5dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:padding="5dp">
 
                     <TextView
                         android:id="@+id/hospitalName"
@@ -88,9 +88,9 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:paddingTop="5dp"
                         android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:paddingTop="5dp">
 
                         <TextView
                             android:id="@+id/hospitalAddress"
@@ -122,9 +122,10 @@
         </RelativeLayout>
 
         <!-- just a divider -->
-        <View android:background="#CCC"
+        <View
             android:layout_width="fill_parent"
-            android:layout_height="0.5dp" />
+            android:layout_height="0.5dp"
+            android:background="#CCC" />
 
     </FrameLayout>
 

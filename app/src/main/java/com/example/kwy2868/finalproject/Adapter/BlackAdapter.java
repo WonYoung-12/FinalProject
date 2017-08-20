@@ -16,7 +16,7 @@ import java.util.List;
  * Created by kwy2868 on 2017-08-18.
  */
 
-public class BlackAdapter extends RecyclerView.Adapter<BlackViewHolder> {
+public class BlackAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Black> blackList;
 
     public BlackAdapter(List<Black> blackList) {
@@ -24,7 +24,7 @@ public class BlackAdapter extends RecyclerView.Adapter<BlackViewHolder> {
     }
 
     @Override
-    public BlackViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
@@ -36,9 +36,13 @@ public class BlackAdapter extends RecyclerView.Adapter<BlackViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(BlackViewHolder holder, int position) {
-        holder.bind(position);
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        Black black = blackList.get(position);
+        BlackViewHolder blackViewHolder = (BlackViewHolder) holder;
+        blackViewHolder.bind(position);
+        blackViewHolder.data = black;
     }
+
 
     @Override
     public int getItemCount() {
