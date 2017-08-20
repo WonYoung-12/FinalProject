@@ -105,8 +105,8 @@ dependencies {
     // Firebase crash
     compile 'com.google.firebase:firebase-crash:10.0.1'
 
-    // TedPermission
-    compile 'gun0912.ted:tedpermission:1.0.2'
+    // SwipeToAction 사용.
+    compile 'co.dift.ui.swipetoaction:library:1.1'
 
     testCompile 'junit:junit:4.12'
 }

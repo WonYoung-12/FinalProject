@@ -1,11 +1,15 @@
 package com.example.kwy2868.finalproject.View;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.kwy2868.finalproject.Adapter.FavoriteAdapter;
@@ -20,6 +24,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import co.dift.ui.SwipeToAction;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,8 +39,10 @@ public class FavoriteActivity extends AppCompatActivity {
 
     private List<Favorite> favoriteList;
     private FavoriteAdapter favoriteAdapter;
-    private StaggeredGridLayoutManager layoutManager;
+    private LinearLayoutManager layoutManager;
     private static final int COLUMN_SPAN = 2;
+
+    private SwipeToAction swipeToAction;
 
     private Unbinder unbinder;
 
@@ -76,12 +83,53 @@ public class FavoriteActivity extends AppCompatActivity {
     }
 
     public void recyclerViewSetting() {
-        layoutManager = new StaggeredGridLayoutManager(COLUMN_SPAN, StaggeredGridLayoutManager.VERTICAL);
+        layoutManager = new LinearLayoutManager(this);
         favoriteRecyclerView.setLayoutManager(layoutManager);
         favoriteRecyclerView.setHasFixedSize(true);
         favoriteRecyclerView.setItemAnimator(null);
         favoriteAdapter = new FavoriteAdapter(favoriteList);
         favoriteRecyclerView.setAdapter(favoriteAdapter);
+
+        swipeToAction = new SwipeToAction(favoriteRecyclerView, new SwipeToAction.SwipeListener<Favorite>() {
+            @Override
+            public boolean swipeLeft(Favorite itemData) {
+                displaySnackbar(itemData.getName() + " removed", "Undo", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+                return true;
+            }
+
+            @Override
+            public boolean swipeRight(Favorite itemData) {
+                displaySnackbar(itemData.getName() + " loved", null, null);
+                return true;
+            }
+
+            @Override
+            public void onClick(Favorite itemData) {
+
+            }
+
+            @Override
+            public void onLongClick(Favorite itemData) {
+
+            }
+        });
+    }
+
+    private void displaySnackbar(String text, String actionName, View.OnClickListener action) {
+        Snackbar snack = Snackbar.make(findViewById(android.R.id.content), text, Snackbar.LENGTH_LONG)
+                .setAction(actionName, action);
+
+        View v = snack.getView();
+        v.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        ((TextView) v.findViewById(android.support.design.R.id.snackbar_text)).setTextColor(Color.WHITE);
+        ((TextView) v.findViewById(android.support.design.R.id.snackbar_action)).setTextColor(Color.BLACK);
+
+        snack.show();
     }
 
     @Override

@@ -84,7 +84,6 @@ public class ParsingHelper {
     public static void speciesParsing(Hospital hospital, JsonObject jsonObject){
         ArrayList<String> speciesList = new ArrayList<>();
 
-        Log.d("파싱", "파싱하자");
         if(jsonObject.has("species")){
             JsonArray jsonArray = jsonObject.getAsJsonArray("species");
             for(int i=0; i<jsonArray.size(); i++){

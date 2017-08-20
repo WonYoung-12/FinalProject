@@ -91,6 +91,9 @@ public class HospitalFragment extends Fragment
     private static final int REQUEST_CODE = 0;
     private static final int COLUMN_SPAN = 2;
 
+    // 병원마다 받아온 종 개수. 이게 리스트 사이즈만큼 돌면 refresh 해주자.
+     private int speciesCount = 0;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -106,11 +109,11 @@ public class HospitalFragment extends Fragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        recyclerViewSetting(hospitalList);
+        recyclerViewSetting();
         checkBox.setOnCheckedChangeListener(this);
     }
 
-    public void recyclerViewSetting(List<Hospital> hospitalList) {
+    public void recyclerViewSetting() {
         layoutManager = new StaggeredGridLayoutManager(COLUMN_SPAN, StaggeredGridLayoutManager.VERTICAL);
         hospitalRecyclerView.setLayoutManager(layoutManager);
         hospitalRecyclerView.setHasFixedSize(true);
@@ -120,9 +123,17 @@ public class HospitalFragment extends Fragment
         hideDistance();
     }
 
+    public void refreshRecyclerView(List<Hospital> hospitalList){
+        layoutManager = new StaggeredGridLayoutManager(COLUMN_SPAN, StaggeredGridLayoutManager.VERTICAL);
+        hospitalRecyclerView.setLayoutManager(layoutManager);
+        hospitalAdapter = new HospitalAdapter(hospitalList);
+        hospitalRecyclerView.setAdapter(hospitalAdapter);
+    }
+
     // 거리 구할때 직선거리 말고는 없나..?
     public void getHospitalList(String district) {
         final NetworkService networkService = NetworkManager.getNetworkService();
+
         Call<List<Hospital>> call = networkService.getHospitalList(district);
         call.enqueue(new Callback<List<Hospital>>() {
             @Override
@@ -130,29 +141,10 @@ public class HospitalFragment extends Fragment
                 if (response.isSuccessful()) {
                     hospitalList = response.body();
                     // notify 해주자.
-                    recyclerViewSetting(hospitalList);
+                    refreshRecyclerView(hospitalList);
                     Log.d("HospitalList", hospitalList.get(0).getName() + " ");
 
-                    // TODO 여기서 진료과목들도 받아오자.
-                    for(int i=0; i<hospitalList.size(); i++){
-                        final Hospital hospital = hospitalList.get(i);
-                        Call<JsonObject> speciesCall = networkService.getSpecies(hospital.getNum());
-                        speciesCall.enqueue(new Callback<JsonObject>() {
-                            @Override
-                            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                                if(response.isSuccessful()){
-                                    ParsingHelper.speciesParsing(hospital, response.body());
-                                    recyclerViewSetting(hospitalList);
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<JsonObject> call, Throwable t) {
-
-                            }
-                        });
-                    }
-
+                    getSpecies();
                 } else {
 //                    Log.d("씨발", "레트로핏 안된다.");
                 }
@@ -215,10 +207,10 @@ public class HospitalFragment extends Fragment
                     sortedHospitalList = new ArrayList<>();
                     sortedHospitalList.addAll(hospitalList);
                     Collections.sort(sortedHospitalList);
-                    recyclerViewSetting(sortedHospitalList);
+                    refreshRecyclerView(sortedHospitalList);
                 }
                 else{
-                    recyclerViewSetting(sortedHospitalList);
+                    refreshRecyclerView(sortedHospitalList);
                 }
             } else {
                 Toast.makeText(getContext(), "현재 위치를 가져옵니다", Toast.LENGTH_SHORT).show();
@@ -226,12 +218,12 @@ public class HospitalFragment extends Fragment
                     permissionCheck();
                 }
                 else{
-                    recyclerViewSetting(sortedHospitalList);
+                    refreshRecyclerView(sortedHospitalList);
                 }
             }
         } else {
             Log.d("체크해제되었다.", isChecked + "");
-            recyclerViewSetting(hospitalList);
+            refreshRecyclerView(hospitalList);
         }
     }
 
@@ -354,7 +346,7 @@ public class HospitalFragment extends Fragment
         // 중간에 체크 해제하는 예외처리?
 
         if (checkBox.isChecked()) {
-            recyclerViewSetting(sortedHospitalList);
+            refreshRecyclerView(sortedHospitalList);
         }
         hospitalRefreshLayout.setRefreshing(false);
     }
@@ -416,11 +408,39 @@ public class HospitalFragment extends Fragment
             isSetLocation = true;
             currentLocation = GlobalData.getCurrentLocation();
         }
-//        if(isFirst){
-//            isFirst = !isFirst;
-//        }
-//        else{
-//            getHospitalList(currentDistrict);
-//        }
+        if(isFirst){
+            isFirst = !isFirst;
+        }
+        else{
+            getHospitalList(currentDistrict);
+        }
+    }
+
+    public void getSpecies(){
+        NetworkService networkService = NetworkManager.getNetworkService();
+        // TODO 여기서 진료과목들도 받아오자.
+        for(int i=0; i<hospitalList.size(); i++){
+            final Hospital hospital = hospitalList.get(i);
+            Call<JsonObject> speciesCall = networkService.getSpecies(hospital.getNum());
+            speciesCall.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if(response.isSuccessful()){
+                        ParsingHelper.speciesParsing(hospital, response.body());
+                        speciesCount++;
+                        // 리스트에 대한 모든 아이템을 받아오고 화면 갱신해 주어야 효율적이겠지.
+                        if(speciesCount == hospitalList.size()){
+                            speciesCount = 0;
+                            refreshRecyclerView(hospitalList);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+
+                }
+            });
+        }
     }
 }

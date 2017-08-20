@@ -16,7 +16,7 @@ import java.util.List;
  * Created by kwy2868 on 2017-08-18.
  */
 
-public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteViewHolder> {
+public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Favorite> favoriteList;
 
     public FavoriteAdapter(List<Favorite> favoriteList) {
@@ -24,7 +24,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteViewHolder> {
     }
 
     @Override
-    public FavoriteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
@@ -36,8 +36,11 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(FavoriteViewHolder holder, int position) {
-        holder.bind(position);
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        Favorite favorite = favoriteList.get(position);
+        FavoriteViewHolder favoriteViewHolder = (FavoriteViewHolder) holder;
+        favoriteViewHolder.bind(position);
+        favoriteViewHolder.data = favorite;
     }
 
     @Override

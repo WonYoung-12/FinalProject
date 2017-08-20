@@ -3,8 +3,8 @@ package com.example.kwy2868.finalproject.View;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -34,7 +34,7 @@ public class BlackActivity extends AppCompatActivity {
 
     private List<Black> blackList;
     private BlackAdapter blackAdapter;
-    private StaggeredGridLayoutManager layoutManager;
+    private LinearLayoutManager layoutManager;
     private static final int COLUMN_SPAN = 2;
 
     private Unbinder unbinder;
@@ -75,7 +75,7 @@ public class BlackActivity extends AppCompatActivity {
     }
 
     public void recyclerViewSetting() {
-        layoutManager = new StaggeredGridLayoutManager(COLUMN_SPAN, StaggeredGridLayoutManager.VERTICAL);
+        layoutManager = new LinearLayoutManager(this);
         blackRecyclerView.setLayoutManager(layoutManager);
         blackRecyclerView.setHasFixedSize(true);
         blackRecyclerView.setItemAnimator(null);
