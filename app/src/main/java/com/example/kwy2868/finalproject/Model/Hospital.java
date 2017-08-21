@@ -4,8 +4,6 @@ import android.support.annotation.NonNull;
 
 import org.parceler.Parcel;
 
-import java.util.List;
-
 /**
  * Created by kwy2868 on 2017-07-28.
  */
@@ -33,7 +31,7 @@ public class Hospital implements Comparable<Hospital>{
     private String imgPath;
 
     // 진료하는 종들 리스트.
-    private List<String> species;
+    private String species;
 
     public int getNum() {
         return num;
@@ -132,11 +130,11 @@ public class Hospital implements Comparable<Hospital>{
         this.imgPath = imgPath;
     }
 
-    public List<String> getSpecies() {
+    public String getSpecies() {
         return species;
     }
 
-    public void setSpecies(List<String> species) {
+    public void setSpecies(String species) {
         this.species = species;
     }
 

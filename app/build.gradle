@@ -20,10 +20,6 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
     compile 'com.android.support:appcompat-v7:26.+'
     // CoordinatorLayout 사용을 위해.
     compile 'com.android.support:design:26.+'
@@ -108,6 +104,17 @@ dependencies {
     // SwipeToAction 사용.
     compile 'co.dift.ui.swipetoaction:library:1.1'
 
+    // Toasty
+    compile 'com.github.GrenderG:Toasty:1.2.5'
+
+    androidTestCompile 'com.android.support:support-annotations:26.+'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
+
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
     testCompile 'junit:junit:4.12'
 }
 apply plugin: 'com.google.gms.google-services'

@@ -3,6 +3,7 @@ package com.example.kwy2868.finalproject.View;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,6 +25,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import co.dift.ui.SwipeToAction;
+import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -57,6 +59,10 @@ public class MyBlackActivity extends AppCompatActivity {
     }
 
     public void getBlackListFromServer(){
+        Toasty.Config.getInstance()
+                .setInfoColor(ContextCompat.getColor(this, android.R.color.black))
+                .apply();
+
         NetworkService networkService = NetworkManager.getNetworkService();
         Call<List<Black>> call = networkService.getBlackList(GlobalData.getUser().getUserId(), GlobalData.getUser().getFlag());
         call.enqueue(new Callback<List<Black>>() {
@@ -66,16 +72,19 @@ public class MyBlackActivity extends AppCompatActivity {
                     if(response.body().size() > 0){
                         blackList = response.body();
                         recyclerViewSetting();
+                        Toasty.info(MyBlackActivity.this, "등록된 블랙리스트를 삭제할 수 있습니다.", Toast.LENGTH_SHORT, true).show();
                     }
                     else{
-                        Toast.makeText(MyBlackActivity.this, "등록한 블랙리스트가 없습니다.", Toast.LENGTH_SHORT).show();
+                        Toasty.info(MyBlackActivity.this, "등록된 블랙리스트가 없습니다.", Toast.LENGTH_SHORT, true).show();
                     }
                 }
+                Toasty.Config.reset();
             }
 
             @Override
             public void onFailure(Call<List<Black>> call, Throwable t) {
-
+                Toasty.error(MyBlackActivity.this, "네트워크 오류입니다", Toast.LENGTH_SHORT, true).show();
+                Toasty.Config.reset();
             }
         });
     }
@@ -142,16 +151,16 @@ public class MyBlackActivity extends AppCompatActivity {
             public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
                 if(response.isSuccessful()){
                     if(response.body().getResultCode() == 200){
-                        Toast.makeText(MyBlackActivity.this, "정상적으로 삭제되었습니다.", Toast.LENGTH_SHORT).show();
                         blackList.remove(position);
                         blackAdapter.notifyItemRemoved(position);
+                        Toasty.success(MyBlackActivity.this, "정상적으로 삭제 되었습니다.", Toast.LENGTH_SHORT, true).show();
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<BaseResult> call, Throwable t) {
-                Toast.makeText(MyBlackActivity.this, "네트워크 오류.", Toast.LENGTH_SHORT).show();
+                Toasty.error(MyBlackActivity.this, "네트워크 오류입니다", Toast.LENGTH_SHORT, true).show();
             }
         });
     }

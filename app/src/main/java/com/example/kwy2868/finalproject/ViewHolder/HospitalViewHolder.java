@@ -28,6 +28,7 @@ import butterknife.ButterKnife;
  * Created by kwy2868 on 2017-08-01.
  */
 
+// TODO 뷰홀더 재사용 제대로 하려면 조건 체크 꼼꼼하게 해주자!!!
 public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
     @BindView(R.id.hospitalCardView)
     CardView hospitalCardView;
@@ -50,10 +51,12 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
     private static final String LOCATION_TAG = "Location";
 
     private List<Hospital> hospitalList;
+    private boolean byDistance;
 
-    public HospitalViewHolder(View itemView, List<Hospital> hospitalList) {
+    public HospitalViewHolder(View itemView, List<Hospital> hospitalList, boolean byDistance) {
         super(itemView);
         this.hospitalList = hospitalList;
+        this.byDistance = byDistance;
         itemView.setOnClickListener(this);
 
         ButterKnife.bind(this, itemView);
@@ -82,23 +85,24 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
 
         hospitalName.setText(hospital.getName());
         hospitalAddress.setText(hospital.getAddress());
-        hospitalTel.setText(hospital.getTel());
-
-        List<String> speciesList = hospital.getSpecies();
-        if (speciesList == null || speciesList.size() == 0) {
-            hospitalSpecies.setVisibility(View.GONE);
-        } else {
-            for (int i = 0; i < speciesList.size(); i++) {
-                if (i == 0)
-                    hospitalSpecies.setText(speciesList.get(i));
-                else {
-                    hospitalSpecies.append(", " + speciesList.get(i));
-                }
-            }
+        if(hospital.getTel() == null || hospital.getTel().trim().equals("")){
+            hospitalTel.setVisibility(View.GONE);
+        }
+        else{
+            hospitalTel.setVisibility(View.VISIBLE);
+            hospitalTel.setText(hospital.getTel());
         }
 
-        if (hospital.getDistanceFromCurrentLocation() == 0.0) {
-            hospitalDistance.setText("현재위치 파악이 필요합니다.");
+        String species= hospital.getSpecies();
+        if (species == null || species.trim().equals("")) {
+            hospitalSpecies.setVisibility(View.GONE);
+        } else {
+            hospitalSpecies.setVisibility(View.VISIBLE);
+            hospitalSpecies.setText(species);
+        }
+
+        if (byDistance == false) {
+            hospitalDistance.setVisibility(View.GONE);
         } else {
             hospitalDistance.setText(hospital.getDistanceFromCurrentLocation() + "km");
         }

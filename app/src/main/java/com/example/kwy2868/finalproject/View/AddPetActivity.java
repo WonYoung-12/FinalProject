@@ -1,6 +1,7 @@
 package com.example.kwy2868.finalproject.View;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -15,9 +16,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -27,10 +33,11 @@ import com.bumptech.glide.Glide;
 import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.Pet;
-import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Network.NetworkManager;
 import com.example.kwy2868.finalproject.Network.NetworkService;
+import com.example.kwy2868.finalproject.R;
 import com.google.gson.Gson;
+import com.wrapp.floatlabelededittext.FloatLabeledEditText;
 
 import org.parceler.Parcels;
 
@@ -41,6 +48,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import de.hdodenhof.circleimageview.CircleImageView;
+import es.dmoral.toasty.Toasty;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -57,7 +65,7 @@ import static com.example.kwy2868.finalproject.Model.GlobalData.getContext;
  * Created by kwy2868 on 2017-08-12.
  */
 
-public class AddPetActivity extends AppCompatActivity {
+public class AddPetActivity extends AppCompatActivity implements View.OnKeyListener, TextView.OnEditorActionListener {
     @BindView(R.id.inputPetName)
     EditText inputPetName;
     @BindView(R.id.inputPetAge)
@@ -70,6 +78,8 @@ public class AddPetActivity extends AppCompatActivity {
     CircleImageView petImage;
     @BindView(R.id.imageNavigation)
     TextView imageNavigation;
+    @BindView(R.id.petName)
+    FloatLabeledEditText petName;
 
     private Unbinder unbinder;
     private static final int PHOTO_REQUEST = 1;
@@ -88,10 +98,30 @@ public class AddPetActivity extends AppCompatActivity {
         unbinder = ButterKnife.bind(this);
         setTitle("My Pet 등록");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        // EditText 예외 처리를 위한 필터 세팅.
+        filterSetting();
+    }
+
+    public void filterSetting() {
+        InputFilter filter = new InputFilter() {
+            @Override
+            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                for(int i = start; i<end; i++){
+                    if (!Character.isLetterOrDigit(source.charAt(i))) {
+                        return "";
+                    }
+                }
+                return null;
+            }
+        };
+
+        inputPetName.setFilters(new InputFilter[]{filter});
+        inputPetSpecies.setFilters(new InputFilter[]{filter});
+        inputPetSpecies.setOnEditorActionListener(this);
     }
 
     @OnClick(R.id.petImage)
-    public void addPetImage(){
+    public void addPetImage() {
         imagePermissionCheck();
     }
 
@@ -149,7 +179,7 @@ public class AddPetActivity extends AppCompatActivity {
         }
     }
 
-    public void selectImage(){
+    public void selectImage() {
         Intent photoPickIntent = new Intent(Intent.ACTION_GET_CONTENT);
         photoPickIntent.setType("image/*");
         startActivityForResult(photoPickIntent, PHOTO_REQUEST);
@@ -171,7 +201,7 @@ public class AddPetActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == PHOTO_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null){
+        if (requestCode == PHOTO_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
 //            checkPermission();
             imageNavigation.setVisibility(View.GONE);
 
@@ -187,32 +217,49 @@ public class AddPetActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.enrollPetButton)
-    public void enrollPet(){
+    public void enrollPet() {
         String name = inputPetName.getText().toString();
-        int age = Integer.parseInt(inputPetAge.getText().toString());
+        if (name == null || name.trim().equals("")) {
+            Toasty.error(this, "이름은 필수 항목입니다.", Toast.LENGTH_SHORT, true).show();
+            return;
+        }
+
+        int age = 0;
+        if (inputPetAge.getText().toString().trim().equals("")) {
+            Toasty.error(this, "나이를 올바르게 입력하여 주세요.", Toast.LENGTH_SHORT, true).show();
+            return;
+        } else {
+            age = Integer.parseInt(inputPetAge.getText().toString());
+        }
+
         String species = inputPetSpecies.getText().toString();
+        if (species == null || species.trim().equals("")) {
+            Toasty.error(this, "종은 필수 항목입니다.", Toast.LENGTH_SHORT, true).show();
+            return;
+        }
+
         long userId = GlobalData.getUser().getUserId();
-        Log.d("Path", imagePath+"");
+
         // 이미지 선택 안하면.
-        if(imagePath == null || imagePath.trim().equals("")){
+        if (imagePath == null || imagePath.trim().equals("")) {
             enrollPetWithoutImage(name, age, species, userId);
         }
         // 이미지와 함께 등록하면.
-        else{
+        else {
             enrollPetWithImage(name, age, species, userId);
         }
     }
 
-    public void enrollPetWithoutImage(String name, int age, String species, long userId){
+    public void enrollPetWithoutImage(String name, int age, String species, long userId) {
         Pet pet = new Pet(name, age, species, userId, GlobalData.getUser().getFlag());
         NetworkService networkService = NetworkManager.getNetworkService();
         Call<BaseResult> call = networkService.enrollPet(pet);
         call.enqueue(new Callback<BaseResult>() {
             @Override
             public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
-                if(response.isSuccessful()){
-                    if(response.body().getResultCode() == 200) {
-                        Toast.makeText(AddPetActivity.this, "펫 등록 성공!!", Toast.LENGTH_SHORT).show();
+                if (response.isSuccessful()) {
+                    if (response.body().getResultCode() == 200) {
+                        Toasty.success(AddPetActivity.this, "펫 등록 성공", Toast.LENGTH_SHORT, true).show();
                         finish();
                     }
                 }
@@ -225,7 +272,7 @@ public class AddPetActivity extends AppCompatActivity {
         });
     }
 
-    public void enrollPetWithImage(String name, int age, String species, long userId){
+    public void enrollPetWithImage(String name, int age, String species, long userId) {
         File file = new File(imagePath);
 
         // 이미지를 보내는 거다.
@@ -258,7 +305,7 @@ public class AddPetActivity extends AppCompatActivity {
         });
     }
 
-    public String getPath(Uri uri){
+    public String getPath(Uri uri) {
         String filePath = "";
         if (uri.getHost().contains("com.android.providers.media")) {
             // Image pick from recent
@@ -282,8 +329,7 @@ public class AddPetActivity extends AppCompatActivity {
             }
             cursor.close();
             return filePath;
-        }
-        else
+        } else
             return "";
     }
 
@@ -299,5 +345,35 @@ public class AddPetActivity extends AppCompatActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
+        if ((keyEvent.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+            hideKeyBoard(view);
+            return true;
+        }
+        return false;
+
+    }
+
+    public void hideKeyBoard(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    @Override
+    public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+        switch (actionId) {
+            case EditorInfo.IME_ACTION_NEXT:
+                hideKeyBoard(textView);
+                break;
+            case EditorInfo.IME_ACTION_DONE:
+                textView.clearFocus();
+                hideKeyBoard(textView);
+            default:
+                return false;
+        }
+        return true;
     }
 }

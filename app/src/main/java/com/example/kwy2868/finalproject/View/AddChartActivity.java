@@ -6,22 +6,25 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.Chart;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.Pet;
-import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Network.NetworkManager;
 import com.example.kwy2868.finalproject.Network.NetworkService;
+import com.example.kwy2868.finalproject.R;
 import com.kunzisoft.switchdatetime.SwitchDateTimeDialogFragment;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
@@ -39,6 +42,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -47,7 +51,7 @@ import retrofit2.Response;
  * Created by kwy2868 on 2017-08-11.
  */
 
-public class AddChartActivity extends AppCompatActivity implements OnDateSelectedListener, EditText.OnFocusChangeListener{
+public class AddChartActivity extends AppCompatActivity implements OnDateSelectedListener, EditText.OnFocusChangeListener, TextView.OnEditorActionListener{
     @BindView(R.id.materialCalendar)
     MaterialCalendarView materialCalendar;
     @BindView(R.id.treatmentDate)
@@ -90,13 +94,24 @@ public class AddChartActivity extends AppCompatActivity implements OnDateSelecte
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         getPetListFromServer();
-        setFocusChangeListener();
+        setListener();
         initCalendar();
     }
 
-    public void setFocusChangeListener(){
+    public void setListener(){
         inputTreatmentDate.setOnFocusChangeListener(this);
         inputReTreatmentDate.setOnFocusChangeListener(this);
+        inputChartTitle.setOnEditorActionListener(this);
+        inputChartTitle.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
+                if(keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.FLAG_EDITOR_ACTION){
+                    hideKeyBoard(view);
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     public void initSpinnerItem(){
@@ -168,42 +183,61 @@ public class AddChartActivity extends AppCompatActivity implements OnDateSelecte
                     // 선택한 날짜로 위의 달력이 이동하면서 선택됨.
                     materialCalendar.setCurrentDate(CalendarDay.from(date), true);
                     materialCalendar.setSelectedDate(date);
-                    inputTreatmentDate.clearFocus();
-                    inputReTreatmentDate.clearFocus();
                 }
 
                 // 아무것도 안해줘도 됨.
                 @Override
                 public void onNegativeButtonClick(Date date) {
-                    inputTreatmentDate.clearFocus();
-                    inputReTreatmentDate.clearFocus();
+                    if(flag == TREATMENT_FLAG){
+                        hideKeyBoard(inputTreatmentDate);
+                    }
+                    else{
+                        hideKeyBoard(inputReTreatmentDate);
+                    }
                 }
             });
             dateTimeDialogFragment.show(getSupportFragmentManager(), TAG_DATETIME_FRAGMENT);
         }
     }
 
-    public void hideKeyBoard(EditText editText){
-        editText.clearFocus();
+    public void hideKeyBoard(View view){
+        view.clearFocus();
         InputMethodManager imm= (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     // 작성 버튼 누르면 호출. DB에 써주자.
     @OnClick(R.id.writeChartButton)
     public void writeChart(){
         String tempPetName = spinner.getSelectedItem().toString();
+        if(tempPetName == null || tempPetName.trim().equals("")){
+            Toasty.error(this, "펫을 먼저 등록해 주세요.", Toast.LENGTH_SHORT, true).show();
+            return;
+        }
         int index = tempPetName.indexOf("(");
         String petName = tempPetName.substring(0, index);
+
         String treatmentDate = inputTreatmentDate.getText().toString();
+        if(treatmentDate == null || treatmentDate.trim().equals("")){
+            Toasty.error(this, "진료 날짜를 입력하여 주세요.", Toast.LENGTH_SHORT, true).show();
+            return;
+        }
         String reTreatmentDate = inputReTreatmentDate.getText().toString();
+
         String title = inputChartTitle.getText().toString();
+        if(title == null || title.trim().equals("")){
+            Toasty.error(this, "제목을 올바르게 입력하여 주세요.", Toast.LENGTH_SHORT, true).show();
+            return;
+        }
+
         String description = inputChartDescription.getText().toString();
+        if(description == null || description.trim().equals("")){
+            Toasty.error(this, "내용을 올바르게 입력하여 주세요.", Toast.LENGTH_SHORT, true).show();
+            return;
+        }
 
         Chart chart = new Chart(petName, GlobalData.getUser().getUserId(), GlobalData.getUser().getFlag(), treatmentDate, reTreatmentDate, title, description);
         GlobalData.getChartDBHelper().addChart(chart);
-        Toast.makeText(this, "정상적으로 차트를 등록하였습니다.", Toast.LENGTH_SHORT).show();
-
 
         NetworkService networkService = NetworkManager.getNetworkService();
         Call<BaseResult> call = networkService.writeChart(chart);
@@ -212,7 +246,7 @@ public class AddChartActivity extends AppCompatActivity implements OnDateSelecte
             public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
                 if(response.isSuccessful()){
                     if(response.body().getResultCode() == 200)
-                        Toast.makeText(AddChartActivity.this, "차트 작성 성공", Toast.LENGTH_SHORT).show();
+                        Toasty.success(AddChartActivity.this, "차트 작성 성공", Toast.LENGTH_SHORT, true).show();
                 }
             }
 
@@ -283,5 +317,17 @@ public class AddChartActivity extends AppCompatActivity implements OnDateSelecte
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+        switch (actionId) {
+            case EditorInfo.IME_ACTION_NONE:
+                hideKeyBoard(textView);
+                break;
+            default:
+                return false;
+        }
+        return true;
     }
 }

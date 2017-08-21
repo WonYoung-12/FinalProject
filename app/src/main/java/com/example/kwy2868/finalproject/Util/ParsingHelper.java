@@ -81,21 +81,6 @@ public class ParsingHelper {
             return false;
     }
 
-    public static void speciesParsing(Hospital hospital, JsonObject jsonObject){
-        ArrayList<String> speciesList = new ArrayList<>();
-
-        if(jsonObject.has("species")){
-            JsonArray jsonArray = jsonObject.getAsJsonArray("species");
-            for(int i=0; i<jsonArray.size(); i++){
-                if(jsonArray.get(i).getAsJsonObject().has("species")){
-                    String temp = jsonArray.get(i).getAsJsonObject().get("species").getAsString();
-                    speciesList.add(temp);
-                }
-            }
-            hospital.setSpecies(speciesList);
-        }
-    }
-
     // 이거는 이제 사용 안함.
     public static void geocodingParsing(Hospital hospital, JsonObject jsonObject) {
         if (jsonObject.has("result")) {

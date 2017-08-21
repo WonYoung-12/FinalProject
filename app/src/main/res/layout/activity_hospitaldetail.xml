@@ -1,88 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/detailContent"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/detailContent"
+            <!--여기는 이미지랑 병원 정보-->
+            <include layout="@layout/hospital_information" />
+
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/route_information"
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
-                <!--여기는 이미지랑 병원 정보-->
-                <include layout="@layout/hospital_information" />
+            <!--여기는 사용자가 남기는 부분-->
+            <include layout="@layout/hospital_review" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/route_information"
-                    android:textStyle="bold"
-                    android:textSize="15sp"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:layout_margin="10dp"
+                android:background="@color/colorPrimary" />
 
-                <!--여기는 사용자가 남기는 부분-->
-                <include layout="@layout/hospital_review" />
+            <!--사용자 후기 보는 부분-->
+            <include layout="@layout/list_review" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="5dp"
-                    android:background="@color/colorPrimary"
-                    android:layout_margin="10dp"/>
-
-                <!--사용자 후기 보는 부분-->
-                <include layout="@layout/list_review"/>
-
-            </LinearLayout>
-        </RelativeLayout>
+        </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
+
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         android:id="@+id/floatingActionsMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
         fab:fab_addButtonColorNormal="@color/white"
         fab:fab_addButtonColorPressed="@color/white_pressed"
         fab:fab_addButtonPlusIconColor="@color/half_black"
-        fab:fab_labelStyle="@style/menu_labels_style"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginEnd="16dp">
+        fab:fab_labelStyle="@style/menu_labels_style">
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/favoriteButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            fab:fab_title="즐겨찾기 등록"
-            fab:fab_icon="@mipmap/ic_favorite"
             fab:fab_colorNormal="@color/pink"
-            fab:fab_colorPressed="@color/pink_pressed"/>
+            fab:fab_colorPressed="@color/pink_pressed"
+            fab:fab_icon="@mipmap/ic_favorite"
+            fab:fab_title="즐겨찾기 등록" />
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/blackButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            fab:fab_title="블랙리스트 등록"
-            fab:fab_icon="@mipmap/ic_blacklist"
             fab:fab_colorNormal="@color/pink"
-            fab:fab_colorPressed="@color/pink_pressed"/>
+            fab:fab_colorPressed="@color/pink_pressed"
+            fab:fab_icon="@mipmap/ic_blacklist"
+            fab:fab_title="블랙리스트 등록" />
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/ratingButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            fab:fab_title="별점 주기"
-            fab:fab_icon="@mipmap/ic_grade"
             fab:fab_colorNormal="@color/pink"
-            fab:fab_colorPressed="@color/pink_pressed"/>
+            fab:fab_colorPressed="@color/pink_pressed"
+            fab:fab_icon="@mipmap/ic_grade"
+            fab:fab_title="별점 주기" />
 
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 </android.support.design.widget.CoordinatorLayout>

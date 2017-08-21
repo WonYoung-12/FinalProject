@@ -17,9 +17,11 @@ import java.util.List;
 
 public class HospitalAdapter extends RecyclerView.Adapter<HospitalViewHolder> {
     private List hospitalList;
+    private boolean byDistance;
 
-    public HospitalAdapter(List hospitalList) {
+    public HospitalAdapter(List hospitalList, boolean byDistance) {
         this.hospitalList = hospitalList;
+        this.byDistance = byDistance;
     }
 
     @Override
@@ -29,7 +31,7 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalViewHolder> {
         boolean shouldAttachToParentImmediately = false;
 
         View view = inflater.inflate(R.layout.cardview_hospital, parent, shouldAttachToParentImmediately);
-        HospitalViewHolder hospitalViewHolder = new HospitalViewHolder(view, hospitalList);
+        HospitalViewHolder hospitalViewHolder = new HospitalViewHolder(view, hospitalList, byDistance);
 
         return hospitalViewHolder;
     }

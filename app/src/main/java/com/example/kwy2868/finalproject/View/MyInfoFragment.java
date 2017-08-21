@@ -100,14 +100,14 @@ public class MyInfoFragment extends Fragment {
                 if (response.isSuccessful()) {
                     petList = response.body();
                     GlobalData.setPetList(petList);
-                    System.out.println("이미지들");
+//                    System.out.println("이미지들");
                     petRecyclerViewSetting();
                     for (int i = 0; i < petList.size(); i++) {
                         final Pet pet = petList.get(i);
                         // 등록된 경로가 있으면 이미지 받아오자.
                         if (!(pet.getImagePath() == null || pet.getImagePath().trim().equals(""))) {
                             Call<ResponseBody> imageCall = networkService.getPetImage(pet.getImagePath());
-                            Log.i("이미지 세팅", "세팅 해주자");
+//                            Log.i("이미지 세팅", "세팅 해주자");
 
                             imageCall.enqueue(new Callback<ResponseBody>() {
                                 @Override
@@ -116,7 +116,6 @@ public class MyInfoFragment extends Fragment {
                                         File imgFile = convertToFile(response.body(), pet.getImagePath());
                                         pet.setImgFile(imgFile);
                                         petAdapter.notifyDataSetChanged();
-                                        Log.d("이미지 가져옴", "가져왔다");
                                     }
                                 }
 

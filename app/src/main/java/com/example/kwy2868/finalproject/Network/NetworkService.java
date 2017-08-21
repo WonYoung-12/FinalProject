@@ -93,9 +93,6 @@ public interface NetworkService {
     @GET("getPetImage")
     Call<ResponseBody> getPetImage(@Query("filePath") String filePath);
 
-    @GET("getSpecies")
-    Call<JsonObject> getSpecies(@Query("num") int num);
-
     // 병원 번호, 유저 아이디, 유저 플래그 보내주자.
     @GET("checkAddedFavorite")
     Call<BaseResult> checkAddedFavorite(@Query("num") int num, @Query("userId") long userId, @Query("flag") int flag);

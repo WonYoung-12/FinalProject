@@ -24,10 +24,10 @@
                 android:id="@+id/treatmentDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:windowSoftInputMode="adjustPan"
                 android:hint="진료(접종) 날짜"
                 android:lines="1"
-                android:maxLines="1" />
+                android:maxLines="1"
+                android:windowSoftInputMode="adjustPan" />
         </com.wrapp.floatlabelededittext.FloatLabeledEditText>
 
         <com.wrapp.floatlabelededittext.FloatLabeledEditText
@@ -41,10 +41,10 @@
                 android:id="@+id/reTreatmentDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:windowSoftInputMode="adjustPan"
                 android:hint="재진료(접종) 날짜"
                 android:lines="1"
-                android:maxLines="1" />
+                android:maxLines="1"
+                android:windowSoftInputMode="adjustPan" />
         </com.wrapp.floatlabelededittext.FloatLabeledEditText>
 
         <com.wrapp.floatlabelededittext.FloatLabeledEditText
@@ -58,8 +58,8 @@
                 android:id="@+id/inputPetName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Pet"
                 android:focusable="false"
+                android:hint="Pet"
                 android:lines="1"
                 android:maxLines="1" />
         </com.wrapp.floatlabelededittext.FloatLabeledEditText>
@@ -70,8 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:layout_marginLeft="50dp"
-            android:layout_marginRight="50dp">
-        </Spinner>
+            android:layout_marginRight="50dp"></Spinner>
 
         <com.wrapp.floatlabelededittext.FloatLabeledEditText
             android:layout_width="match_parent"
@@ -86,6 +85,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="title"
+                android:inputType="text"
                 android:lines="1"
                 android:maxLines="1" />
         </com.wrapp.floatlabelededittext.FloatLabeledEditText>
@@ -102,6 +102,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="description"
+                android:imeOptions="actionDone"
+                android:inputType="textMultiLine"
                 android:lines="5"
                 android:maxLength="500"
                 android:maxLines="5" />
@@ -113,7 +115,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:text="작성"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
     </LinearLayout>
 

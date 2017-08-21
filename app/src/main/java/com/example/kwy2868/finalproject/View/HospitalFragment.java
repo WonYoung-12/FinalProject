@@ -32,12 +32,10 @@ import com.baoyz.widget.PullRefreshLayout;
 import com.example.kwy2868.finalproject.Adapter.HospitalAdapter;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.Hospital;
-import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Network.NetworkManager;
 import com.example.kwy2868.finalproject.Network.NetworkService;
+import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Util.LocationHelper;
-import com.example.kwy2868.finalproject.Util.ParsingHelper;
-import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +44,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -91,8 +90,7 @@ public class HospitalFragment extends Fragment
     private static final int REQUEST_CODE = 0;
     private static final int COLUMN_SPAN = 2;
 
-    // 병원마다 받아온 종 개수. 이게 리스트 사이즈만큼 돌면 refresh 해주자.
-     private int speciesCount = 0;
+    private boolean byDistance = false;
 
     @Nullable
     @Override
@@ -115,18 +113,18 @@ public class HospitalFragment extends Fragment
 
     public void recyclerViewSetting() {
         layoutManager = new StaggeredGridLayoutManager(COLUMN_SPAN, StaggeredGridLayoutManager.VERTICAL);
+        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
         hospitalRecyclerView.setLayoutManager(layoutManager);
-        hospitalAdapter = new HospitalAdapter(hospitalList);
+        hospitalRecyclerView.setHasFixedSize(true);
+        hospitalRecyclerView.setItemAnimator(null);
+        hospitalAdapter = new HospitalAdapter(hospitalList, byDistance);
         hospitalRecyclerView.setAdapter(hospitalAdapter);
-//        hideDistance();
     }
 
     public void refreshRecyclerView(List<Hospital> hospitalList){
         layoutManager = new StaggeredGridLayoutManager(COLUMN_SPAN, StaggeredGridLayoutManager.VERTICAL);
         hospitalRecyclerView.setLayoutManager(layoutManager);
-        hospitalRecyclerView.setHasFixedSize(true);
-        hospitalRecyclerView.setItemAnimator(null);
-        hospitalAdapter = new HospitalAdapter(hospitalList);
+        hospitalAdapter = new HospitalAdapter(hospitalList, byDistance);
         hospitalRecyclerView.setAdapter(hospitalAdapter);
     }
 
@@ -140,8 +138,7 @@ public class HospitalFragment extends Fragment
             public void onResponse(Call<List<Hospital>> call, Response<List<Hospital>> response) {
                 if (response.isSuccessful()) {
                     hospitalList = response.body();
-                    hospitalAdapter.notifyItemRangeChanged(0, hospitalList.size());
-                    getSpecies();
+                    refreshRecyclerView(hospitalList);
                 } else {
 //                    Log.d("씨발", "레트로핏 안된다.");
                 }
@@ -184,6 +181,11 @@ public class HospitalFragment extends Fragment
         Log.d("갱신하자", "갱신하자");
         // 거리순으로 보는상태면.
         if (checkBox.isChecked()) {
+            Toasty.Config.getInstance()
+                    .setInfoColor(ContextCompat.getColor(getContext(), android.R.color.black))
+                    .apply();
+            Toasty.info(getContext(), "현재 위치를 가져옵니다.", Toast.LENGTH_SHORT, true).show();
+            Toasty.Config.reset();
             permissionCheck();
         }
         // 아니면.
@@ -196,6 +198,7 @@ public class HospitalFragment extends Fragment
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
         // 체크해서 현재 위치 기준으로 정렬하려 할 때.
         if (isChecked) {
+            byDistance = true;
             Log.d("체크되었다.", isChecked + "");
             if (isSetLocation) {
                 if(sortedHospitalList == null){
@@ -210,7 +213,12 @@ public class HospitalFragment extends Fragment
                     refreshRecyclerView(sortedHospitalList);
                 }
             } else {
-                Toast.makeText(getContext(), "현재 위치를 가져옵니다", Toast.LENGTH_SHORT).show();
+                Toasty.Config.getInstance()
+                        .setInfoColor(ContextCompat.getColor(getContext(), android.R.color.black))
+                        .apply();
+                Toasty.info(getContext(), "현재 위치를 가져옵니다.", Toast.LENGTH_SHORT, true).show();
+                Toasty.Config.reset();
+
                 if(GlobalData.getCurrentLocation() == null) {
                     permissionCheck();
                 }
@@ -218,27 +226,12 @@ public class HospitalFragment extends Fragment
                     refreshRecyclerView(sortedHospitalList);
                 }
             }
-        } else {
+        }
+        else {
+            byDistance = false;
             Log.d("체크해제되었다.", isChecked + "");
             refreshRecyclerView(hospitalList);
         }
-    }
-
-    public void hideDistance() {
-//        Log.d("distance 숨기자", "숨기자");
-        int[] viewIds = layoutManager.findFirstCompletelyVisibleItemPositions(null);
-        int[] start = layoutManager.findFirstVisibleItemPositions(viewIds);
-//        Log.d("start size", start.length + "");
-//        Log.d("start 1", start[0] + " ");
-//        Log.d("start 2", start[1] + " ");
-
-        int[] viewIds2 = layoutManager.findLastCompletelyVisibleItemPositions(null);
-        int[] end = layoutManager.findLastVisibleItemPositions(viewIds2);
-//        HospitalViewHolder holder = (HospitalViewHolder) hospitalRecyclerView.getChildViewHolder(hospitalRecyclerView.getChildAt(i))
-//        Log.d("holder 널 테스트", holder + " ");
-//        if (holder != null) {
-//            holder.hideDistance();
-//        }
     }
 
     public void permissionCheck() {
@@ -299,7 +292,7 @@ public class HospitalFragment extends Fragment
             @Override
             public void onProviderDisabled(String s) {
                 Log.d("onProviderDisabled", "onProviderDisabled");
-                Toast.makeText(getContext(), "현재 위치를 받아오는데 실패 했습니다.", Toast.LENGTH_SHORT).show();
+                Toasty.error(getContext(), "현재 위치를 받아오는 데 실패했습니다.", Toast.LENGTH_SHORT, true).show();
             }
         };
 
@@ -322,7 +315,7 @@ public class HospitalFragment extends Fragment
 
     // 위치 받아왔으니 계산해주자.
     public void afterLocationUpdated(Location location) {
-        Toast.makeText(getContext(), "현재 위치를 받아오는데 성공 했습니다.", Toast.LENGTH_SHORT).show();
+        Toasty.success(getContext(), "현재 위치를 받아오는데 성공했습니다.", Toast.LENGTH_SHORT, true).show();
         currentLocation = location;
 
         isSetLocation = true;
@@ -379,7 +372,7 @@ public class HospitalFragment extends Fragment
             // 해당 퍼미션이 거절된 경우.
             else {
                 Log.d("퍼미션 거절", "퍼미션 거절");
-                Toast.makeText(getContext(), "퍼미션을 승인 해주셔야 이용이 가능합니다", Toast.LENGTH_SHORT).show();
+                Toasty.error(getContext(), "퍼미션을 승인 해주셔야 이용이 가능합니다.", Toast.LENGTH_SHORT, true).show();
                 // 앱 정보 화면을 통해 퍼미션을 다시 요구해보자.
                 requestPermissionInSettings();
             }
@@ -410,34 +403,6 @@ public class HospitalFragment extends Fragment
         }
         else{
             getHospitalList(currentDistrict);
-        }
-    }
-
-    public void getSpecies(){
-        NetworkService networkService = NetworkManager.getNetworkService();
-        // 진료 가능한 동물들 받아온다.
-        for(int i=0; i<hospitalList.size(); i++){
-            final Hospital hospital = hospitalList.get(i);
-            Call<JsonObject> speciesCall = networkService.getSpecies(hospital.getNum());
-            speciesCall.enqueue(new Callback<JsonObject>() {
-                @Override
-                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    if(response.isSuccessful()){
-                        ParsingHelper.speciesParsing(hospital, response.body());
-                        speciesCount++;
-                        // 리스트에 대한 모든 아이템을 받아오고 화면 갱신해 주어야 효율적이겠지.
-                        if(speciesCount == hospitalList.size()){
-                            refreshRecyclerView(hospitalList);
-                            speciesCount = 0;
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
-
-                }
-            });
         }
     }
 }

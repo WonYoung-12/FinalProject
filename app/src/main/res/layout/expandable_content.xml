@@ -47,8 +47,10 @@
             android:layout_height="wrap_content"
             android:hint="@string/treatment_hint"
             android:textColorHint="@color/white"
+            android:imeOptions="actionDone"
             android:inputType="textMultiLine"
             android:lines="5"
+            android:maxLines="5"
             android:maxLength="300" />
 
         <Button

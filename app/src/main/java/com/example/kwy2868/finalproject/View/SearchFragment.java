@@ -1,5 +1,6 @@
 package com.example.kwy2868.finalproject.View;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -12,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,9 +27,9 @@ import com.example.kwy2868.finalproject.Adapter.CafeArticleAdapter;
 import com.example.kwy2868.finalproject.Adapter.KiNContentAdapter;
 import com.example.kwy2868.finalproject.Model.BlogContent;
 import com.example.kwy2868.finalproject.Model.CafeArticle;
-import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Network.NaverAPI.NaverAPIManager;
 import com.example.kwy2868.finalproject.Network.NaverAPI.SearchService;
+import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Util.ParsingHelper;
 import com.google.gson.JsonObject;
 
@@ -46,7 +48,7 @@ import retrofit2.Response;
  */
 
 public class SearchFragment extends Fragment
-        implements AdapterView.OnItemSelectedListener, View.OnKeyListener, TextView.OnEditorActionListener, PullRefreshLayout.OnRefreshListener {
+        implements AdapterView.OnItemSelectedListener, TextView.OnEditorActionListener, PullRefreshLayout.OnRefreshListener, View.OnFocusChangeListener {
 
     @BindView(R.id.searchSpinner)
     Spinner searchSpinner;
@@ -87,8 +89,8 @@ public class SearchFragment extends Fragment
         searchRefreshLayout.setOnRefreshListener(this);
 
         // 엔터키 이벤트
-        searchEditText.setOnKeyListener(this);
         searchEditText.setOnEditorActionListener(this);
+        searchEditText.setOnFocusChangeListener(this);
 
         if (savedInstanceState != null) {
             currentList = savedInstanceState.getParcelableArrayList("currentList");
@@ -150,16 +152,6 @@ public class SearchFragment extends Fragment
                 kiNSearch(searchService, keyword);
                 break;
         }
-    }
-
-    // 엔터키 눌렀을 때도 검색이 되게 해주자.
-    @Override
-    public boolean onKey(View view, int i, KeyEvent keyEvent) {
-        if ((keyEvent.getAction() == KeyEvent.ACTION_DOWN) && (i == KeyEvent.KEYCODE_ENTER)) {
-            search();
-            return true;
-        }
-        return false;
     }
 
     public void blogSearch(SearchService searchService, String keyword) {
@@ -263,5 +255,13 @@ public class SearchFragment extends Fragment
     @Override
     public void onRefresh() {
         search();
+    }
+
+    @Override
+    public void onFocusChange(View view, boolean isFocus) {
+        if(!isFocus){
+            InputMethodManager imm= (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }

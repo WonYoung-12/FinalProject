@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,9 +19,9 @@ import com.example.kwy2868.finalproject.Adapter.FavoriteAdapter;
 import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.Favorite;
 import com.example.kwy2868.finalproject.Model.GlobalData;
-import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Network.NetworkManager;
 import com.example.kwy2868.finalproject.Network.NetworkService;
+import com.example.kwy2868.finalproject.R;
 
 import java.util.List;
 
@@ -28,6 +29,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import co.dift.ui.SwipeToAction;
+import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -61,7 +63,10 @@ public class MyFavoriteActivity extends AppCompatActivity {
     }
 
     public void getFavoriteListFromServer(){
-        NetworkService networkService = NetworkManager.getNetworkService();
+        Toasty.Config.getInstance()
+                .setInfoColor(ContextCompat.getColor(this, android.R.color.black))
+                .apply();NetworkService networkService = NetworkManager.getNetworkService();
+
         Call<List<Favorite>> call = networkService.getFavoriteList(GlobalData.getUser().getUserId(), GlobalData.getUser().getFlag());
         call.enqueue(new Callback<List<Favorite>>() {
             @Override
@@ -71,16 +76,19 @@ public class MyFavoriteActivity extends AppCompatActivity {
                     if (response.body().size() > 0){
                         favoriteList = response.body();
                         recyclerViewSetting();
+                        Toasty.info(MyFavoriteActivity.this, "등록된 즐겨찾기를 삭제할 수 있습니다.", Toast.LENGTH_SHORT, true).show();
                     }
                     else{
-                        Toast.makeText(MyFavoriteActivity.this, "등록한 즐겨찾기가 없습니다.", Toast.LENGTH_SHORT).show();
+                        Toasty.info(MyFavoriteActivity.this, "등록된 즐겨찾기가 없습니다.", Toast.LENGTH_SHORT, true).show();
                     }
                 }
+                Toasty.Config.reset();
             }
 
             @Override
             public void onFailure(Call<List<Favorite>> call, Throwable t) {
-
+                Toasty.error(MyFavoriteActivity.this, "네트워크 오류입니다", Toast.LENGTH_SHORT, true).show();
+                Toasty.Config.reset();
             }
         });
     }
@@ -97,12 +105,12 @@ public class MyFavoriteActivity extends AppCompatActivity {
             @Override
             public boolean swipeLeft(Favorite itemData) {
                 showDeleteFavoriteDialog(itemData);
-                displaySnackbar(itemData.getName() + " removed", "Undo", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
-                });
+//                displaySnackbar(itemData.getName() + " removed", "Undo", new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//
+//                    }
+//                });
                 return true;
             }
 
@@ -167,7 +175,7 @@ public class MyFavoriteActivity extends AppCompatActivity {
             public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
                 if(response.isSuccessful()){
                     if(response.body().getResultCode() == 200){
-                        Toast.makeText(MyFavoriteActivity.this, "정상적으로 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                        Toasty.success(MyFavoriteActivity.this, "정상적으로 삭제되었습니다.", Toast.LENGTH_SHORT, true).show();
                         favoriteList.remove(position);
                         favoriteAdapter.notifyItemRemoved(position);
                     }
@@ -176,7 +184,7 @@ public class MyFavoriteActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<BaseResult> call, Throwable t) {
-                Toast.makeText(MyFavoriteActivity.this, "네트워크 오류.", Toast.LENGTH_SHORT).show();
+                Toasty.error(MyFavoriteActivity.this, "네트워크 오류입니다", Toast.LENGTH_SHORT, true).show();
             }
         });
     }

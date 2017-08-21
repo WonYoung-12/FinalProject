@@ -48,9 +48,9 @@ import com.example.kwy2868.finalproject.Model.Hospital;
 import com.example.kwy2868.finalproject.Model.Review;
 import com.example.kwy2868.finalproject.Model.UserInfo;
 import com.example.kwy2868.finalproject.Model.WriteResult;
-import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Network.NetworkManager;
 import com.example.kwy2868.finalproject.Network.NetworkService;
+import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Util.LocationHelper;
 import com.example.kwy2868.finalproject.Util.NavigationDialog;
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -69,6 +69,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -82,7 +83,7 @@ import static com.example.kwy2868.finalproject.Model.GlobalData.getContext;
 
 public class HospitalDetailActivity extends AppCompatActivity
         implements MapView.POIItemEventListener, MapView.MapViewEventListener, TextWatcher
-                    , RatingBar.OnRatingBarChangeListener, LocationHelper{
+        , RatingBar.OnRatingBarChangeListener, LocationHelper {
     @BindView(R.id.detailHospitalImage)
     ImageView hospitalImage;
     @BindView(R.id.hospitalName)
@@ -91,6 +92,8 @@ public class HospitalDetailActivity extends AppCompatActivity
     TextView hospitalAddress;
     @BindView(R.id.hospitalTel)
     TextView hospitalTel;
+    @BindView(R.id.hospitalSpecies)
+    TextView hospitalSpecies;
 
     @BindView(R.id.mapView)
     MapView mapView;
@@ -161,6 +164,9 @@ public class HospitalDetailActivity extends AppCompatActivity
     // 서버에서 받아온 리뷰 리스트들.
     private List<GetReviewResult> reviewList;
 
+    // 진료 동물들.
+    String species;
+
     // 사용자가 평가한 점수.
     private float score;
 
@@ -179,10 +185,10 @@ public class HospitalDetailActivity extends AppCompatActivity
         checkAdded();
     }
 
-    public void checkLocation(){
+    public void checkLocation() {
         Location location = GlobalData.getCurrentLocation();
         // 이전 액티비티에서 현재 위치가 설정 되어 있는 경우.
-        if(location != null){
+        if (location != null) {
             isSetLocation = true;
             currentLocation = location;
             currentLatitude = location.getLatitude();
@@ -190,25 +196,25 @@ public class HospitalDetailActivity extends AppCompatActivity
         }
     }
 
-    public void dataInit(){
+    public void dataInit() {
         Intent intent = getIntent();
         hospital = Parcels.unwrap(intent.getParcelableExtra(HOSPITAL_TAG));
         setTitle(hospital.getName());
         user = GlobalData.getUser();
         Log.d("유저", user + " ");
+        species = hospital.getSpecies();
 
         setHospitalDataOnView();
         mapSetting();
     }
 
-    public void setHospitalDataOnView(){
+    public void setHospitalDataOnView() {
         Log.d("이미지 패스", hospital.getImgPath() + "");
-        if(hospital.getImgPath() == null || hospital.getImgPath().trim().equals("")){
+        if (hospital.getImgPath() == null || hospital.getImgPath().trim().equals("")) {
             Glide.with(this).load(R.drawable.imgready)
                     .centerCrop().bitmapTransform(new CenterCrop(this))
                     .into(hospitalImage);
-        }
-        else{
+        } else {
             Glide.with(this).load(hospital.getImgPath())
                     .centerCrop().bitmapTransform(new CenterCrop(this))
                     .into(hospitalImage);
@@ -218,10 +224,24 @@ public class HospitalDetailActivity extends AppCompatActivity
         hospitalAddress.setText(hospital.getAddress());
         hospitalTel.setText(hospital.getTel());
 
+        if (species == null || species.trim().equals("")) {
+            hospitalSpecies.setVisibility(View.GONE);
+        } else {
+            hospitalSpecies.setVisibility(View.VISIBLE);
+            hospitalSpecies.setText(species);
+//            for (int i = 0; i < speciesList.size(); i++) {
+//                if (i == 0)
+//                    hospitalSpecies.setText(speciesList.get(i));
+//                else {
+//                    hospitalSpecies.append(", " + speciesList.get(i));
+//                }
+//            }
+        }
+
         reviewContent.addTextChangedListener(this);
     }
 
-    public void mapSetting(){
+    public void mapSetting() {
         mapView.setPOIItemEventListener(this);
         // 사용자 위치 받아올 수 있지만 맵 이동은 안됨.
 //        mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
@@ -243,25 +263,26 @@ public class HospitalDetailActivity extends AppCompatActivity
         mapView.setMapCenterPoint(hospitalMapPoint, false);
     }
 
-    public void recyclerViewSetting(){
+    public void recyclerViewSetting() {
         layoutManager = new StaggeredGridLayoutManager(COLUMN_SPAN, StaggeredGridLayoutManager.VERTICAL);
         reviewRecyclerView.setLayoutManager(layoutManager);
         reviewRecyclerView.setHasFixedSize(true);
+        reviewAdapter = new ReviewAdapter();
+        reviewRecyclerView.setAdapter(reviewAdapter);
     }
 
     // 서버에서 이 병원에 해당하는 리뷰 목록들 가져오자.
-    public void getReviewList(){
+    public void getReviewList() {
         Call<List<GetReviewResult>> call = networkService.getReviewList(hospital.getNum());
         call.enqueue(new Callback<List<GetReviewResult>>() {
             @Override
             public void onResponse(Call<List<GetReviewResult>> call, Response<List<GetReviewResult>> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     reviewList = response.body();
                     // 받아온 리스트가 있으면.
-                    if(reviewList.size() > 0) {
+                    if (reviewList.size() > 0) {
                         refreshRecyclerView();
-                    }
-                    else{
+                    } else {
                         reviewRecyclerView.postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -279,18 +300,18 @@ public class HospitalDetailActivity extends AppCompatActivity
         });
     }
 
-    public void checkAdded(){
+    public void checkAdded() {
         Call<BaseResult> favoriteCheck = networkService.checkAddedFavorite(hospital.getNum(), user.getUserId(), user.getFlag());
         favoriteCheck.enqueue(new Callback<BaseResult>() {
             @Override
             public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
-                if (response.isSuccessful()){
+                if (response.isSuccessful()) {
                     // 이미 추가 되어 있는 병원.
-                    if(response.body().getResultCode() == 200){
+                    if (response.body().getResultCode() == 200) {
                         favoriteButton.setTitle(FAVORITE_DELETE);
                     }
                     // 추가 되어 있지 않은 병원.
-                    else if(response.body().getResultCode() == 300){
+                    else if (response.body().getResultCode() == 300) {
                         favoriteButton.setTitle(FAVORITE_ADD);
                     }
                 }
@@ -298,7 +319,7 @@ public class HospitalDetailActivity extends AppCompatActivity
 
             @Override
             public void onFailure(Call<BaseResult> call, Throwable t) {
-                Toast.makeText(HospitalDetailActivity.this, "네트워크 오류입니다", Toast.LENGTH_SHORT).show();
+                Toasty.error(HospitalDetailActivity.this, "네트워크 오류입니다.", Toast.LENGTH_SHORT, true).show();
             }
         });
 
@@ -306,12 +327,12 @@ public class HospitalDetailActivity extends AppCompatActivity
         blackCheck.enqueue(new Callback<BaseResult>() {
             @Override
             public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
-                if (response.isSuccessful()){
-                    if(response.body().getResultCode() == 200){
+                if (response.isSuccessful()) {
+                    if (response.body().getResultCode() == 200) {
                         blackButton.setTitle(BLACK_DELETE);
                     }
                     // 추가 되어 있지 않은 병원.
-                    else if(response.body().getResultCode() == 300){
+                    else if (response.body().getResultCode() == 300) {
                         blackButton.setTitle(BLACK_ADD);
                     }
                 }
@@ -319,15 +340,15 @@ public class HospitalDetailActivity extends AppCompatActivity
 
             @Override
             public void onFailure(Call<BaseResult> call, Throwable t) {
-                Toast.makeText(HospitalDetailActivity.this, "네트워크 오류입니다", Toast.LENGTH_SHORT).show();
+                Toasty.error(HospitalDetailActivity.this, "네트워크 오류입니다.", Toast.LENGTH_SHORT, true).show();
             }
         });
     }
 
-    public void refreshRecyclerView(){
+    public void refreshRecyclerView() {
         // 로딩중인인 카드 보이게 세팅.
-        reviewAdapter = new ReviewAdapter();
-        reviewRecyclerView.setAdapter(reviewAdapter);
+//        reviewAdapter = new ReviewAdapter(reviewList);
+        reviewAdapter.notifyDataSetChanged();
         reviewRecyclerView.showShimmerAdapter();
 
         // 1초 후에.
@@ -343,7 +364,7 @@ public class HospitalDetailActivity extends AppCompatActivity
     }
 
     @OnClick(R.id.writeReviewButton)
-    public void writeReview(){
+    public void writeReview() {
         // 포커스 없애주자.
         reviewTitle.clearFocus();
         reviewCost.clearFocus();
@@ -352,23 +373,31 @@ public class HospitalDetailActivity extends AppCompatActivity
         int hospitalNum = hospital.getNum();
         long userId = user.getUserId();
         String title = reviewTitle.getText().toString();
-        if(reviewCost.getText().toString().trim().equals("")){
-            Toast.makeText(this, "모두 빠짐없이 입력하여 주세요.", Toast.LENGTH_SHORT).show();
+
+        if (title == null || title.trim().equals("")) {
+            Toasty.error(HospitalDetailActivity.this, "제목을 바르게 입력하여 주세요.", Toast.LENGTH_SHORT, true).show();
+            return;
+        }
+
+        if (reviewCost.getText() == null || reviewCost.getText().toString().trim().equals("")) {
+            Toasty.error(HospitalDetailActivity.this, "금액을 바르게 입력하여 주세요.", Toast.LENGTH_SHORT, true).show();
             return;
         }
         int cost = Integer.parseInt(reviewCost.getText().toString());
+
         String content = reviewContent.getText().toString();
+        if (content == null || content.trim().equals("")) {
+            Toasty.error(HospitalDetailActivity.this, "내용을 바르게 입력하여 주세요.", Toast.LENGTH_SHORT, true).show();
+            return;
+        }
 
         long time = System.currentTimeMillis();
         Date tempDate = new Date(time);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date = sdf.format(tempDate);
 
-        if(title.trim().equals("") || reviewCost.getText().toString().trim().equals("") || content.trim().equals("")){
-            Toast.makeText(this, "모두 빠짐없이 입력하여 주세요.", Toast.LENGTH_SHORT).show();
-            return;
-        }
         Review review = new Review(hospitalNum, userId, title, cost, content, date);
+
         sendReviewToServer(review);
 
         // EditText들 다 지워주자.
@@ -379,20 +408,20 @@ public class HospitalDetailActivity extends AppCompatActivity
         expandableLayout.hide();
     }
 
-    public void sendReviewToServer(final Review review){
+    public void sendReviewToServer(final Review review) {
         Call<WriteResult> call = networkService.writeReview(review);
         call.enqueue(new Callback<WriteResult>() {
             @Override
             public void onResponse(Call<WriteResult> call, Response<WriteResult> response) {
-                if(response.isSuccessful()){
-                    if(response.body().getResultCode() == 200){
+                if (response.isSuccessful()) {
+                    if (response.body().getResultCode() == 200) {
                         Log.d("게시글 번호", response.body().getReviewNum() + "");
                         review.setNum(response.body().getReviewNum());
-                        Toast.makeText(HospitalDetailActivity.this, "후기를 정상적으로 등록하였습니다.", Toast.LENGTH_SHORT).show();
+                        Toasty.success(HospitalDetailActivity.this, "후기를 정상적으로 등록하였습니다.", Toast.LENGTH_SHORT, true).show();
                         // 작성했으면 새로 리스트 받아와야지!
                         // 작성한 리뷰도 화면에 나오게 리사이클러뷰 갱신해줘야겠지.
                         getReviewList();
-                        if(noReview.getVisibility() == View.VISIBLE)
+                        if (noReview.getVisibility() == View.VISIBLE)
                             noReview.setVisibility(View.GONE);
                     }
                 }
@@ -400,7 +429,7 @@ public class HospitalDetailActivity extends AppCompatActivity
 
             @Override
             public void onFailure(Call<WriteResult> call, Throwable t) {
-                Log.d("Retrofit Fail", "서버와 통신 실패");
+                Toasty.error(HospitalDetailActivity.this, "네트워크 오류입니다.", Toast.LENGTH_SHORT, true).show();
             }
         });
     }
@@ -413,11 +442,10 @@ public class HospitalDetailActivity extends AppCompatActivity
     // 마커의 병원 이름 클릭 했을 때 호출.
     @Override
     public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem) {
-        if(isSetLocation) {
+        if (isSetLocation) {
             NavigationDialog navigationDialog = new NavigationDialog(this, currentLatitude, currentLongitude, hospital.getLatitude(), hospital.getLongitude());
             navigationDialog.show();
-        }
-        else {
+        } else {
             permissionCheck();
             Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content),
                     "현재 위치를 받아옵니다.", Snackbar.LENGTH_LONG)
@@ -504,38 +532,39 @@ public class HospitalDetailActivity extends AppCompatActivity
     }
 
     @OnClick(R.id.expandableHeader)
-    public void headerClick(){
+    public void headerClick() {
         // 레이아웃이 펼쳐져 있으면 헤더의 텍스트 바꿔주자.
-        if(expandableLayout.isOpened()) {
+        if (expandableLayout.isOpened()) {
             headerText.setText(getString(R.string.header_open));
             expandableLayout.hide();
-        }
-        else {
+        } else {
             headerText.setText(getString(R.string.header_close));
             expandableLayout.show();
         }
     }
-    
+
     @OnClick(R.id.favoriteButton)
-    public void enrollFavorite(){
+    public void enrollFavorite() {
         Favorite favorite = new Favorite(hospital.getNum(), user.getUserId(), user.getFlag());
         // 즐겨찾기가 등록이 되어 있지 않은 상태면 정상적으로 추가해 주자.
-        if(favoriteButton.getTitle().equals(FAVORITE_ADD)){
+        if (favoriteButton.getTitle().equals(FAVORITE_ADD)) {
             Call<BaseResult> call = networkService.enrollFavorite(favorite);
             call.enqueue(new Callback<BaseResult>() {
                 @Override
                 public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
-                    if(response.isSuccessful()){
+                    if (response.isSuccessful()) {
                         BaseResult baseResult = response.body();
-                        if(baseResult.getResultCode() == 200) {
-                            Toast.makeText(HospitalDetailActivity.this, "즐겨찾기 추가 성공.", Toast.LENGTH_SHORT).show();
+                        if (baseResult.getResultCode() == 200) {
+                            Toasty.success(HospitalDetailActivity.this, "즐겨찾기 추가 성공.", Toast.LENGTH_SHORT, true).show();
                             favoriteButton.setTitle(FAVORITE_DELETE);
                             Log.d("즐겨찾기", "즐겨찾기 등록 성공");
                         }
-                        else if(baseResult.getResultCode() == 300){
+                        // 여기 이제 안들어갈듯.
+                        else if (baseResult.getResultCode() == 300) {
                             Toast.makeText(HospitalDetailActivity.this, "블랙 리스트에 추가된 병원입니다. 블랙리스트에서 해제 후에 추가 해주세요.", Toast.LENGTH_SHORT).show();
                         }
-                        else if(response.body().getResultCode() == 2000){
+                        // 여기도 이제 안들어갈듯.
+                        else if (response.body().getResultCode() == 2000) {
                             Toast.makeText(HospitalDetailActivity.this, "즐겨찾기에 이미 추가된 병원입니다.", Toast.LENGTH_SHORT).show();
                             Log.d("Result Code", baseResult.getResultCode() + " ");
                         }
@@ -544,18 +573,17 @@ public class HospitalDetailActivity extends AppCompatActivity
 
                 @Override
                 public void onFailure(Call<BaseResult> call, Throwable t) {
-                    Toast.makeText(HospitalDetailActivity.this, "네트워크 문제로 즐겨찾기 추가 실패.", Toast.LENGTH_SHORT).show();
+                    Toasty.error(HospitalDetailActivity.this, "네트워크 오류입니다.", Toast.LENGTH_SHORT, true).show();
                 }
             });
         }
         // TODO 즐겨찾기 해제해주자.
-        else{
+        else {
             showDeleteFavoriteDialog(favorite);
-            Toast.makeText(this, "즐찾 해제해주자", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void showDeleteFavoriteDialog(final Favorite favorite){
+    public void showDeleteFavoriteDialog(final Favorite favorite) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("즐겨찾기 해제")
                 .setMessage("즐겨찾기에서 삭제하시겠습니까?")
@@ -577,14 +605,14 @@ public class HospitalDetailActivity extends AppCompatActivity
         alertDialog.show();
     }
 
-    public void deleteFavorite(Favorite favorite){
+    public void deleteFavorite(Favorite favorite) {
         Call<BaseResult> call = networkService.deleteFavorite(favorite.getNum(), favorite.getUserId(), favorite.getFlag());
         call.enqueue(new Callback<BaseResult>() {
             @Override
             public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
-                if(response.isSuccessful()){
-                    if(response.body().getResultCode() == 200){
-                        Toast.makeText(HospitalDetailActivity.this, "정상적으로 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                if (response.isSuccessful()) {
+                    if (response.body().getResultCode() == 200) {
+                        Toasty.success(HospitalDetailActivity.this, "정상적으로 삭제되었습니다", Toast.LENGTH_SHORT, true).show();
                         favoriteButton.setTitle(FAVORITE_ADD);
                     }
                 }
@@ -592,31 +620,33 @@ public class HospitalDetailActivity extends AppCompatActivity
 
             @Override
             public void onFailure(Call<BaseResult> call, Throwable t) {
-                Toast.makeText(HospitalDetailActivity.this, "네트워크 오류.", Toast.LENGTH_SHORT).show();
+                Toasty.error(HospitalDetailActivity.this, "네트워크 오류입니다.", Toast.LENGTH_SHORT, true).show();
             }
         });
     }
-    
+
     @OnClick(R.id.blackButton)
-    public void enrollBlack(){
+    public void enrollBlack() {
         Black black = new Black(hospital.getNum(), user.getUserId(), user.getFlag());
         // 블랙 리스트 추가 되어 있지 않은 상태이면 눌렀을 때 추가해주자.
-        if(blackButton.getTitle().equals(BLACK_ADD)){
+        if (blackButton.getTitle().equals(BLACK_ADD)) {
             Call<BaseResult> call = networkService.enrollBlack(black);
             call.enqueue(new Callback<BaseResult>() {
                 @Override
                 public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
-                    if(response.isSuccessful()){
+                    if (response.isSuccessful()) {
                         BaseResult baseResult = response.body();
-                        if(baseResult.getResultCode() == 200){
-                            Toast.makeText(HospitalDetailActivity.this, "블랙리스트 추가 성공.", Toast.LENGTH_SHORT).show();
+                        if (baseResult.getResultCode() == 200) {
+                            Toasty.success(HospitalDetailActivity.this, "블랙리스트 추가 성공.", Toast.LENGTH_SHORT, true).show();
                             blackButton.setTitle("블랙리스트 해제");
                             Log.d("블랙리스트", "블랙리스트 추가");
                         }
-                        else if(baseResult.getResultCode() == 300){
+                        // 여기 이제 안들어가겠지.
+                        else if (baseResult.getResultCode() == 300) {
                             Toast.makeText(HospitalDetailActivity.this, "즐겨 찾기에 추가된 병원입니다. 즐겨 찾기에서 해제 후에 추가 해주세요.", Toast.LENGTH_SHORT).show();
                         }
-                        else if(baseResult.getResultCode() == 2000){
+                        // 여기도 이제 안들어가겠지.
+                        else if (baseResult.getResultCode() == 2000) {
                             Toast.makeText(HospitalDetailActivity.this, "이미 블랙 리스트에 추가된 병원입니다.", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -624,18 +654,17 @@ public class HospitalDetailActivity extends AppCompatActivity
 
                 @Override
                 public void onFailure(Call<BaseResult> call, Throwable t) {
-                    Toast.makeText(HospitalDetailActivity.this, "네트워크 문제로 블랙리스트 추가 실패.", Toast.LENGTH_SHORT).show();
+                    Toasty.error(HospitalDetailActivity.this, "네트워크 오류입니다.", Toast.LENGTH_SHORT, true).show();
                 }
             });
         }
         // 블랙리스트 해제해주자.
-        else{
+        else {
             showDeleteBlackDialog(black);
-            Toast.makeText(this, "블랙 해제해주자", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void showDeleteBlackDialog(final Black black){
+    public void showDeleteBlackDialog(final Black black) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("블랙리스트 해제")
                 .setMessage("블랙리스트에서 해제하시겠습니까?")
@@ -656,14 +685,14 @@ public class HospitalDetailActivity extends AppCompatActivity
         alertDialog.show();
     }
 
-    public void deleteBlack(final Black black){
+    public void deleteBlack(final Black black) {
         Call<BaseResult> call = networkService.deleteBlack(black.getNum(), black.getUserId(), black.getFlag());
         call.enqueue(new Callback<BaseResult>() {
             @Override
             public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
-                if(response.isSuccessful()){
-                    if(response.body().getResultCode() == 200){
-                        Toast.makeText(HospitalDetailActivity.this, "정상적으로 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                if (response.isSuccessful()) {
+                    if (response.body().getResultCode() == 200) {
+                        Toasty.success(HospitalDetailActivity.this, "정상적으로 삭제되었습니다.", Toast.LENGTH_SHORT, true).show();
                         blackButton.setTitle(BLACK_ADD);
                     }
                 }
@@ -671,13 +700,13 @@ public class HospitalDetailActivity extends AppCompatActivity
 
             @Override
             public void onFailure(Call<BaseResult> call, Throwable t) {
-                Toast.makeText(HospitalDetailActivity.this, "네트워크 오류.", Toast.LENGTH_SHORT).show();
+                Toasty.error(HospitalDetailActivity.this, "네트워크 오류입니다.", Toast.LENGTH_SHORT, true).show();
             }
         });
     }
 
     @OnClick(R.id.ratingButton)
-    public void showRatingDialog(){
+    public void showRatingDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setTitle("별점 평가");
@@ -696,8 +725,8 @@ public class HospitalDetailActivity extends AppCompatActivity
                 call.enqueue(new Callback<BaseResult>() {
                     @Override
                     public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
-                        if(response.isSuccessful()){
-                            if(response.body().getResultCode() == 200){
+                        if (response.isSuccessful()) {
+                            if (response.body().getResultCode() == 200) {
                                 Log.d("평가 완료", "평가 완료");
                             }
                         }
@@ -705,7 +734,7 @@ public class HospitalDetailActivity extends AppCompatActivity
 
                     @Override
                     public void onFailure(Call<BaseResult> call, Throwable t) {
-
+                        Toasty.error(HospitalDetailActivity.this, "네트워크 오류입니다.", Toast.LENGTH_SHORT, true).show();
                     }
                 });
                 Log.d("별점 평가", "서버에 전송해주자" + score);
@@ -786,7 +815,7 @@ public class HospitalDetailActivity extends AppCompatActivity
             @Override
             public void onProviderDisabled(String s) {
                 Log.d("onProviderDisabled", "onProviderDisabled");
-                Toast.makeText(getContext(), "현재 위치를 받아오는데 실패 했습니다.", Toast.LENGTH_SHORT).show();
+                Toasty.error(getContext(), "현재 위치를 받아오는데 실패 했습니다.", Toast.LENGTH_SHORT, true).show();
             }
         };
 
@@ -808,14 +837,12 @@ public class HospitalDetailActivity extends AppCompatActivity
     }
 
     // 위치 받아왔으니 계산해주자.
-    public void afterLocationUpdated(Location location){
-        Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content),
-                "현재 위치를 받아왔습니다. 길찾기 방법을 선택하세요.", Snackbar.LENGTH_SHORT)
-                .setAction("Action", null).show();
+    public void afterLocationUpdated(Location location) {
+        Toasty.success(getContext(), "현재 위치를 받아오는데 성공했습니다.", Toast.LENGTH_SHORT, true).show();
 
-        try{
+        try {
             Thread.sleep(1000);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -828,7 +855,7 @@ public class HospitalDetailActivity extends AppCompatActivity
         makeDialog();
     }
 
-    public void makeDialog(){
+    public void makeDialog() {
 //        DialogPlus dialogPlus = DialogPlus.newDialog(this)
 //                .setAdapter(new DialogAdapter(this))
 //                .setOnItemClickListener(new OnItemClickListener() {
@@ -843,7 +870,7 @@ public class HospitalDetailActivity extends AppCompatActivity
 //                .create();
 //        dialogPlus.show();
         NavigationDialog navigationDialog = new NavigationDialog(this, currentLatitude, currentLongitude, hospital.getLatitude(), hospital.getLongitude());
-        if(!this.isFinishing())
+        if (!this.isFinishing())
             navigationDialog.show();
     }
 
@@ -862,7 +889,7 @@ public class HospitalDetailActivity extends AppCompatActivity
             // 해당 퍼미션이 거절된 경우.
             else {
                 Log.d("퍼미션 거절", "퍼미션 거절");
-                Toast.makeText(this, "퍼미션을 승인 해주셔야 이용이 가능합니다", Toast.LENGTH_SHORT).show();
+                Toasty.error(getContext(), "퍼미션을 승인 해주셔야 이용이 가능합니다.", Toast.LENGTH_SHORT, true).show();
                 // 앱 정보 화면을 통해 퍼미션을 다시 요구해보자.
                 requestPermissionInSettings();
             }

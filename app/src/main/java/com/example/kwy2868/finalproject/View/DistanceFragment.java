@@ -173,7 +173,7 @@ public class DistanceFragment extends Fragment
         layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         distanceRecyclerView.setLayoutManager(layoutManager);
         distanceRecyclerView.setHasFixedSize(true);
-        hospitalAdapter = new HospitalAdapter(sortedHospitalList);
+        hospitalAdapter = new HospitalAdapter(sortedHospitalList, false);
         distanceRecyclerView.setAdapter(hospitalAdapter);
     }
 
