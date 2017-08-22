@@ -152,6 +152,13 @@ public class SearchFragment extends Fragment
                 kiNSearch(searchService, keyword);
                 break;
         }
+        hideKeyBoard(searchEditText);
+    }
+
+    public void hideKeyBoard(View view) {
+        searchEditText.clearFocus();
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     public void blogSearch(SearchService searchService, String keyword) {

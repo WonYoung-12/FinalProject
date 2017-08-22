@@ -209,13 +209,13 @@ public class AddChartActivity extends AppCompatActivity implements OnDateSelecte
     // 작성 버튼 누르면 호출. DB에 써주자.
     @OnClick(R.id.writeChartButton)
     public void writeChart(){
-        String tempPetName = spinner.getSelectedItem().toString();
-        if(tempPetName == null || tempPetName.trim().equals("")){
+        Object tempPetName = spinner.getSelectedItem();
+        if(tempPetName == null || tempPetName.toString().trim().equals("")){
             Toasty.error(this, "펫을 먼저 등록해 주세요.", Toast.LENGTH_SHORT, true).show();
             return;
         }
-        int index = tempPetName.indexOf("(");
-        String petName = tempPetName.substring(0, index);
+        int index = tempPetName.toString().indexOf("(");
+        String petName = tempPetName.toString().substring(0, index);
 
         String treatmentDate = inputTreatmentDate.getText().toString();
         if(treatmentDate == null || treatmentDate.trim().equals("")){

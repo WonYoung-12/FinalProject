@@ -78,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
         Session.getCurrentSession().addCallback(callback);
         // 이거 호출하면 자동으로 로그인 처리가 됨.
         // 호출하지 않으면 로그인 버튼 눌러야 다음 화면으로 넘어간다.
-//        Session.getCurrentSession().checkAndImplicitOpen();
+        Session.getCurrentSession().checkAndImplicitOpen();
         naverLoginInit();
     }
 

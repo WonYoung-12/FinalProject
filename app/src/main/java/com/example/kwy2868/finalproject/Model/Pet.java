@@ -27,11 +27,12 @@ public class Pet {
     File imgFile;
 
     @ParcelConstructor
-    public Pet(String name, int age, String species, long userId, int flag) {
+    public Pet(String name, int age, String species, long userId, String imagePath, int flag) {
         this.name = name;
         this.age = age;
         this.species = species;
         this.userId = userId;
+        this.imagePath = imagePath;
         this.flag = flag;
     }
 

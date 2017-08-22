@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -36,12 +37,16 @@ import com.example.kwy2868.finalproject.Model.Pet;
 import com.example.kwy2868.finalproject.Network.NetworkManager;
 import com.example.kwy2868.finalproject.Network.NetworkService;
 import com.example.kwy2868.finalproject.R;
-import com.google.gson.Gson;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.wrapp.floatlabelededittext.FloatLabeledEditText;
 
-import org.parceler.Parcels;
-
 import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,10 +55,6 @@ import butterknife.Unbinder;
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -91,6 +92,9 @@ public class AddPetActivity extends AppCompatActivity implements View.OnKeyListe
 
     private String imagePath;
 
+    private FirebaseStorage storage;
+    private StorageReference storageReference;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,13 +104,14 @@ public class AddPetActivity extends AppCompatActivity implements View.OnKeyListe
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // EditText 예외 처리를 위한 필터 세팅.
         filterSetting();
+        storageSetting();
     }
 
     public void filterSetting() {
         InputFilter filter = new InputFilter() {
             @Override
             public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-                for(int i = start; i<end; i++){
+                for (int i = start; i < end; i++) {
                     if (!Character.isLetterOrDigit(source.charAt(i))) {
                         return "";
                     }
@@ -118,6 +123,11 @@ public class AddPetActivity extends AppCompatActivity implements View.OnKeyListe
         inputPetName.setFilters(new InputFilter[]{filter});
         inputPetSpecies.setFilters(new InputFilter[]{filter});
         inputPetSpecies.setOnEditorActionListener(this);
+    }
+
+    public void storageSetting() {
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
     }
 
     @OnClick(R.id.petImage)
@@ -211,6 +221,9 @@ public class AddPetActivity extends AppCompatActivity implements View.OnKeyListe
                     .into(petImage);
             Log.d("selected Image", selectedImage + " ");
 
+            File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+            String path = file.getAbsolutePath();
+            Log.d("절대 경로", path);
             imagePath = getPath(selectedImage);
             Log.d("Image Path", imagePath);
         }
@@ -251,7 +264,7 @@ public class AddPetActivity extends AppCompatActivity implements View.OnKeyListe
     }
 
     public void enrollPetWithoutImage(String name, int age, String species, long userId) {
-        Pet pet = new Pet(name, age, species, userId, GlobalData.getUser().getFlag());
+        Pet pet = new Pet(name, age, species, userId, "", GlobalData.getUser().getFlag());
         NetworkService networkService = NetworkManager.getNetworkService();
         Call<BaseResult> call = networkService.enrollPet(pet);
         call.enqueue(new Callback<BaseResult>() {
@@ -272,35 +285,83 @@ public class AddPetActivity extends AppCompatActivity implements View.OnKeyListe
         });
     }
 
-    public void enrollPetWithImage(String name, int age, String species, long userId) {
-        File file = new File(imagePath);
-
-        // 이미지를 보내는 거다.
-        RequestBody reqFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("upload", file.getName(), reqFile);
-        Log.d("File name", file.getName());
-        Log.d("reqFile", reqFile.toString() + " ");
-        Log.d("Body", body + " ");
-
-        String json = new Gson().toJson(Parcels.wrap(new Pet(name, age, species, userId, GlobalData.getUser().getFlag())));
-
-        // 텍스트를 보내는거다.
-        RequestBody pet = RequestBody.create(MediaType.parse("text/plain"), json);
+    public void enrollPetWithImage(final String name, final int age, final String species, final long userId) {
+        Toasty.Config.getInstance()
+                .setInfoColor(ContextCompat.getColor(this, android.R.color.black))
+                .apply();
+        Toasty.info(this, "서버에 데이터를 전송합니다.", Toast.LENGTH_SHORT, true).show();
+        Toasty.Config.reset();
 
         NetworkService networkService = NetworkManager.getNetworkService();
-
-        Call<ResponseBody> call = networkService.addPetImage(body, pet);
-        call.enqueue(new Callback<ResponseBody>() {
+        Uri file = Uri.fromFile(new File(imagePath));
+        StorageReference imgRef = storageReference.child("images/" + file.getLastPathSegment());
+        UploadTask uploadTask = imgRef.putFile(file);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.d("레트로핏 옴", "옴");
-                finish();
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            // 이미지 정상적으로 올라갔을 때.
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                imagePath =  taskSnapshot.getDownloadUrl().toString();
+                Pet pet = new Pet(name, age, species, userId, imagePath, GlobalData.getUser().getFlag());
+                sendPetDataToServer(pet);
+            }
+        });
+//        File file = new File(imagePath);
+        // 이미지를 보내는 거다.
+//        RequestBody reqFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+//        MultipartBody.Part body = MultipartBody.Part.createFormData("upload", file.getName(), reqFile);
+//        Log.d("File name", file.getName());
+//        Log.d("reqFile", reqFile.toString() + " ");
+//        Log.d("Body", body + " ");
+//
+//        String json = new Gson().toJson(Parcels.wrap(new Pet(name, age, species, userId, GlobalData.getUser().getFlag())));
+//
+//        // 텍스트를 보내는거다.
+//        RequestBody pet = RequestBody.create(MediaType.parse("text/plain"), json);
+
+//        NetworkService networkService = NetworkManager.getNetworkService();
+//
+//        Call<ResponseBody> call = networkService.addPetImage(body, pet);
+//        call.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                Log.d("레트로핏 옴", "옴");
+//                finish();
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                t.printStackTrace();
+//                Log.d("레트로핏 안옴", "안옴");
+//            }
+//        });
+    }
+
+    public void sendPetDataToServer(Pet pet){
+        NetworkService networkService = NetworkManager.getNetworkService();
+        Call<BaseResult> call = networkService.enrollPet(pet);
+        call.enqueue(new Callback<BaseResult>() {
+            @Override
+            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+                if (response.isSuccessful()) {
+                    if (response.body().getResultCode() == 200) {
+                        Toasty.success(AddPetActivity.this, "펫 등록 성공", Toast.LENGTH_SHORT, true).show();
+                        finish();
+                    }
+                    else if(response.body().getResultCode() == 300){
+                        Toasty.error(AddPetActivity.this, "이미 등록된 펫입니다.", Toast.LENGTH_SHORT, true).show();
+                    }
+                }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                t.printStackTrace();
-                Log.d("레트로핏 안옴", "안옴");
+            public void onFailure(Call<BaseResult> call, Throwable t) {
+
             }
         });
     }
@@ -331,6 +392,36 @@ public class AddPetActivity extends AppCompatActivity implements View.OnKeyListe
             return filePath;
         } else
             return "";
+    }
+
+    public String getRealPath(Uri uri) {
+        Cursor cursor = null;
+        try {
+            Uri newUri = handleImageUri(uri);
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = getContentResolver().query(newUri, proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } catch (Exception e) {
+            return null;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    public static Uri handleImageUri(Uri uri) {
+        if (uri.getPath().contains("content")) {
+            Pattern pattern = Pattern.compile("(content://media/.*\\d)");
+            Matcher matcher = pattern.matcher(uri.getPath());
+            if (matcher.find())
+                return Uri.parse(matcher.group(1));
+            else
+                throw new IllegalArgumentException("Cannot handle this URI");
+        }
+        return uri;
     }
 
     @Override

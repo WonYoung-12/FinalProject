@@ -16,7 +16,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="3"
+            android:layout_weight="2"
             android:orientation="vertical">
 
             <TextView
@@ -36,24 +36,25 @@
                 android:layout_weight="1" />
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:padding="5dp">
-
-            <ImageView
-                android:id="@+id/userImage"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+            android:layout_weight="1">
 
             <TextView
                 android:id="@+id/userNickname"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_alignParentBottom="true"/>
 
-        </LinearLayout>
+            <ImageView
+                android:id="@+id/userImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@id/userNickname"/>
+
+        </RelativeLayout>
     </LinearLayout>
 
 </android.support.v7.widget.CardView>

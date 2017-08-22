@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -66,7 +67,7 @@ public class MyInfoFragment extends Fragment {
     private ChartAdapter chartAdapter;
     private List<Chart> chartList;
 
-    private static final int COLUMN_SPAN = 3;
+    private static final int COLUMN_SPAN = 2;
     private Unbinder unbinder;
 
     private static final int REQUEST_CODE = 0;
@@ -87,7 +88,8 @@ public class MyInfoFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         getChartListFromServer();
-        imagePermissionCheck();
+        getPetListFromServer();
+//        imagePermissionCheck();
     }
 
     public void getPetListFromServer() {
@@ -102,32 +104,32 @@ public class MyInfoFragment extends Fragment {
                     GlobalData.setPetList(petList);
 //                    System.out.println("이미지들");
                     petRecyclerViewSetting();
-                    for (int i = 0; i < petList.size(); i++) {
-                        final Pet pet = petList.get(i);
-                        // 등록된 경로가 있으면 이미지 받아오자.
-                        if (!(pet.getImagePath() == null || pet.getImagePath().trim().equals(""))) {
-                            Call<ResponseBody> imageCall = networkService.getPetImage(pet.getImagePath());
-//                            Log.i("이미지 세팅", "세팅 해주자");
-
-                            imageCall.enqueue(new Callback<ResponseBody>() {
-                                @Override
-                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                    if (response.isSuccessful()) {
-                                        File imgFile = convertToFile(response.body(), pet.getImagePath());
-                                        pet.setImgFile(imgFile);
-                                        petAdapter.notifyDataSetChanged();
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                    Log.d("이미지 못 가져옴", "못 가져왔다.");
-                                    t.printStackTrace();
-                                }
-                            });
-                            Log.d("이미지 경로", pet.getImagePath());
-                        }
-                    }
+//                    for (int i = 0; i < petList.size(); i++) {
+//                        final Pet pet = petList.get(i);
+//                        // 등록된 경로가 있으면 이미지 받아오자.
+//                        if (!(pet.getImagePath() == null || pet.getImagePath().trim().equals(""))) {
+//                            Call<ResponseBody> imageCall = networkService.getPetImage(pet.getImagePath());
+////                            Log.i("이미지 세팅", "세팅 해주자");
+//
+//                            imageCall.enqueue(new Callback<ResponseBody>() {
+//                                @Override
+//                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                                    if (response.isSuccessful()) {
+//                                        File imgFile = convertToFile(response.body(), pet.getImagePath());
+//                                        pet.setImgFile(imgFile);
+//                                        petAdapter.notifyDataSetChanged();
+//                                    }
+//                                }
+//
+//                                @Override
+//                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                                    Log.d("이미지 못 가져옴", "못 가져왔다.");
+//                                    t.printStackTrace();
+//                                }
+//                            });
+//                            Log.d("이미지 경로", pet.getImagePath());
+//                        }
+//                    }
                     Log.d("펫 리스트 받아옴", "펫 리스트 받아왔다");
                 }
             }
@@ -178,7 +180,7 @@ public class MyInfoFragment extends Fragment {
     }
 
     public void chartRecyclerViewSetting() {
-        chartLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        chartLayoutManager = new LinearLayoutManager(getContext());
         myChartRecyclerView.setLayoutManager(chartLayoutManager);
         myChartRecyclerView.setItemAnimator(null);
         myChartRecyclerView.setNestedScrollingEnabled(false);

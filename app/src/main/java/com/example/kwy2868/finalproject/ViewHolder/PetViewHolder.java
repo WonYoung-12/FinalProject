@@ -42,9 +42,9 @@ public class PetViewHolder extends RecyclerView.ViewHolder{
     public void bind(int position){
         Pet pet = petList.get(position);
         // 서버에서 받아온 이미지가 있으면.
-        if(pet.getImgFile() != null){
+        if(pet.getImagePath() != null){
             Glide.with(itemView.getContext())
-                    .load(pet.getImgFile())
+                    .load(pet.getImagePath())
                     .centerCrop()
                     .bitmapTransform(new CenterCrop(itemView.getContext()))
                     .into(petImage);

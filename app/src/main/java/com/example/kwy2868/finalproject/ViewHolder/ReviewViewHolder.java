@@ -42,9 +42,16 @@ public class ReviewViewHolder extends RecyclerView.ViewHolder {
 
     public void bind(int position){
         // 여기서 유저 이미지를 서버에서 받아와야 할듯. 받아 왔으니 글라이드로 해주자.
-        Glide.with(itemView.getContext()).load(reviewList.get(position).getThumbnailImagePath())
-                .centerCrop().bitmapTransform(new CropCircleTransformation(itemView.getContext()))
-                .into(userImage);
+        if(reviewList.get(position).getThumbnailImagePath() == null || reviewList.get(position).getThumbnailImagePath().trim().equals("")){
+            Glide.with(itemView.getContext()).load(R.drawable.img_noprofile)
+                    .centerCrop().bitmapTransform(new CropCircleTransformation(itemView.getContext()))
+                    .into(userImage);
+        }
+        else{
+            Glide.with(itemView.getContext()).load(reviewList.get(position).getThumbnailImagePath())
+                    .centerCrop().bitmapTransform(new CropCircleTransformation(itemView.getContext()))
+                    .into(userImage);
+        }
         userNickname.setText(reviewList.get(position).getNickname());
         reviewTitle.setText(reviewList.get(position).getTitle());
         reviewCost.setText(reviewList.get(position).getCost() + "");

@@ -257,7 +257,7 @@ public class HospitalFragment extends Fragment
                 // 액티비티, permission String 배열, requestCode를 인자로 받음.
                 // 퍼미션을 요구하는 다이얼로그 창을 띄운다.
                 // requestCode 다르게 하면 다르게 처리할 수 있을듯?
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
             }
             // 퍼미션이 있는 경우.
             else {
@@ -293,6 +293,7 @@ public class HospitalFragment extends Fragment
             public void onProviderDisabled(String s) {
                 Log.d("onProviderDisabled", "onProviderDisabled");
                 Toasty.error(getContext(), "현재 위치를 받아오는 데 실패했습니다.", Toast.LENGTH_SHORT, true).show();
+                checkBox.setChecked(false);
             }
         };
 
@@ -359,13 +360,13 @@ public class HospitalFragment extends Fragment
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         // requestPermission 메소드의 requestCode와 일치하는지 확인.
         if (requestCode == REQUEST_CODE) {
             Log.d("퍼미션 요구", "퍼미션 요구");
             // 요구하는 퍼미션이 한개이기 때문에 하나만 확인한다.
             // 해당 퍼미션이 승낙된 경우.
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
                 Log.d("퍼미션 승인", "퍼미션 승인");
                 getCurrentLocation();
             }
@@ -402,7 +403,12 @@ public class HospitalFragment extends Fragment
             isFirst = !isFirst;
         }
         else{
-            getHospitalList(currentDistrict);
+            if(checkBox.isChecked()){
+                refreshRecyclerView(sortedHospitalList);
+            }
+            else{
+                getHospitalList(currentDistrict);
+            }
         }
     }
 }

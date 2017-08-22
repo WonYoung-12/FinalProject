@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);
         // 미리 3개를 만들어 놓는다.
-        viewPager.setOffscreenPageLimit(FRAGMENT_COUNT);
+        viewPager.setOffscreenPageLimit(FRAGMENT_COUNT-1);
         viewPager.setCurrentItem(0);
         tabLayout.setupWithViewPager(viewPager);
 

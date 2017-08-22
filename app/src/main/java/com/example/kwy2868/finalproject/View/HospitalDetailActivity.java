@@ -260,7 +260,7 @@ public class HospitalDetailActivity extends AppCompatActivity
         mapView.selectPOIItem(marker, true);
         // 숫자가 낮을수록 좁게, 숫자가 높을수록 넓은 지역까지 보인다.
         // 이렇게 하면 드래그 막히는거 아닌가..?
-        mapView.setMapCenterPoint(hospitalMapPoint, false);
+        mapView.setMapCenterPoint(hospitalMapPoint, true);
     }
 
     public void recyclerViewSetting() {
@@ -559,11 +559,11 @@ public class HospitalDetailActivity extends AppCompatActivity
                             favoriteButton.setTitle(FAVORITE_DELETE);
                             Log.d("즐겨찾기", "즐겨찾기 등록 성공");
                         }
-                        // 여기 이제 안들어갈듯.
+                        //
                         else if (baseResult.getResultCode() == 300) {
-                            Toast.makeText(HospitalDetailActivity.this, "블랙 리스트에 추가된 병원입니다. 블랙리스트에서 해제 후에 추가 해주세요.", Toast.LENGTH_SHORT).show();
+                            Toasty.error(HospitalDetailActivity.this, "블랙 리스트에 추가된 병원입니다. 블랙리스트에서 해제 후에 추가 해주세요.", Toast.LENGTH_SHORT, true).show();
                         }
-                        // 여기도 이제 안들어갈듯.
+                        // 여기 이제 안들어갈듯.
                         else if (response.body().getResultCode() == 2000) {
                             Toast.makeText(HospitalDetailActivity.this, "즐겨찾기에 이미 추가된 병원입니다.", Toast.LENGTH_SHORT).show();
                             Log.d("Result Code", baseResult.getResultCode() + " ");
@@ -643,7 +643,7 @@ public class HospitalDetailActivity extends AppCompatActivity
                         }
                         // 여기 이제 안들어가겠지.
                         else if (baseResult.getResultCode() == 300) {
-                            Toast.makeText(HospitalDetailActivity.this, "즐겨 찾기에 추가된 병원입니다. 즐겨 찾기에서 해제 후에 추가 해주세요.", Toast.LENGTH_SHORT).show();
+                            Toasty.error(HospitalDetailActivity.this, "즐겨 찾기에 추가된 병원입니다. 즐겨 찾기에서 해제 후에 추가 해주세요.", Toast.LENGTH_SHORT, true).show();
                         }
                         // 여기도 이제 안들어가겠지.
                         else if (baseResult.getResultCode() == 2000) {
