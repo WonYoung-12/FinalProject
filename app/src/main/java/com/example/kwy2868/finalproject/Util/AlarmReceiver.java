@@ -37,6 +37,12 @@ public class AlarmReceiver extends BroadcastReceiver {
         builder.setPriority(Notification.PRIORITY_MAX);
         builder.setAutoCancel(true);
 
+//        Intent alertIntent = new Intent(context, AlertActivity.class);
+//        alertIntent.putExtra("Title", title);
+//        alertIntent.putExtra("Description", description);
+//        alertIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        context.startActivity(alertIntent);
+
         // 전달. 그런데 EventBus는 앱 꺼지면 유지가 안됨..!
 //        EventBus.getDefault().post(new AlarmEvent(title, description));
 

@@ -16,12 +16,11 @@
             android:layout_height="match_parent"
             app:titleEnabled="false">
             <android.support.v7.widget.Toolbar
-                app:title="@string/app_name"
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                app:titleTextAppearance="@style/toolBarTextStyle"
                 android:background="?attr/colorPrimary"
-                app:popupTheme="@style/AppTheme.PopupOverlay"
                 app:layout_collapseMode="pin"/>
         </android.support.design.widget.CollapsingToolbarLayout>
 

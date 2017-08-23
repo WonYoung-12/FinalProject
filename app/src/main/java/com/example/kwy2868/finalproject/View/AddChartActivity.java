@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -51,7 +50,7 @@ import retrofit2.Response;
  * Created by kwy2868 on 2017-08-11.
  */
 
-public class AddChartActivity extends AppCompatActivity implements OnDateSelectedListener, EditText.OnFocusChangeListener, TextView.OnEditorActionListener{
+public class AddChartActivity extends BaseActivity implements OnDateSelectedListener, EditText.OnFocusChangeListener, TextView.OnEditorActionListener{
     @BindView(R.id.materialCalendar)
     MaterialCalendarView materialCalendar;
     @BindView(R.id.treatmentDate)

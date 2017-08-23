@@ -13,17 +13,11 @@ import com.example.kwy2868.finalproject.View.SearchFragment;
  */
 
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {
-    private String[] tabTitles = new String[]{"Hospital", "Search", "My Info"};
 
     private static final int ITEM_COUNT = 3;
 
     public ViewPagerAdapter(FragmentManager fm) {
         super(fm);
-    }
-
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return tabTitles[position];
     }
 
     // 현재 포지션의 프래그먼트를 반환함.

@@ -66,7 +66,7 @@ import static com.example.kwy2868.finalproject.Model.GlobalData.getContext;
  * Created by kwy2868 on 2017-08-12.
  */
 
-public class AddPetActivity extends AppCompatActivity implements View.OnKeyListener, TextView.OnEditorActionListener {
+public class AddPetActivity extends BaseActivity implements View.OnKeyListener, TextView.OnEditorActionListener {
     @BindView(R.id.inputPetName)
     EditText inputPetName;
     @BindView(R.id.inputPetAge)

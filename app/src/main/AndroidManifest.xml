@@ -43,11 +43,7 @@
         <activity
             android:name="com.example.kwy2868.finalproject.View.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <!--네이버 로그인-->
@@ -122,6 +118,21 @@
         </activity>
 
         <receiver android:name=".Util.AlarmReceiver" />
+
+        <activity
+            android:name=".View.AlertActivity"/>
+
+        <activity
+            android:name=".View.SplashActivity"
+            android:theme="@style/SplashTheme"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

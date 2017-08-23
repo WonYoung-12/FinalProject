@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -34,7 +33,7 @@ import retrofit2.Response;
  * Created by kwy2868 on 2017-08-17.
  */
 
-public class MyBlackActivity extends AppCompatActivity {
+public class MyBlackActivity extends BaseActivity {
     @BindView(R.id.blackRecyclerView)
     RecyclerView blackRecyclerView;
 

@@ -18,10 +18,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
@@ -53,6 +54,7 @@ import com.example.kwy2868.finalproject.Network.NetworkService;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Util.LocationHelper;
 import com.example.kwy2868.finalproject.Util.NavigationDialog;
+import com.example.kwy2868.finalproject.Util.TypefaceSpan;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
@@ -70,6 +72,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import es.dmoral.toasty.Toasty;
+import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -81,7 +84,7 @@ import static com.example.kwy2868.finalproject.Model.GlobalData.getContext;
  * Created by kwy2868 on 2017-08-08.
  */
 
-public class HospitalDetailActivity extends AppCompatActivity
+public class HospitalDetailActivity extends BaseActivity
         implements MapView.POIItemEventListener, MapView.MapViewEventListener, TextWatcher
         , RatingBar.OnRatingBarChangeListener, LocationHelper {
     @BindView(R.id.detailHospitalImage)
@@ -199,7 +202,12 @@ public class HospitalDetailActivity extends AppCompatActivity
     public void dataInit() {
         Intent intent = getIntent();
         hospital = Parcels.unwrap(intent.getParcelableExtra(HOSPITAL_TAG));
-        setTitle(hospital.getName());
+
+        SpannableString s = new SpannableString(hospital.getName());
+        s.setSpan(new TypefaceSpan(this, "NanumBarunpenB.ttf"), 0, s.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        setTitle(s);
+        
         user = GlobalData.getUser();
         Log.d("유저", user + " ");
         species = hospital.getSpecies();
@@ -581,6 +589,7 @@ public class HospitalDetailActivity extends AppCompatActivity
         else {
             showDeleteFavoriteDialog(favorite);
         }
+        floatingActionsMenu.collapse();
     }
 
     public void showDeleteFavoriteDialog(final Favorite favorite) {
@@ -662,6 +671,7 @@ public class HospitalDetailActivity extends AppCompatActivity
         else {
             showDeleteBlackDialog(black);
         }
+        floatingActionsMenu.collapse();
     }
 
     public void showDeleteBlackDialog(final Black black) {
@@ -713,7 +723,7 @@ public class HospitalDetailActivity extends AppCompatActivity
         View mView = getLayoutInflater().inflate(R.layout.rating_bar, null);
         builder.setView(mView);
 
-        RatingBar ratingBar = (RatingBar) mView.findViewById(R.id.ratingBar);
+        MaterialRatingBar ratingBar = mView.findViewById(R.id.ratingBar);
         ratingBar.setOnRatingBarChangeListener(this);
 
         // 평가 완료 했을 때.
@@ -727,6 +737,7 @@ public class HospitalDetailActivity extends AppCompatActivity
                     public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
                         if (response.isSuccessful()) {
                             if (response.body().getResultCode() == 200) {
+                                Toasty.success(getContext(), "별점을 부여하였습니다..", Toast.LENGTH_SHORT, true).show();
                                 Log.d("평가 완료", "평가 완료");
                             }
                         }
@@ -738,6 +749,7 @@ public class HospitalDetailActivity extends AppCompatActivity
                     }
                 });
                 Log.d("별점 평가", "서버에 전송해주자" + score);
+                floatingActionsMenu.collapse();
             }
         });
 
@@ -745,7 +757,7 @@ public class HospitalDetailActivity extends AppCompatActivity
         builder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
+                floatingActionsMenu.collapse();
             }
         });
         builder.create();

@@ -4,14 +4,16 @@
     android:layout_height="match_parent"
     android:gravity="center">
 
-    <RatingBar
+    <me.zhanghai.android.materialratingbar.MaterialRatingBar
         android:id="@+id/ratingBar"
+        style="@style/Widget.MaterialRatingBar.RatingBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:isIndicator="false"
-        android:numStars="5"
+        android:layout_gravity="center"
         android:rating="0"
-        android:stepSize="0.5"
-        android:max="5"/>
+        android:numStars="5"
+        android:stepSize="0.5">
+
+    </me.zhanghai.android.materialratingbar.MaterialRatingBar>
 
 </LinearLayout>

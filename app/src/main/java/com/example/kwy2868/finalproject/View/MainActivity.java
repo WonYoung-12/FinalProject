@@ -10,8 +10,9 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -26,10 +27,11 @@ import com.example.kwy2868.finalproject.Model.AlarmEvent;
 import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.UserInfo;
-import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Network.NetworkManager;
 import com.example.kwy2868.finalproject.Network.NetworkService;
+import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Util.MyAlarmManager;
+import com.example.kwy2868.finalproject.Util.TypefaceSpan;
 import com.kakao.auth.Session;
 import com.nhn.android.naverlogin.OAuthLogin;
 import com.tapadoo.alerter.Alerter;
@@ -47,7 +49,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 // 그래도 프래그먼트를 가지고 있는 액티비티도 가지고 있어야 할 것 같고, 나중에 혹시 모르니까..!
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, TabLayout.OnTabSelectedListener{
 
     @BindView(R.id.drawer_layout)
@@ -103,7 +105,13 @@ public class MainActivity extends AppCompatActivity
 
     public void toolbarSetting() {
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.app_name);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+
+        SpannableString s = new SpannableString(getString(R.string.app_name));
+        s.setSpan(new TypefaceSpan(this, "NanumBarunpenB.ttf"), 0, s.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        getSupportActionBar().setTitle(s);
     }
 
     public void drawerSetting() {
@@ -146,8 +154,15 @@ public class MainActivity extends AppCompatActivity
         // 아이콘 설정.
         int[] tabIcons = new int[]{R.drawable.ic_local_hospital_white_24dp, R.drawable.ic_search_white_24dp,
                 R.drawable.ic_account_circle_white_24dp};
-        for (int i = 0; i < FRAGMENT_COUNT; i++)
+        String[] tabTitles = new String[]{"Hospital", "Search", "My Info"};
+
+        for (int i = 0; i < FRAGMENT_COUNT; i++) {
             tabLayout.getTabAt(i).setIcon(tabIcons[i]);
+            SpannableString s = new SpannableString(tabTitles[i]);
+            s.setSpan(new TypefaceSpan(this, "NanumBarunpenB.ttf"), 0, s.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            tabLayout.getTabAt(i).setText(s);
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

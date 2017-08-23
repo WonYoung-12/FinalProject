@@ -19,4 +19,5 @@
     <color name="pink">#e91e63</color>
     <color name="pink_pressed">#ec407a</color>
     <color name="icons">#FFF</color>
+    <color name="transparent">#00000000</color>
 </resources>

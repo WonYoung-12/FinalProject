@@ -64,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        getWindow().setBackgroundDrawableResource(R.color.colorPrimary);
         unbinder = ButterKnife.bind(this);
 
         // 툴바 처리.

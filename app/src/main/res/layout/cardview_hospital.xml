@@ -20,61 +20,56 @@
             android:adjustViewBounds="true"
             android:scaleType="fitCenter" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/hospitalName"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginTop="10dp"
-            android:orientation="vertical">
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/hospitalName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="#F0A84C" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="3dp"
-                android:background="#F0A84C" />
+        <TextView
+            android:id="@+id/hospitalAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textSize="12sp" />
 
-            <TextView
-                android:id="@+id/hospitalAddress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp" />
+        <TextView
+            android:id="@+id/hospitalTel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp" />
 
-            <TextView
-                android:id="@+id/hospitalTel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp" />
+        <TextView
+            android:id="@+id/hospitalSpecies"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp" />
 
-            <TextView
-                android:id="@+id/hospitalSpecies"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp" />
+        <TextView
+            android:id="@+id/hospitalDistance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp" />
 
-            <TextView
-                android:id="@+id/hospitalDistance"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp" />
+        <me.zhanghai.android.materialratingbar.MaterialRatingBar
+            android:id="@+id/hospitalRating"
+            style="@style/Widget.MaterialRatingBar.RatingBar.Indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:focusableInTouchMode="false"
+            android:numStars="5"
+            android:stepSize="0.5">
 
-            <RatingBar
-                android:id="@+id/hospitalRating"
-                style="@style/Widget.AppCompat.RatingBar.Indicator"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:isIndicator="true"
-                android:max="5"
-                android:numStars="5"
-                android:rating="0"
-                android:stepSize="0.5" />
-
-        </LinearLayout>
+        </me.zhanghai.android.materialratingbar.MaterialRatingBar>
 
     </LinearLayout>
 

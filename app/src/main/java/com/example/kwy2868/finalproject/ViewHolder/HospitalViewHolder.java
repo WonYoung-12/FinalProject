@@ -6,7 +6,6 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -23,6 +22,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
 /**
  * Created by kwy2868 on 2017-08-01.
@@ -45,7 +45,7 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
     @BindView(R.id.hospitalDistance)
     TextView hospitalDistance;
     @BindView(R.id.hospitalRating)
-    RatingBar hospitalRating;
+    MaterialRatingBar hospitalRating;
 
     private static final String HOSPITAL_TAG = "Hospital";
     private static final String LOCATION_TAG = "Location";

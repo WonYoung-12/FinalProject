@@ -34,8 +34,6 @@ public class PetAdapter extends RecyclerView.Adapter<PetViewHolder> {
         View view = inflater.inflate(R.layout.cardview_mypet, parent, shouldAttachToParentImmediately);
         PetViewHolder petViewHolder = new PetViewHolder(view, petList);
 
-        Log.i("onCreateViewHolder 생성", "생성");
-
         return petViewHolder;
     }
 

@@ -104,6 +104,12 @@ dependencies {
     // Toasty
     compile 'com.github.GrenderG:Toasty:1.2.5'
 
+    // RatingBar
+    compile 'me.zhanghai.android.materialratingbar:library:1.0.2'
+
+    // Typekit
+    compile 'com.tsengvn:Typekit:1.0.0'
+
     // firebase
     compile 'com.google.firebase:firebase-crash:10.2.6'
     compile 'com.google.firebase:firebase-core:10.2.6'
