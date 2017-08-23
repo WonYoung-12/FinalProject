@@ -4,15 +4,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.LoginResult;
 import com.example.kwy2868.finalproject.Model.UserInfo;
-import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Network.NetworkManager;
 import com.example.kwy2868.finalproject.Network.NetworkService;
+import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Util.ParsingHelper;
 import com.example.kwy2868.finalproject.kakao.KakaoSignupActivity;
 import com.kakao.auth.ISessionCallback;
@@ -38,6 +43,9 @@ import retrofit2.Response;
 //// 이미지 움직이는거 어떻게 할까
 public class LoginActivity extends AppCompatActivity {
 
+    @BindView(R.id.loginImage)
+    ImageView loginImage;
+
     // 로그인 버튼들 있는 레이아웃.
     @BindView(R.id.loginButtons)
     LinearLayout loginButtons;
@@ -54,6 +62,8 @@ public class LoginActivity extends AppCompatActivity {
     private Unbinder unbinder;
 
     private static final int REQUEST_CODE = 0;
+
+    private Animation up;
 
     /**
      * 로그인 버튼을 클릭 했을시 access token을 요청하도록 설정한다.
@@ -73,6 +83,16 @@ public class LoginActivity extends AppCompatActivity {
         }
         // 자바 코드로 키 해시 받아오는 거.
 //        Log.d("hash", "key : " + getKeyHash(this));
+        Glide.with(this).load(R.drawable.icon)
+                .centerCrop().bitmapTransform(new FitCenter(this))
+                .into(loginImage);
+
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                setAnimation();
+//            }
+//        }).start();
 
         callback = new SessionCallback();
         Session.getCurrentSession().addCallback(callback);
@@ -80,6 +100,11 @@ public class LoginActivity extends AppCompatActivity {
         // 호출하지 않으면 로그인 버튼 눌러야 다음 화면으로 넘어간다.
         Session.getCurrentSession().checkAndImplicitOpen();
         naverLoginInit();
+    }
+
+    public void setAnimation(){
+        up = AnimationUtils.loadAnimation(this, R.anim.translate_anim);
+        loginImage.startAnimation(up);
     }
 
     public void naverLoginInit(){
