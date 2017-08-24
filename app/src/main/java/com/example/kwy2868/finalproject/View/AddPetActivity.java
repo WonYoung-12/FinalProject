@@ -16,7 +16,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.Log;
@@ -27,10 +26,12 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.Pet;
@@ -43,6 +44,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.wrapp.floatlabelededittext.FloatLabeledEditText;
+
+import org.parceler.Parcels;
 
 import java.io.File;
 import java.util.regex.Matcher;
@@ -73,14 +76,22 @@ public class AddPetActivity extends BaseActivity implements View.OnKeyListener, 
     EditText inputPetAge;
     @BindView(R.id.inputPetSpecies)
     EditText inputPetSpecies;
-    @BindView(R.id.enrollPetButton)
-    Button enrollPetButton;
     @BindView(R.id.petImage)
     CircleImageView petImage;
     @BindView(R.id.imageNavigation)
     TextView imageNavigation;
-    @BindView(R.id.petName)
-    FloatLabeledEditText petName;
+
+    @BindView(R.id.enrollLayout)
+    LinearLayout enrollLayout;
+    @BindView(R.id.modifyLayout)
+    LinearLayout modifyLayout;
+
+    @BindView(R.id.enrollPetButton)
+    Button enrollPetButton;
+    @BindView(R.id.deletePetButton)
+    Button deletePetButton;
+    @BindView(R.id.modifyPetButton)
+    Button modifyPetButton;
 
     private Unbinder unbinder;
     private static final int PHOTO_REQUEST = 1;
@@ -88,12 +99,18 @@ public class AddPetActivity extends BaseActivity implements View.OnKeyListener, 
 
     private static final int REQUEST_CODE = 0;
 
+    private static final int MODE_ADD = 0;
+    private static final int MODE_MODIFY = 1;
+    private int mode;
+
     private Uri selectedImage;
 
     private String imagePath;
 
     private FirebaseStorage storage;
     private StorageReference storageReference;
+
+    private static final String PET_TAG = "PET";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -105,6 +122,57 @@ public class AddPetActivity extends BaseActivity implements View.OnKeyListener, 
         // EditText 예외 처리를 위한 필터 세팅.
         filterSetting();
         storageSetting();
+
+        Intent intent = getIntent();
+        if(intent != null){
+            setData(intent);
+            mode = MODE_MODIFY;
+        }
+        else{
+            mode = MODE_ADD;
+        }
+
+        if(mode == MODE_ADD) {
+            enrollLayout.setVisibility(View.VISIBLE);
+            modifyLayout.setVisibility(View.GONE);
+
+        }
+        else{
+            enrollLayout.setVisibility(View.GONE);
+            modifyLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
+
+
+    @OnClick(R.id.modifyPetButton)
+    public void modifyPet(){
+        Toast.makeText(this, "수정", Toast.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.deletePetButton)
+    public void deletePet(){
+        Toast.makeText(this, "삭제", Toast.LENGTH_SHORT).show();
+    }
+
+    public void setData(Intent intent){
+        Pet pet = Parcels.unwrap(intent.getParcelableExtra(PET_TAG));
+        if(pet != null){
+            // 서버에서 받아온 이미지가 있으면.
+            if(pet.getImagePath() == null || pet.getImagePath().trim().equals("")){
+
+            }
+            else{
+                Glide.with(this)
+                        .load(pet.getImagePath())
+                        .centerCrop()
+                        .bitmapTransform(new CenterCrop(this))
+                        .into(petImage);
+            }
+            inputPetName.setText(pet.getName());
+            inputPetAge.setText(pet.getAge() + "");
+            inputPetSpecies.setText(pet.getSpecies());
+        }
     }
 
     public void filterSetting() {
@@ -292,7 +360,6 @@ public class AddPetActivity extends BaseActivity implements View.OnKeyListener, 
         Toasty.info(this, "서버에 데이터를 전송합니다.", Toast.LENGTH_SHORT, true).show();
         Toasty.Config.reset();
 
-        NetworkService networkService = NetworkManager.getNetworkService();
         Uri file = Uri.fromFile(new File(imagePath));
         StorageReference imgRef = storageReference.child("images/" + file.getLastPathSegment());
         UploadTask uploadTask = imgRef.putFile(file);

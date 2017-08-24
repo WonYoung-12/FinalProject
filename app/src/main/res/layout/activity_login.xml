@@ -4,17 +4,17 @@
     android:id="@+id/loginActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:animateLayoutChanges="true">
 
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/loginImage"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:layout_centerInParent="true"
-        android:background="@drawable/circle_border"
-        android:padding="30dp"
-        android:scaleType="fitCenter" />
+        android:padding="20dp"
+        app:civ_border_color="@color/white"
+        app:civ_border_width="5dp" />
 
     <LinearLayout
         android:id="@+id/loginButtons"

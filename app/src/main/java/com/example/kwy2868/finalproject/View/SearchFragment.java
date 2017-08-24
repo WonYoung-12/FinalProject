@@ -71,7 +71,8 @@ public class SearchFragment extends Fragment
     // 네이버 API에 요구하는 아이템의 갯수. 10개가 디폴트 최대 100개.
     private static final int REQUEST_ITEM_COUNT = 20;
 
-    private RecyclerView.LayoutManager layoutManager;
+    private LinearLayoutManager layoutManager;
+    private static final int COLUMN_SPAN = 2;
 
     private Unbinder unbinder;
 
@@ -121,6 +122,12 @@ public class SearchFragment extends Fragment
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         // i = 0이면 블로그, 1이면 카페, 2이면 지식인. 이제 이걸로 나중에 비교하자. 검색창에서 클릭 버튼 눌렀을 때..!
         currentItem = i;
+        if(searchEditText.getText() == null || searchEditText.getText().toString().trim().equals("")){
+            return;
+        }
+        else{
+            search();
+        }
     }
 
     @Override

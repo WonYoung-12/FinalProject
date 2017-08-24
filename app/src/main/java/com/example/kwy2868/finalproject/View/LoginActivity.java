@@ -2,16 +2,18 @@ package com.example.kwy2868.finalproject.View;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.transition.TransitionManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.LoginResult;
 import com.example.kwy2868.finalproject.Model.UserInfo;
@@ -31,6 +33,8 @@ import com.nhn.android.naverlogin.ui.view.OAuthLoginButton;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import de.hdodenhof.circleimageview.CircleImageView;
+import jp.wasabeef.glide.transformations.CropCircleTransformation;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -42,9 +46,11 @@ import retrofit2.Response;
 //// 여기서 현재 위치 받아오자..! 로딩 화면을 통해서
 //// 이미지 움직이는거 어떻게 할까
 public class LoginActivity extends AppCompatActivity {
+    @BindView(R.id.loginActivity)
+    RelativeLayout loginActivity;
 
     @BindView(R.id.loginImage)
-    ImageView loginImage;
+    CircleImageView loginImage;
 
     // 로그인 버튼들 있는 레이아웃.
     @BindView(R.id.loginButtons)
@@ -65,6 +71,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private Animation up;
 
+    private boolean ANIMATION_END = false;
+
     /**
      * 로그인 버튼을 클릭 했을시 access token을 요청하도록 설정한다.
      *
@@ -74,8 +82,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        getWindow().setBackgroundDrawableResource(R.color.colorPrimary);
         unbinder = ButterKnife.bind(this);
+        hideView();
 
         // 툴바 처리.
         if (getActionBar() != null) {
@@ -83,16 +91,6 @@ public class LoginActivity extends AppCompatActivity {
         }
         // 자바 코드로 키 해시 받아오는 거.
 //        Log.d("hash", "key : " + getKeyHash(this));
-        Glide.with(this).load(R.drawable.icon)
-                .centerCrop().bitmapTransform(new FitCenter(this))
-                .into(loginImage);
-
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                setAnimation();
-//            }
-//        }).start();
 
         callback = new SessionCallback();
         Session.getCurrentSession().addCallback(callback);
@@ -100,14 +98,56 @@ public class LoginActivity extends AppCompatActivity {
         // 호출하지 않으면 로그인 버튼 눌러야 다음 화면으로 넘어간다.
         Session.getCurrentSession().checkAndImplicitOpen();
         naverLoginInit();
+
+        Glide.with(LoginActivity.this).load(R.drawable.icon)
+                .centerCrop().bitmapTransform(new CropCircleTransformation(LoginActivity.this))
+                .into(loginImage);
+
+        TransitionManager.beginDelayedTransition(loginActivity);
+
+        loginActivity.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                setAnimation();
+                loginActivity.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
+
+        loginActivity.setVisibility(View.VISIBLE);
+        loginImage.setVisibility(View.VISIBLE);
     }
 
-    public void setAnimation(){
-        up = AnimationUtils.loadAnimation(this, R.anim.translate_anim);
+    public void hideView() {
+        loginActivity.setVisibility(View.GONE);
+        loginImage.setVisibility(View.GONE);
+//        loginButtons.setVisibility(View.GONE);
+    }
+
+    public void setAnimation() {
+//        up = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, -0.15f);
+        up = AnimationUtils.loadAnimation(LoginActivity.this, R.anim.translate_anim);
+
+        up.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                Log.d("시작", "애니메이션 시작");
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                loginButtons.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        getWindow().setBackgroundDrawableResource(R.color.colorPrimary);
         loginImage.startAnimation(up);
     }
 
-    public void naverLoginInit(){
+    public void naverLoginInit() {
         oAuthLoginModule = OAuthLogin.getInstance();
         oAuthLoginModule.init(this,
                 getString(R.string.Client_ID),
@@ -117,7 +157,7 @@ public class LoginActivity extends AppCompatActivity {
         naverLoginButton.setOAuthLoginHandler(new OAuthLoginHandler() {
             @Override
             public void run(boolean isSuccess) {
-                if(isSuccess){
+                if (isSuccess) {
                     final String token = oAuthLoginModule.getAccessToken(LoginActivity.this);
 
                     new Thread(new Runnable() {
@@ -125,7 +165,7 @@ public class LoginActivity extends AppCompatActivity {
                         public void run() {
                             String response = oAuthLoginModule.requestApi(LoginActivity.this, token, NAVER_LOGIN_URL);
                             Log.d("Naver Response", response);
-                            if(ParsingHelper.naverLoginResponseParsing(response))
+                            if (ParsingHelper.naverLoginResponseParsing(response))
                                 loginToServer(GlobalData.getUser());
                             else
                                 Toast.makeText(LoginActivity.this, "로그인 실패 다시 시도하여 주세요.", Toast.LENGTH_SHORT).show();
@@ -159,18 +199,20 @@ public class LoginActivity extends AppCompatActivity {
             // redirectSignupActivity(); // 세션 연결시 SignupActivity로.
             redirectSignupActivity();
         }
+
         // 세션 연결이 실패했을 때 로그인 화면 다시 불러온다.
         @Override
         public void onSessionOpenFailed(KakaoException exception) {
-            if(exception != null) {
+            if (exception != null) {
                 Logger.e(exception);
             }
             setContentView(R.layout.activity_login);
         }
+
     }
 
     // 세션 연결 성공 시 SignupActivity로.
-    protected void redirectSignupActivity(){
+    protected void redirectSignupActivity() {
         Intent intent = new Intent(this, KakaoSignupActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
@@ -197,8 +239,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
     // 카카오 디벨로퍼 키 값을 등록하기 위해 자바로 받아오는 메소드.
 //    public static String getKeyHash(final Context context) {

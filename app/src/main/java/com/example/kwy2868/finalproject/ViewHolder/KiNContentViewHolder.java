@@ -20,8 +20,6 @@ import butterknife.ButterKnife;
 public class KiNContentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
     @BindView(R.id.contentTitle)
     TextView contentTitle;
-    @BindView(R.id.contentLink)
-    TextView contentLink;
     @BindView(R.id.contentDescription)
     TextView contentDescription;
 
@@ -38,7 +36,6 @@ public class KiNContentViewHolder extends RecyclerView.ViewHolder implements Vie
     public void bind(int position){
         KiNContent kiNContent = kiNContentList.get(position);
         contentTitle.setText(kiNContent.getTitle());
-        contentLink.setText(kiNContent.getLink());
         contentDescription.setText(kiNContent.getDescription());
     }
 

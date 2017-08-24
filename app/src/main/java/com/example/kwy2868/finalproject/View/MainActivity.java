@@ -189,6 +189,7 @@ public class MainActivity extends BaseActivity
         EventBus.getDefault().unregister(this);
     }
 
+
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         viewPager.setCurrentItem(tab.getPosition());

@@ -20,14 +20,10 @@ import butterknife.ButterKnife;
 public class CafeArticleViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
     @BindView(R.id.contentTitle)
     TextView contentTitle;
-    @BindView(R.id.contentLink)
-    TextView contentLink;
     @BindView(R.id.contentDescription)
     TextView contentDescription;
     @BindView(R.id.cafeName)
     TextView cafeName;
-    @BindView(R.id.cafeUrl)
-    TextView cafeUrl;
 
     private List<CafeArticle> cafeArticleList;
     private SearchResultClickListener searchResultClickListener;
@@ -42,10 +38,8 @@ public class CafeArticleViewHolder extends RecyclerView.ViewHolder implements Vi
     public void bind(int position){
         CafeArticle cafeArticle = cafeArticleList.get(position);
         contentTitle.setText(cafeArticle.getTitle());
-        contentLink.setText(cafeArticle.getLink());
         contentDescription.setText(cafeArticle.getDescription());
-        cafeName.setText(cafeArticle.getCafename());
-        cafeUrl.setText(cafeArticle.getCafeurl());
+        cafeName.setText("Cafe : " + cafeArticle.getCafename());
     }
 
     @Override
