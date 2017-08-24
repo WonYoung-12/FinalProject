@@ -7,6 +7,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -17,6 +19,7 @@ import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Network.NetworkManager;
 import com.example.kwy2868.finalproject.Network.NetworkService;
 import com.example.kwy2868.finalproject.R;
+import com.example.kwy2868.finalproject.Util.TypefaceSpan;
 
 import java.util.List;
 
@@ -51,7 +54,11 @@ public class MyBlackActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_black);
         unbinder = ButterKnife.bind(this);
-        setTitle("BlackList");
+
+        SpannableString title = new SpannableString("BlackList");
+        title.setSpan(new TypefaceSpan(this, "NanumBarunpenB.ttf"), 0, title.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        setTitle(title);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         getBlackListFromServer();

@@ -17,6 +17,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.InputFilter;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.Spanned;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -38,12 +40,12 @@ import com.example.kwy2868.finalproject.Model.Pet;
 import com.example.kwy2868.finalproject.Network.NetworkManager;
 import com.example.kwy2868.finalproject.Network.NetworkService;
 import com.example.kwy2868.finalproject.R;
+import com.example.kwy2868.finalproject.Util.TypefaceSpan;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.wrapp.floatlabelededittext.FloatLabeledEditText;
 
 import org.parceler.Parcels;
 
@@ -117,7 +119,12 @@ public class AddPetActivity extends BaseActivity implements View.OnKeyListener, 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_addpet);
         unbinder = ButterKnife.bind(this);
-        setTitle("My Pet 등록");
+
+        SpannableString title = new SpannableString("My Pet 등록");
+        title.setSpan(new TypefaceSpan(this, "NanumBarunpenB.ttf"), 0, title.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        setTitle(title);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // EditText 예외 처리를 위한 필터 세팅.
         filterSetting();
@@ -126,20 +133,16 @@ public class AddPetActivity extends BaseActivity implements View.OnKeyListener, 
         Intent intent = getIntent();
         if(intent != null){
             setData(intent);
-            mode = MODE_MODIFY;
         }
         else{
             mode = MODE_ADD;
         }
 
         if(mode == MODE_ADD) {
-            enrollLayout.setVisibility(View.VISIBLE);
             modifyLayout.setVisibility(View.GONE);
-
         }
         else{
             enrollLayout.setVisibility(View.GONE);
-            modifyLayout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -158,6 +161,7 @@ public class AddPetActivity extends BaseActivity implements View.OnKeyListener, 
     public void setData(Intent intent){
         Pet pet = Parcels.unwrap(intent.getParcelableExtra(PET_TAG));
         if(pet != null){
+            mode = MODE_MODIFY;
             // 서버에서 받아온 이미지가 있으면.
             if(pet.getImagePath() == null || pet.getImagePath().trim().equals("")){
 

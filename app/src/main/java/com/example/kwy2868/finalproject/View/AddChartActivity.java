@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -24,6 +26,7 @@ import com.example.kwy2868.finalproject.Model.Pet;
 import com.example.kwy2868.finalproject.Network.NetworkManager;
 import com.example.kwy2868.finalproject.Network.NetworkService;
 import com.example.kwy2868.finalproject.R;
+import com.example.kwy2868.finalproject.Util.TypefaceSpan;
 import com.kunzisoft.switchdatetime.SwitchDateTimeDialogFragment;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
@@ -89,7 +92,12 @@ public class AddChartActivity extends BaseActivity implements OnDateSelectedList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_addchart);
         unbinder = ButterKnife.bind(this);
-        setTitle("진료 내역 차트 작성");
+
+        SpannableString title = new SpannableString("진료 내역 작성");
+        title.setSpan(new TypefaceSpan(this, "NanumBarunpenB.ttf"), 0, title.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        setTitle(title);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         getPetListFromServer();

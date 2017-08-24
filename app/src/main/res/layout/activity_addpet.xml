@@ -1,143 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="5dp"
-    android:padding="10dp"
-    app:cardCornerRadius="5dp"
-    app:cardElevation="3dp">
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical"
+    android:padding="10dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:orientation="vertical"
-        android:paddingTop="20dp">
+        android:layout_height="wrap_content"
+        android:gravity="center">
 
-        <RelativeLayout
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/petImage"
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:layout_gravity="center">
+            android:layout_centerInParent="true"
+            android:background="@drawable/circle_imageview_border"
+            android:clickable="true" />
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/petImage"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/circle_imageview_border"
-                android:clickable="true" />
-
-            <TextView
-                android:id="@+id/imageNavigation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="이미지 등록" />
-        </RelativeLayout>
-
-
-        <com.wrapp.floatlabelededittext.FloatLabeledEditText
-            android:id="@+id/petName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:layout_marginRight="50dp"
-            app:fletPadding="10dp">
-
-            <EditText
-                android:id="@+id/inputPetName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Pet Name"
-                android:imeOptions="actionNext"
-                android:inputType="text"
-                android:lines="1"
-                android:maxLines="1"
-                android:windowSoftInputMode="adjustPan" />
-        </com.wrapp.floatlabelededittext.FloatLabeledEditText>
-
-        <com.wrapp.floatlabelededittext.FloatLabeledEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:layout_marginRight="50dp"
-            app:fletPadding="10dp">
-
-            <EditText
-                android:id="@+id/inputPetAge"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Age"
-                android:imeOptions="actionNext"
-                android:inputType="number"
-                android:lines="1"
-                android:maxLines="1" />
-        </com.wrapp.floatlabelededittext.FloatLabeledEditText>
-
-        <com.wrapp.floatlabelededittext.FloatLabeledEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:layout_marginLeft="50dp"
-            android:layout_marginRight="50dp"
-            app:fletPadding="10dp">
-
-            <EditText
-                android:id="@+id/inputPetSpecies"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Species"
-                android:imeOptions="actionDone"
-                android:inputType="text"
-                android:lines="1"
-                android:maxLines="1" />
-        </com.wrapp.floatlabelededittext.FloatLabeledEditText>
-
-        <FrameLayout
+        <TextView
+            android:id="@+id/imageNavigation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="right">
+            android:layout_centerInParent="true"
+            android:text="이미지 등록" />
+    </RelativeLayout>
 
-            <LinearLayout
-                android:id="@+id/enrollLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:visibility="gone">
 
-                <Button
-                    android:id="@+id/modifyPetButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="수정"
-                    android:textStyle="bold" />
+    <com.wrapp.floatlabelededittext.FloatLabeledEditText
+        android:id="@+id/petName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        app:fletPadding="10dp">
 
-                <Button
-                    android:id="@+id/deletePetButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="삭제"
-                    android:textStyle="bold" />
+        <EditText
+            android:id="@+id/inputPetName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Pet Name"
+            android:imeOptions="actionNext"
+            android:inputType="text"
+            android:lines="1"
+            android:maxLines="1"
+            android:windowSoftInputMode="adjustPan" />
+    </com.wrapp.floatlabelededittext.FloatLabeledEditText>
 
-            </LinearLayout>
+    <com.wrapp.floatlabelededittext.FloatLabeledEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        app:fletPadding="10dp">
 
-            <LinearLayout
-                android:id="@+id/modifyLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:visibility="gone">
+        <EditText
+            android:id="@+id/inputPetAge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Age"
+            android:imeOptions="actionNext"
+            android:inputType="number"
+            android:lines="1"
+            android:maxLines="1" />
+    </com.wrapp.floatlabelededittext.FloatLabeledEditText>
 
-            <Button
-                    android:id="@+id/enrollPetButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="등록"
-                    android:textStyle="bold" />
-            </LinearLayout>
+    <com.wrapp.floatlabelededittext.FloatLabeledEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        app:fletPadding="10dp">
 
-        </FrameLayout>
+        <EditText
+            android:id="@+id/inputPetSpecies"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Species"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:lines="1"
+            android:maxLines="1" />
+    </com.wrapp.floatlabelededittext.FloatLabeledEditText>
+
+    <LinearLayout
+        android:id="@+id/modifyLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="right">
+
+        <Button
+            android:id="@+id/modifyPetButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="수정"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/deletePetButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="삭제"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
-</android.support.v7.widget.CardView>
+    <LinearLayout
+        android:id="@+id/enrollLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="right">
+
+        <Button
+            android:id="@+id/enrollPetButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="등록"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+
+</LinearLayout>

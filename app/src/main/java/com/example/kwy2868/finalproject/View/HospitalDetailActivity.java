@@ -268,7 +268,8 @@ public class HospitalDetailActivity extends BaseActivity
         mapView.selectPOIItem(marker, true);
         // 숫자가 낮을수록 좁게, 숫자가 높을수록 넓은 지역까지 보인다.
         // 이렇게 하면 드래그 막히는거 아닌가..?
-        mapView.setMapCenterPoint(hospitalMapPoint, true);
+        mapView.setZoomLevel(2, false);
+        mapView.setMapCenterPoint(hospitalMapPoint, false);
     }
 
     public void recyclerViewSetting() {
