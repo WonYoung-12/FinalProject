@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         android:text="@string/header_open"
         android:textColor="@color/white"
-        android:textSize="20sp"
+        android:textSize="15sp"
         android:textStyle="bold"
-        android:background="@color/colorPrimaryDark"
+        android:background="#FFC107"
         android:gravity="center"/>
 </RelativeLayout>

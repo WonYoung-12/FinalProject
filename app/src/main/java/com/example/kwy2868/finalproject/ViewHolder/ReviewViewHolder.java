@@ -54,7 +54,7 @@ public class ReviewViewHolder extends RecyclerView.ViewHolder {
         }
         userNickname.setText(reviewList.get(position).getNickname());
         reviewTitle.setText(reviewList.get(position).getTitle());
-        reviewCost.setText(reviewList.get(position).getCost() + "");
+        reviewCost.setText(reviewList.get(position).getCost() + "원");
         reviewContent.setText(reviewList.get(position).getContent());
     }
 }

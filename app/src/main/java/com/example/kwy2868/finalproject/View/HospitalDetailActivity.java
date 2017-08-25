@@ -14,12 +14,11 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -37,7 +36,7 @@ import android.widget.Toast;
 
 import com.andexert.expandablelayout.library.ExpandableLayout;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 import com.example.kwy2868.finalproject.Adapter.ReviewAdapter;
 import com.example.kwy2868.finalproject.Model.BaseResult;
@@ -85,8 +84,7 @@ import static com.example.kwy2868.finalproject.Model.GlobalData.getContext;
  */
 
 public class HospitalDetailActivity extends BaseActivity
-        implements MapView.POIItemEventListener, MapView.MapViewEventListener, TextWatcher
-        , RatingBar.OnRatingBarChangeListener, LocationHelper {
+        implements MapView.MapViewEventListener, TextWatcher, RatingBar.OnRatingBarChangeListener, LocationHelper {
     @BindView(R.id.detailHospitalImage)
     ImageView hospitalImage;
     @BindView(R.id.hospitalName)
@@ -97,6 +95,8 @@ public class HospitalDetailActivity extends BaseActivity
     TextView hospitalTel;
     @BindView(R.id.hospitalSpecies)
     TextView hospitalSpecies;
+    @BindView(R.id.fab)
+    android.support.design.widget.FloatingActionButton fab;
 
     @BindView(R.id.mapView)
     MapView mapView;
@@ -220,11 +220,11 @@ public class HospitalDetailActivity extends BaseActivity
         Log.d("이미지 패스", hospital.getImgPath() + "");
         if (hospital.getImgPath() == null || hospital.getImgPath().trim().equals("")) {
             Glide.with(this).load(R.drawable.imgready)
-                    .centerCrop().bitmapTransform(new CenterCrop(this))
+                    .centerCrop().bitmapTransform(new FitCenter(this))
                     .into(hospitalImage);
         } else {
             Glide.with(this).load(hospital.getImgPath())
-                    .centerCrop().bitmapTransform(new CenterCrop(this))
+                    .centerCrop().bitmapTransform(new FitCenter(this))
                     .into(hospitalImage);
         }
 
@@ -237,20 +237,12 @@ public class HospitalDetailActivity extends BaseActivity
         } else {
             hospitalSpecies.setVisibility(View.VISIBLE);
             hospitalSpecies.setText(species);
-//            for (int i = 0; i < speciesList.size(); i++) {
-//                if (i == 0)
-//                    hospitalSpecies.setText(speciesList.get(i));
-//                else {
-//                    hospitalSpecies.append(", " + speciesList.get(i));
-//                }
-//            }
         }
 
         reviewContent.addTextChangedListener(this);
     }
 
     public void mapSetting() {
-        mapView.setPOIItemEventListener(this);
         // 사용자 위치 받아올 수 있지만 맵 이동은 안됨.
 //        mapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving);
         mapView.setMapViewEventListener(this);
@@ -273,7 +265,7 @@ public class HospitalDetailActivity extends BaseActivity
     }
 
     public void recyclerViewSetting() {
-        layoutManager = new StaggeredGridLayoutManager(COLUMN_SPAN, StaggeredGridLayoutManager.VERTICAL);
+        layoutManager = new LinearLayoutManager(this);
         reviewRecyclerView.setLayoutManager(layoutManager);
         reviewRecyclerView.setHasFixedSize(true);
         reviewAdapter = new ReviewAdapter();
@@ -415,6 +407,7 @@ public class HospitalDetailActivity extends BaseActivity
         reviewContent.setText(null);
         // 등록하면 후기 등록창 닫아주자.
         expandableLayout.hide();
+        headerText.setText(getString(R.string.header_open));
     }
 
     public void sendReviewToServer(final Review review) {
@@ -443,33 +436,18 @@ public class HospitalDetailActivity extends BaseActivity
         });
     }
 
-    @Override
-    public void onPOIItemSelected(MapView mapView, MapPOIItem mapPOIItem) {
-
-    }
-
-    // 마커의 병원 이름 클릭 했을 때 호출.
-    @Override
-    public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem) {
+    @OnClick(R.id.fab)
+    public void navigateRoute(){
         if (isSetLocation) {
             NavigationDialog navigationDialog = new NavigationDialog(this, currentLatitude, currentLongitude, hospital.getLatitude(), hospital.getLongitude());
             navigationDialog.show();
         } else {
             permissionCheck();
-            Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content),
-                    "현재 위치를 받아옵니다.", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
+            Toasty.Config.getInstance()
+                    .setInfoColor(ContextCompat.getColor(this, android.R.color.black))
+                    .apply();
+            Toasty.info(HospitalDetailActivity.this, "현재 위치를 받아옵니다.", Toast.LENGTH_SHORT, true).show();
         }
-    }
-
-    @Override
-    public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem, MapPOIItem.CalloutBalloonButtonType calloutBalloonButtonType) {
-
-    }
-
-    @Override
-    public void onDraggablePOIItemMoved(MapView mapView, MapPOIItem mapPOIItem, MapPoint mapPoint) {
-
     }
 
     @Override
@@ -851,6 +829,9 @@ public class HospitalDetailActivity extends BaseActivity
 
     // 위치 받아왔으니 계산해주자.
     public void afterLocationUpdated(Location location) {
+        // 위치 업데이트는 한번만.
+        locationManager.removeUpdates(locationListener);
+
         Toasty.success(getContext(), "현재 위치를 받아오는데 성공했습니다.", Toast.LENGTH_SHORT, true).show();
 
         try {

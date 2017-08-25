@@ -120,11 +120,6 @@ public class AddPetActivity extends BaseActivity implements View.OnKeyListener, 
         setContentView(R.layout.activity_addpet);
         unbinder = ButterKnife.bind(this);
 
-        SpannableString title = new SpannableString("My Pet 등록");
-        title.setSpan(new TypefaceSpan(this, "NanumBarunpenB.ttf"), 0, title.length(),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        setTitle(title);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // EditText 예외 처리를 위한 필터 세팅.
         filterSetting();
@@ -138,15 +133,20 @@ public class AddPetActivity extends BaseActivity implements View.OnKeyListener, 
             mode = MODE_ADD;
         }
 
+        SpannableString title;
+
         if(mode == MODE_ADD) {
             modifyLayout.setVisibility(View.GONE);
+            title = new SpannableString("My Pet 등록");
         }
         else{
             enrollLayout.setVisibility(View.GONE);
+            title = new SpannableString("My Pet 정보 수정");
         }
+        title.setSpan(new TypefaceSpan(this, "NanumBarunpenB.ttf"), 0, title.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        setTitle(title);
     }
-
-
 
     @OnClick(R.id.modifyPetButton)
     public void modifyPet(){
@@ -277,7 +277,6 @@ public class AddPetActivity extends BaseActivity implements View.OnKeyListener, 
         intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         startActivityForResult(intent, REQUEST_CODE);
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

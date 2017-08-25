@@ -25,8 +25,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:padding="5dp"
-            android:textSize="15sp"
+            android:layout_marginTop="5dp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <View
@@ -34,34 +34,83 @@
             android:layout_height="3dp"
             android:background="#F0A84C" />
 
-        <TextView
-            android:id="@+id/hospitalAddress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:padding="5dp"
-            android:textSize="12sp" />
 
-        <TextView
-            android:id="@+id/hospitalTel"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:textSize="12sp" />
+            android:padding="3dp">
 
-        <TextView
-            android:id="@+id/hospitalSpecies"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:textSize="12sp" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_place_black_24dp" />
 
-        <TextView
-            android:id="@+id/hospitalDistance"
+            <TextView
+                android:id="@+id/hospitalAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:textSize="12sp" />
+            android:padding="3dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_local_phone_black_24dp" />
+
+            <TextView
+                android:id="@+id/hospitalTel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="3dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_pets_black_24dp" />
+
+            <TextView
+                android:id="@+id/hospitalSpecies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/distanceLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="3dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_transfer_within_a_station_black_24dp" />
+
+            <TextView
+                android:id="@+id/hospitalDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:textSize="12sp" />
+        </LinearLayout>
+
 
         <me.zhanghai.android.materialratingbar.MaterialRatingBar
             android:id="@+id/hospitalRating"

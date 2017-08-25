@@ -3,7 +3,6 @@ package com.example.kwy2868.finalproject.View;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.transition.TransitionManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -39,6 +38,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static android.R.anim.accelerate_interpolator;
 
 /**
  * Created by kwy2868 on 2017-07-25.
@@ -86,7 +87,6 @@ public class LoginActivity extends AppCompatActivity {
         unbinder = ButterKnife.bind(this);
         getWindow().setBackgroundDrawableResource(R.color.colorPrimary);
 
-
         // 툴바 처리.
         if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -112,26 +112,15 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
 
-        TransitionManager.beginDelayedTransition(loginActivity);
-
-
         setAnimation();
-//        loginActivity.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//            @Override
-//            public void onGlobalLayout() {
-//                s
-//                loginActivity.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-//            }
-//        });
     }
 
     public void setAnimation() {
         loginActivity.setVisibility(View.VISIBLE);
         loginImage.setVisibility(View.VISIBLE);
 
-//        up = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, -0.15f);
         up = AnimationUtils.loadAnimation(LoginActivity.this, R.anim.translate_anim);
-
+        up.setInterpolator(AnimationUtils.loadInterpolator(this, accelerate_interpolator));
         up.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -151,6 +140,11 @@ public class LoginActivity extends AppCompatActivity {
         loginImage.startAnimation(up);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setAnimation();
+    }
 
     public void naverLoginInit() {
         oAuthLoginModule = OAuthLogin.getInstance();

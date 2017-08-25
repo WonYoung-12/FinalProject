@@ -6,6 +6,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -46,6 +47,8 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
     TextView hospitalDistance;
     @BindView(R.id.hospitalRating)
     MaterialRatingBar hospitalRating;
+    @BindView(R.id.distanceLayout)
+    LinearLayout distanceLayout;
 
     private static final String HOSPITAL_TAG = "Hospital";
     private static final String LOCATION_TAG = "Location";
@@ -102,17 +105,13 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
         }
 
         if (byDistance == false) {
-            hospitalDistance.setVisibility(View.GONE);
+            distanceLayout.setVisibility(View.GONE);
         } else {
+            distanceLayout.setVisibility(View.VISIBLE);
             hospitalDistance.setText(hospital.getDistanceFromCurrentLocation() + "km");
         }
         hospitalRating.setRating(hospital.getRating_avg());
     }
-
-//    @OnClick(R.id.checkbox)
-//    public void checkBoxClick() {
-//        Log.d("체크박스", "체크박스 설정했다가 풀었다가");
-//    }
 
     @Override
     public void onClick(View view) {
@@ -126,10 +125,5 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
         intent.putExtra(HOSPITAL_TAG, wrappedHospital);
         intent.putExtra(LOCATION_TAG, GlobalData.getCurrentLocation());
         view.getContext().startActivity(intent);
-    }
-
-    public void hideDistance() {
-        if (hospitalDistance != null)
-            hospitalDistance.setVisibility(View.GONE);
     }
 }

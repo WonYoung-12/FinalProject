@@ -27,7 +27,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         String description = intent.getStringExtra("Description");
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setSmallIcon(R.mipmap.ic_launcher);
+        builder.setSmallIcon(R.drawable.icon);
         builder.setTicker(title);
         builder.setContentTitle(title);
         builder.setContentText(description);

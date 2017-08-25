@@ -26,9 +26,9 @@
     <string name="treatment_hint">진료(검사) 내용과 후기를 입력해주세요.</string>
     <string name="text_count">글자수 : 0/300</string>
 
-    <string name="list_review">후기 목록</string>
+    <string name="list_review">후기</string>
     <string name="no_review">등록된 후기가 없습니다.</string>
 
-    <string name="header_open">후기를 남기려면 눌러주세요.</string>
+    <string name="header_open">후기 작성</string>
     <string name="header_close">접기</string>
 </resources>

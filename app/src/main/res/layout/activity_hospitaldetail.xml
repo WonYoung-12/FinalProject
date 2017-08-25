@@ -17,25 +17,17 @@
             <!--여기는 이미지랑 병원 정보-->
             <include layout="@layout/hospital_information" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:text="@string/route_information"
-                android:textStyle="bold" />
-
             <!--여기는 사용자가 남기는 부분-->
             <include layout="@layout/hospital_review" />
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="5dp"
-                android:layout_margin="10dp"
-                android:background="@color/colorPrimary" />
+                android:layout_height="1dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="#757575" />
 
             <!--사용자 후기 보는 부분-->
             <include layout="@layout/list_review" />
