@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="#FFC107"
-    android:layout_marginTop="10dp"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginTop="10dp"
+    android:background="#FFC107">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,10 +16,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/review_title_hint"
-            android:textColorHint="@color/white"
             android:inputType="text"
             android:lines="1"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:textColorHint="@color/white"
+            android:textSize="12sp" />
 
         <!--한줄만 입력 가능-->
         <EditText
@@ -28,10 +28,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/cost_hint"
-            android:textColorHint="@color/white"
             android:inputType="number"
             android:lines="1"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:textColorHint="@color/white"
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/textCount"
@@ -39,27 +40,30 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:gravity="right"
-            android:text="@string/text_count" />
+            android:gravity="end"
+            android:text="@string/text_count"
+            android:textSize="12sp" />
 
         <EditText
             android:id="@+id/reviewContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/treatment_hint"
-            android:textColorHint="@color/white"
             android:imeOptions="actionDone"
             android:inputType="textMultiLine"
             android:lines="5"
+            android:maxLength="300"
             android:maxLines="5"
-            android:maxLength="300" />
+            android:textColorHint="@color/white"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/writeReviewButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:text="후기 등록" />
+            android:layout_gravity="end"
+            android:text="@string/enroll_review"
+            android:textSize="12sp"/>
 
     </LinearLayout>
 </RelativeLayout>

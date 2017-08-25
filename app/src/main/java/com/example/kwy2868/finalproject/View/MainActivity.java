@@ -161,7 +161,7 @@ public class MainActivity extends BaseActivity
             SpannableString s = new SpannableString(tabTitles[i]);
             s.setSpan(new TypefaceSpan(this, "NanumBarunpenB.ttf"), 0, s.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            tabLayout.getTabAt(i).setText(s);
+//            tabLayout.getTabAt(i).setText(s);
         }
     }
 

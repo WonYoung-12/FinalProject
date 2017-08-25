@@ -25,6 +25,7 @@
     <style name="toolBarTextStyle">
         <item name="android:textSize">22sp</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="tabTextStyle">
@@ -53,5 +54,9 @@
 
     <style name="SplashTheme" parent="@android:style/Theme.NoTitleBar">
         <item name="android:windowBackground">@color/colorPrimary</item>
+    </style>
+
+    <style name="spinnerTheme">
+        <item name="android:textSize">10sp</item>
     </style>
 </resources>

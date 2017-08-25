@@ -4,7 +4,7 @@
     android:id="@+id/hospitalCardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="5dp"
+    android:layout_margin="3dp"
     app:cardCornerRadius="5dp"
     app:cardElevation="3dp">
 
@@ -26,14 +26,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="5dp"
-            android:textSize="18sp"
+            android:textColor="#212121"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="3dp"
+            android:layout_marginBottom="3dp"
             android:background="#F0A84C" />
-
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -51,6 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="5dp"
+                android:textColor="#757575"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -70,6 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="5dp"
+                android:textColor="#757575"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -89,6 +92,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="5dp"
+                android:textColor="#757575"
                 android:textSize="12sp" />
         </LinearLayout>
 
@@ -107,10 +111,10 @@
                 android:id="@+id/hospitalDistance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_marginLeft="5dp"
                 android:textSize="12sp" />
         </LinearLayout>
-
 
         <me.zhanghai.android.materialratingbar.MaterialRatingBar
             android:id="@+id/hospitalRating"
@@ -120,7 +124,8 @@
             android:layout_gravity="center"
             android:focusableInTouchMode="false"
             android:numStars="5"
-            android:stepSize="0.5">
+            android:stepSize="0.5"
+            app:mrb_progressTint="#FFA000">
 
         </me.zhanghai.android.materialratingbar.MaterialRatingBar>
 

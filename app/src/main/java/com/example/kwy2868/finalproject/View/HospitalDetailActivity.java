@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.PorterDuff;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -92,7 +93,7 @@ public class HospitalDetailActivity extends BaseActivity
     @BindView(R.id.hospitalAddress)
     TextView hospitalAddress;
     @BindView(R.id.hospitalTel)
-    TextView hospitalTel;
+    Button hospitalTel;
     @BindView(R.id.hospitalSpecies)
     TextView hospitalSpecies;
     @BindView(R.id.fab)
@@ -231,6 +232,14 @@ public class HospitalDetailActivity extends BaseActivity
         hospitalName.setText(hospital.getName());
         hospitalAddress.setText(hospital.getAddress());
         hospitalTel.setText(hospital.getTel());
+        // 클릭하면 전화 걸리게.
+        hospitalTel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent dialIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + hospital.getTel()));
+                startActivity(dialIntent);
+            }
+        });
 
         if (species == null || species.trim().equals("")) {
             hospitalSpecies.setVisibility(View.GONE);
@@ -526,6 +535,9 @@ public class HospitalDetailActivity extends BaseActivity
             expandableLayout.hide();
         } else {
             headerText.setText(getString(R.string.header_close));
+            reviewTitle.getBackground().setColorFilter(ContextCompat.getColor(this, android.R.color.white), PorterDuff.Mode.SRC_IN);
+            reviewCost.getBackground().setColorFilter(ContextCompat.getColor(this, android.R.color.white), PorterDuff.Mode.SRC_IN);
+            reviewContent.getBackground().setColorFilter(ContextCompat.getColor(this, android.R.color.white), PorterDuff.Mode.SRC_IN);
             expandableLayout.show();
         }
     }
@@ -716,7 +728,7 @@ public class HospitalDetailActivity extends BaseActivity
                     public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
                         if (response.isSuccessful()) {
                             if (response.body().getResultCode() == 200) {
-                                Toasty.success(getContext(), "별점을 부여하였습니다..", Toast.LENGTH_SHORT, true).show();
+                                Toasty.success(getContext(), "별점을 부여하였습니다.", Toast.LENGTH_SHORT, true).show();
                                 Log.d("평가 완료", "평가 완료");
                             }
                         }

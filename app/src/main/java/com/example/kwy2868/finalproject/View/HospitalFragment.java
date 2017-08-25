@@ -123,6 +123,7 @@ public class HospitalFragment extends Fragment
 
     public void refreshRecyclerView(List<Hospital> hospitalList){
         layoutManager = new StaggeredGridLayoutManager(COLUMN_SPAN, StaggeredGridLayoutManager.VERTICAL);
+        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
         hospitalRecyclerView.setLayoutManager(layoutManager);
         hospitalAdapter = new HospitalAdapter(hospitalList, byDistance);
         hospitalRecyclerView.setAdapter(hospitalAdapter);
