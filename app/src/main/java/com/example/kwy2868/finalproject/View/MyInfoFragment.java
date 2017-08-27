@@ -15,11 +15,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.kwy2868.finalproject.Adapter.ChartAdapter;
@@ -27,9 +28,9 @@ import com.example.kwy2868.finalproject.Adapter.PetAdapter;
 import com.example.kwy2868.finalproject.Model.Chart;
 import com.example.kwy2868.finalproject.Model.GlobalData;
 import com.example.kwy2868.finalproject.Model.Pet;
-import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Network.NetworkManager;
 import com.example.kwy2868.finalproject.Network.NetworkService;
+import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Util.MyAlarmManager;
 
 import java.io.File;
@@ -37,11 +38,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
+import es.dmoral.toasty.Toasty;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -58,14 +62,34 @@ public class MyInfoFragment extends Fragment {
     RecyclerView myPetRecyclerView;
     @BindView(R.id.myChartRecyclerView)
     RecyclerView myChartRecyclerView;
+    @BindView(R.id.showMorePetButton)
+    Button showMorePetButton;
+    @BindView(R.id.showMoreChartButton)
+    Button showMoreChartButton;
+
+    @BindView(R.id.myPet)
+    LinearLayout myPet;
+    @BindView(R.id.myChart)
+    LinearLayout myChart;
 
     private RecyclerView.LayoutManager petLayoutManager;
     private PetAdapter petAdapter;
+    // 전체 펫 리스트.
     private List<Pet> petList;
+    // 사용자에게 보여주는 펫 리스트.
+    private ArrayList<Pet> showPetList = new ArrayList<Pet>();
+    // 현재 보여지고 있는 펫 수. 처음은 2개만.
+    private int currentShowPetCount = 0;
+
+    // 버튼 누르면 펫과 차트를 두개씩 더 보여줄 수 있게 해주는 상수. 2개씩 더.
+    private static final int SHOW_MORE_COUNT = 2;
 
     private RecyclerView.LayoutManager chartLayoutManager;
     private ChartAdapter chartAdapter;
     private List<Chart> chartList;
+    private ArrayList<Chart> showChartList = new ArrayList<Chart>();
+    // 현재 보여지고 있는 펫 수. 처음은 2개만.
+    private int currentShowChartCount = 0;
 
     private static final int COLUMN_SPAN = 2;
     private Unbinder unbinder;
@@ -74,11 +98,20 @@ public class MyInfoFragment extends Fragment {
 
     private boolean isFirst = true;
 
+    // 상태 저장을 위한 태그값.
+    private static final String PET_COUNT_TAG = "Pet";
+    private static final String CHART_COUNT_TAG = "Chart";
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_myinfo, container, false);
         unbinder = ButterKnife.bind(this, view);
+
+        if(savedInstanceState != null){
+            currentShowPetCount = savedInstanceState.getInt(PET_COUNT_TAG);
+            currentShowChartCount = savedInstanceState.getInt(CHART_COUNT_TAG);
+        }
 
         return view;
     }
@@ -89,6 +122,7 @@ public class MyInfoFragment extends Fragment {
 
         getChartListFromServer();
         getPetListFromServer();
+
 //        imagePermissionCheck();
     }
 
@@ -171,11 +205,41 @@ public class MyInfoFragment extends Fragment {
     }
 
     public void petRecyclerViewSetting() {
-        petLayoutManager = new StaggeredGridLayoutManager(COLUMN_SPAN, StaggeredGridLayoutManager.VERTICAL);
+        petLayoutManager = new LinearLayoutManager(getContext());
         myPetRecyclerView.setLayoutManager(petLayoutManager);
         myPetRecyclerView.setItemAnimator(null);
         myPetRecyclerView.setNestedScrollingEnabled(false);
-        petAdapter = new PetAdapter(petList);
+
+        // 저장된 값이 있는 경우.
+        if(currentShowPetCount != 0){
+            showPetList = new ArrayList<Pet>();
+
+            if(currentShowPetCount > petList.size())
+                currentShowPetCount = petList.size();
+
+            if(currentShowPetCount < 2 && petList.size() >= 2)
+                currentShowPetCount = 2;
+
+            for(int i=0; i<currentShowPetCount; i++){
+                showPetList.add(petList.get(i));
+            }
+            petAdapter = new PetAdapter(showPetList);
+            myPetRecyclerView.setAdapter(petAdapter);
+            return;
+        }
+
+        // 아이템이 3개 이상인 경우는 2개만 보여주자.
+        if(petList.size() > 2){
+            currentShowPetCount = 2;
+            showPetList.add(petList.get(0));
+            showPetList.add(petList.get(1));
+            petAdapter = new PetAdapter(showPetList);
+        }
+        else{
+            currentShowPetCount = petList.size();
+            petAdapter = new PetAdapter(petList);
+        }
+
         myPetRecyclerView.setAdapter(petAdapter);
     }
 
@@ -184,7 +248,37 @@ public class MyInfoFragment extends Fragment {
         myChartRecyclerView.setLayoutManager(chartLayoutManager);
         myChartRecyclerView.setItemAnimator(null);
         myChartRecyclerView.setNestedScrollingEnabled(false);
-        chartAdapter = new ChartAdapter(chartList);
+
+        // 저장된 값이 있는 경우.
+        if(currentShowChartCount != 0){
+            showChartList = new ArrayList<Chart>();
+
+            if(currentShowChartCount > chartList.size())
+                currentShowChartCount = chartList.size();
+
+            if(currentShowChartCount < 2 && chartList.size() >= 2)
+                currentShowChartCount = 2;
+
+            for(int i=0; i<currentShowChartCount; i++){
+                showChartList.add(chartList.get(i));
+            }
+            chartAdapter = new ChartAdapter(showChartList);
+            myChartRecyclerView.setAdapter(chartAdapter);
+            return;
+        }
+
+        // 아이템이 3개 이상인 경우는 2개만 보여주자.
+        if(chartList.size() > 2){
+            currentShowChartCount = 2;
+            showChartList.add(chartList.get(0));
+            showChartList.add(chartList.get(1));
+            chartAdapter = new ChartAdapter(showChartList);
+        }
+        else{
+            currentShowChartCount = chartList.size();
+            chartAdapter = new ChartAdapter(chartList);
+        }
+
         myChartRecyclerView.setAdapter(chartAdapter);
     }
 
@@ -306,5 +400,90 @@ public class MyInfoFragment extends Fragment {
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         startActivityForResult(intent, REQUEST_CODE);
+    }
+
+    @OnClick(R.id.showMorePetButton)
+    public void showMorePet(){
+        if(showMorePetButton.getText().toString().equals("접기")){
+            showPetList = new ArrayList<Pet>();
+            showPetList.add(petList.get(0));
+            showPetList.add(petList.get(1));
+
+            currentShowPetCount = 2;
+            showMorePetButton.setText("더 보기");
+
+            petAdapter = new PetAdapter(showPetList);
+            myPetRecyclerView.setAdapter(petAdapter);
+            return;
+        }
+
+        if(currentShowPetCount == petList.size()){
+            Toasty.Config.getInstance()
+                    .setInfoColor(ContextCompat.getColor(getContext(), android.R.color.black))
+                    .apply();
+            Toasty.info(getContext(), "더 이상 등록된 반려 동물이 없습니다.", Toast.LENGTH_SHORT, true).show();
+            if(petList.size() > 2)
+                showMorePetButton.setText("접기");
+            return;
+        }
+
+        // 현재 보여지고 있는거에서 2개 더 보여줄 수 있다. 그러면 2개 더 보여주자.
+        if(petList.size() - currentShowPetCount - SHOW_MORE_COUNT >= 0){
+            showPetList.add(petList.get(currentShowPetCount));
+            showPetList.add(petList.get(currentShowPetCount + 1));
+            currentShowPetCount = currentShowPetCount + 2;
+            petAdapter = new PetAdapter(showPetList);
+        }
+        else{
+            petAdapter = new PetAdapter(petList);
+            currentShowPetCount = petList.size();
+        }
+        myPetRecyclerView.setAdapter(petAdapter);
+    }
+
+    @OnClick(R.id.showMoreChartButton)
+    public void showMoreChart(){
+        if(showMoreChartButton.getText().toString().equals("접기")){
+            showChartList = new ArrayList<Chart>();
+            showChartList.add(chartList.get(0));
+            showChartList.add(chartList.get(1));
+
+            currentShowChartCount = 2;
+            showMoreChartButton.setText("더 보기");
+
+            chartAdapter = new ChartAdapter(showChartList);
+            myChartRecyclerView.setAdapter(chartAdapter);
+            return;
+        }
+
+        if(currentShowChartCount == chartList.size()){
+            Toasty.Config.getInstance()
+                    .setInfoColor(ContextCompat.getColor(getContext(), android.R.color.black))
+                    .apply();
+            Toasty.info(getContext(), "더 이상 작성한 진료 내역이 없습니다.", Toast.LENGTH_SHORT, true).show();
+            if(chartList.size() > 2)
+                showMoreChartButton.setText("접기");
+            return;
+        }
+
+        // 현재 보여지고 있는거에서 2개 더 보여줄 수 있다. 그러면 2개 더 보여주자.
+        if(chartList.size() - currentShowChartCount - SHOW_MORE_COUNT >= 0){
+            showChartList.add(chartList.get(currentShowPetCount));
+            showChartList.add(chartList.get(currentShowPetCount + 1));
+            currentShowChartCount = currentShowChartCount + 2;
+            chartAdapter = new ChartAdapter(showChartList);
+        }
+        else{
+            chartAdapter = new ChartAdapter(chartList);
+            currentShowChartCount = chartList.size();
+        }
+        myChartRecyclerView.setAdapter(chartAdapter);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(PET_COUNT_TAG, currentShowPetCount);
+        outState.putInt(CHART_COUNT_TAG, currentShowChartCount);
     }
 }

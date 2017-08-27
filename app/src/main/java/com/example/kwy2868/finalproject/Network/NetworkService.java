@@ -105,4 +105,11 @@ public interface NetworkService {
 
     @GET("deleteBlack")
     Call<BaseResult> deleteBlack(@Query("num") int num, @Query("userId") long userId, @Query("flag") int flag);
+
+    // 유저 아이디, 플래그와 펫 이름이 키 값이니까 이걸로 수정해주자.
+    @GET("modifyPet")
+    Call<BaseResult> modifyPet(@Query("petName") String petName, @Query("age") int age, @Query("userId") long userId, @Query("flag") int flag, @Query("imagePath") String imagePath);
+
+    @GET("deletePet")
+    Call<BaseResult> deletePet(@Query("petName") String petName, @Query("userId") long userId, @Query("flag") int flag);
 }

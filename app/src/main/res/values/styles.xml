@@ -52,8 +52,9 @@
         <item name="android:colorForeground">#fff</item>
     </style>
 
-    <style name="SplashTheme" parent="@android:style/Theme.NoTitleBar">
+    <style name="SplashTheme" parent="AppTheme.NoActionBar">
         <item name="android:windowBackground">@color/colorPrimary</item>
+        <item name="android:statusBarColor">@color/colorPrimary</item>
     </style>
 
     <style name="spinnerTheme">

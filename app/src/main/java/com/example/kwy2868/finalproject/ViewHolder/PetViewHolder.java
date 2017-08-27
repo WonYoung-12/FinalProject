@@ -45,6 +45,7 @@ public class PetViewHolder extends RecyclerView.ViewHolder implements View.OnCli
         itemView.setOnClickListener(this);
 
         ButterKnife.bind(this, itemView);
+        // 아이템 개수가 3 이상이면 2개까지만 보여주자 우선은.
     }
 
     public void bind(int position){
@@ -67,6 +68,7 @@ public class PetViewHolder extends RecyclerView.ViewHolder implements View.OnCli
         petName.setText("이름 : " + pet.getName());
         petAge.setText("나이 : " + pet.getAge() + "살");
         petSpecies.setText("종 : " + pet.getSpecies());
+
     }
 
     @Override

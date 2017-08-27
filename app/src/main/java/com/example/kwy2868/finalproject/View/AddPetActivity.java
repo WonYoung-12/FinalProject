@@ -66,6 +66,7 @@ import retrofit2.Response;
 
 import static android.os.Build.VERSION_CODES.M;
 import static com.example.kwy2868.finalproject.Model.GlobalData.getContext;
+import static com.example.kwy2868.finalproject.Model.GlobalData.getUser;
 
 /**
  * Created by kwy2868 on 2017-08-12.
@@ -150,12 +151,77 @@ public class AddPetActivity extends BaseActivity implements View.OnKeyListener, 
 
     @OnClick(R.id.modifyPetButton)
     public void modifyPet(){
-        Toast.makeText(this, "수정", Toast.LENGTH_SHORT).show();
+        if (inputPetAge.getText().toString().trim().equals("")) {
+            Toasty.error(this, "나이를 올바르게 입력하여 주세요.", Toast.LENGTH_SHORT, true).show();
+            return;
+        }
+
+        Toasty.Config.getInstance()
+                .setInfoColor(ContextCompat.getColor(getContext(), android.R.color.black))
+                .apply();
+        Toasty.info(getContext(), "펫 정보를 수정중입니다.", Toast.LENGTH_SHORT, true).show();
+
+        Uri file = Uri.fromFile(new File(imagePath));
+        StorageReference imgRef = storageReference.child("images/" + file.getLastPathSegment());
+        UploadTask uploadTask = imgRef.putFile(file);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            // 이미지 정상적으로 올라갔을 때.
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                imagePath =  taskSnapshot.getDownloadUrl().toString();
+
+                // 이제 웹 서버에 전송해주자.
+                NetworkService networkService = NetworkManager.getNetworkService();
+                Call<BaseResult> modifyPetCall
+                        = networkService.modifyPet(inputPetName.getText().toString(), Integer.parseInt(inputPetAge.getText().toString()),
+                            GlobalData.getUser().getUserId(), GlobalData.getUser().getFlag(), imagePath);
+                modifyPetCall.enqueue(new Callback<BaseResult>() {
+                    @Override
+                    public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+                        if(response.isSuccessful()){
+                            if(response.body().getResultCode() == 200){
+                                Toasty.success(AddPetActivity.this, "펫 정보를 수정하였습니다.", Toast.LENGTH_SHORT, true).show();
+                                finish();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<BaseResult> call, Throwable t) {
+                        Toasty.error(AddPetActivity.this, "네트워크 오류입니다.", Toast.LENGTH_SHORT, true).show();
+                    }
+                });
+            }
+        });
     }
 
     @OnClick(R.id.deletePetButton)
     public void deletePet(){
-        Toast.makeText(this, "삭제", Toast.LENGTH_SHORT).show();
+        NetworkService networkService = NetworkManager.getNetworkService();
+        Call<BaseResult> deletePetCall
+                = networkService.deletePet(inputPetName.getText().toString(), GlobalData.getUser().getUserId(), GlobalData.getUser().getFlag());
+        deletePetCall.enqueue(new Callback<BaseResult>() {
+            @Override
+            public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getResultCode() == 200){
+                        Toasty.success(AddPetActivity.this, "펫 정보를 삭제하였습니다.", Toast.LENGTH_SHORT, true).show();
+                        finish();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BaseResult> call, Throwable t) {
+                Toasty.error(AddPetActivity.this, "네트워크 오류입니다.", Toast.LENGTH_SHORT, true).show();
+            }
+        });
     }
 
     public void setData(Intent intent){
@@ -167,6 +233,7 @@ public class AddPetActivity extends BaseActivity implements View.OnKeyListener, 
 
             }
             else{
+                imageNavigation.setVisibility(View.GONE);
                 Glide.with(this)
                         .load(pet.getImagePath())
                         .centerCrop()
@@ -174,8 +241,12 @@ public class AddPetActivity extends BaseActivity implements View.OnKeyListener, 
                         .into(petImage);
             }
             inputPetName.setText(pet.getName());
+            // 펫 이름은 수정할 수 없음.
+            inputPetName.setFocusable(false);
             inputPetAge.setText(pet.getAge() + "");
+            // 펫 종류도 수정할 수 없음.
             inputPetSpecies.setText(pet.getSpecies());
+            inputPetSpecies.setFocusable(false);
         }
     }
 
@@ -254,7 +325,7 @@ public class AddPetActivity extends BaseActivity implements View.OnKeyListener, 
             // 해당 퍼미션이 거절된 경우.
             else {
                 Log.d("퍼미션 거절", "퍼미션 거절");
-                Toast.makeText(getContext(), "퍼미션을 승인 해주셔야 알람 이용이 가능합니다", Toast.LENGTH_SHORT).show();
+                Toasty.error(this, "퍼미션을 승인 해주셔야 알람 이용이 가능합니다", Toast.LENGTH_SHORT, true).show();
                 // 앱 정보 화면을 통해 퍼미션을 다시 요구해보자.
                 requestPermissionInSettings();
             }

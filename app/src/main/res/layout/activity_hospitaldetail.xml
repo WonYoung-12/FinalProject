@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -8,31 +9,53 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            android:id="@+id/detailContent"
+        <android.support.design.widget.CoordinatorLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
-            <!--여기는 이미지랑 병원 정보-->
-            <include layout="@layout/hospital_information" />
-
-            <!--여기는 사용자가 남기는 부분-->
-            <include layout="@layout/hospital_review" />
-
-            <View
+            <LinearLayout
+                android:id="@+id/detailContent"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:background="#757575" />
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-            <!--사용자 후기 보는 부분-->
-            <include layout="@layout/list_review" />
+                <net.daum.mf.map.api.MapView
+                    android:id="@+id/mapView"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp" />
 
-        </LinearLayout>
+                <!--여기는 이미지랑 병원 정보-->
+                <include layout="@layout/hospital_information" />
+
+                <!--여기는 사용자가 남기는 부분-->
+                <include layout="@layout/hospital_review" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="5dp"
+                    android:background="#757575" />
+
+                <!--사용자 후기 보는 부분-->
+                <include layout="@layout/list_review" />
+
+            </LinearLayout>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:clickable="true"
+                app:backgroundTint="#FFA000"
+                app:layout_anchor="@id/mapView"
+                app:layout_anchorGravity="bottom|end"
+                app:srcCompat="@mipmap/ic_direction" />
+        </android.support.design.widget.CoordinatorLayout>
+
     </android.support.v4.widget.NestedScrollView>
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu

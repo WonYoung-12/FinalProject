@@ -39,6 +39,11 @@ public class PetAdapter extends RecyclerView.Adapter<PetViewHolder> {
 
     @Override
     public void onBindViewHolder(PetViewHolder holder, int position) {
+//        if(position >= 2){
+//            holder.itemView.setVisibility(View.GONE);
+//            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0);
+//            holder.itemView.setLayoutParams(layoutParams);
+//        }
         holder.bind(position);
     }
 

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
 
         <TextView
             android:id="@+id/petInfo"
@@ -14,9 +15,9 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
-            android:drawableLeft="@drawable/ic_pets_black_24dp"
             android:drawablePadding="5dp"
-            android:text="My Pet"
+            android:drawableStart="@drawable/ic_pets_black_24dp"
+            android:text="@string/my_pet"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -37,6 +38,13 @@
 
             </android.support.v7.widget.RecyclerView>
 
+            <Button
+                android:id="@+id/showMorePetButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="@string/show_more" />
+
         </LinearLayout>
 
         <TextView
@@ -46,9 +54,9 @@
             android:layout_below="@+id/myPet"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
-            android:drawableLeft="@drawable/ic_my_chart24dp"
             android:drawablePadding="5dp"
-            android:text="My Chart"
+            android:drawableStart="@drawable/ic_my_chart24dp"
+            android:text="@string/my_chart"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -68,6 +76,13 @@
                 android:layout_height="wrap_content">
 
             </android.support.v7.widget.RecyclerView>
+
+            <Button
+                android:id="@+id/showMoreChartButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="@string/show_more" />
         </LinearLayout>
 
     </RelativeLayout>

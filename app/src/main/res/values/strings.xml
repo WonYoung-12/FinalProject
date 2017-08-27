@@ -33,4 +33,9 @@
     <string name="header_close">접기</string>
     <string name="enroll_review">후기 등록</string>
     <string name="by_distance">거리순으로 정렬</string>
+
+    <string name="my_pet">My Pet</string>
+    <string name="my_chart">My Chart</string>
+
+    <string name="show_more">더 보기</string>
 </resources>
