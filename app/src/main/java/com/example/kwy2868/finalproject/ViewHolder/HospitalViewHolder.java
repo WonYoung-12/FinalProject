@@ -108,7 +108,7 @@ public class HospitalViewHolder extends RecyclerView.ViewHolder implements View.
             distanceLayout.setVisibility(View.GONE);
         } else {
             distanceLayout.setVisibility(View.VISIBLE);
-            hospitalDistance.setText(hospital.getDistanceFromCurrentLocation() + "km");
+            hospitalDistance.setText( (Math.round(hospital.getDistanceFromCurrentLocation() * 100) / 100.0) + "km");
         }
         hospitalRating.setRating(hospital.getRating_avg());
     }

@@ -3,6 +3,7 @@ package com.example.kwy2868.finalproject.Network;
 import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.Black;
 import com.example.kwy2868.finalproject.Model.Chart;
+import com.example.kwy2868.finalproject.Model.CostResult;
 import com.example.kwy2868.finalproject.Model.Favorite;
 import com.example.kwy2868.finalproject.Model.GetReviewResult;
 import com.example.kwy2868.finalproject.Model.Hospital;
@@ -112,4 +113,7 @@ public interface NetworkService {
 
     @GET("deletePet")
     Call<BaseResult> deletePet(@Query("petName") String petName, @Query("userId") long userId, @Query("flag") int flag);
+
+    @GET("getCostAvg")
+    Call<CostResult> getCostAvg(@Query("num") int num);
 }

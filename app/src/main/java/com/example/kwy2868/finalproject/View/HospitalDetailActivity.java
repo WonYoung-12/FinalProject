@@ -42,6 +42,7 @@ import com.cooltechworks.views.shimmer.ShimmerRecyclerView;
 import com.example.kwy2868.finalproject.Adapter.ReviewAdapter;
 import com.example.kwy2868.finalproject.Model.BaseResult;
 import com.example.kwy2868.finalproject.Model.Black;
+import com.example.kwy2868.finalproject.Model.CostResult;
 import com.example.kwy2868.finalproject.Model.Favorite;
 import com.example.kwy2868.finalproject.Model.GetReviewResult;
 import com.example.kwy2868.finalproject.Model.GlobalData;
@@ -96,6 +97,8 @@ public class HospitalDetailActivity extends BaseActivity
     Button hospitalTel;
     @BindView(R.id.hospitalSpecies)
     TextView hospitalSpecies;
+    @BindView(R.id.hospitalCostAvg)
+    TextView hospitalCostAvg;
     @BindView(R.id.fab)
     android.support.design.widget.FloatingActionButton fab;
 
@@ -169,10 +172,13 @@ public class HospitalDetailActivity extends BaseActivity
     private List<GetReviewResult> reviewList;
 
     // 진료 동물들.
-    String species;
+    private String species;
 
     // 사용자가 평가한 점수.
     private float score;
+
+    // 지금까지 사용자가 진료한 금액들의 평균.
+    private int costAvg;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -184,9 +190,31 @@ public class HospitalDetailActivity extends BaseActivity
         checkLocation();
         dataInit();
         recyclerViewSetting();
+        getCostAvg();
         getReviewList();
         // 보고 있는 병원이 즐겨찾기 또는 블랙리스트에 추가 되어 있는지 확인.
         checkAdded();
+    }
+
+    public void getCostAvg(){
+        NetworkService networkService = NetworkManager.getNetworkService();
+        Call<CostResult> costCall = networkService.getCostAvg(hospital.getNum());
+        costCall.enqueue(new Callback<CostResult>() {
+            @Override
+            public void onResponse(Call<CostResult> call, Response<CostResult> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getResultCode() == 200){
+                        costAvg = response.body().getCost();
+                        hospitalCostAvg.setText(costAvg + "원");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CostResult> call, Throwable t) {
+
+            }
+        });
     }
 
     public void checkLocation() {
