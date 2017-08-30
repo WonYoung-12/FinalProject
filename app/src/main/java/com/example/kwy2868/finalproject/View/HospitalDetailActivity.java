@@ -1,6 +1,7 @@
 package com.example.kwy2868.finalproject.View;
 
 import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,6 +28,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -54,7 +56,6 @@ import com.example.kwy2868.finalproject.Network.NetworkManager;
 import com.example.kwy2868.finalproject.Network.NetworkService;
 import com.example.kwy2868.finalproject.R;
 import com.example.kwy2868.finalproject.Util.LocationHelper;
-import com.example.kwy2868.finalproject.Util.NavigationDialog;
 import com.example.kwy2868.finalproject.Util.TypefaceSpan;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -196,14 +197,14 @@ public class HospitalDetailActivity extends BaseActivity
         checkAdded();
     }
 
-    public void getCostAvg(){
+    public void getCostAvg() {
         NetworkService networkService = NetworkManager.getNetworkService();
         Call<CostResult> costCall = networkService.getCostAvg(hospital.getNum());
         costCall.enqueue(new Callback<CostResult>() {
             @Override
             public void onResponse(Call<CostResult> call, Response<CostResult> response) {
-                if(response.isSuccessful()){
-                    if(response.body().getResultCode() == 200){
+                if (response.isSuccessful()) {
+                    if (response.body().getResultCode() == 200) {
                         costAvg = response.body().getCost();
                         hospitalCostAvg.setText(costAvg + "원");
                     }
@@ -236,7 +237,7 @@ public class HospitalDetailActivity extends BaseActivity
         s.setSpan(new TypefaceSpan(this, "NanumBarunpenB.ttf"), 0, s.length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         setTitle(s);
-        
+
         user = GlobalData.getUser();
         Log.d("유저", user + " ");
         species = hospital.getSpecies();
@@ -474,10 +475,9 @@ public class HospitalDetailActivity extends BaseActivity
     }
 
     @OnClick(R.id.fab)
-    public void navigateRoute(){
+    public void navigateRoute() {
         if (isSetLocation) {
-            NavigationDialog navigationDialog = new NavigationDialog(this, currentLatitude, currentLongitude, hospital.getLatitude(), hospital.getLongitude());
-            navigationDialog.show();
+            makeTransportationDialog();
         } else {
             permissionCheck();
             Toasty.Config.getInstance()
@@ -886,26 +886,61 @@ public class HospitalDetailActivity extends BaseActivity
         currentLatitude = location.getLatitude();
         currentLongitude = location.getLongitude();
 
-        makeDialog();
+        makeTransportationDialog();
     }
 
-    public void makeDialog() {
-//        DialogPlus dialogPlus = DialogPlus.newDialog(this)
-//                .setAdapter(new DialogAdapter(this))
-//                .setOnItemClickListener(new OnItemClickListener() {
-//                    @Override
-//                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-//
-//                    }
-//                })
-//                .setExpanded(true)
-//                .setGravity(Gravity.CENTER)
-//                .setCancelable(true)
-//                .create();
-//        dialogPlus.show();
-        NavigationDialog navigationDialog = new NavigationDialog(this, currentLatitude, currentLongitude, hospital.getLatitude(), hospital.getLongitude());
-        if (!this.isFinishing())
-            navigationDialog.show();
+    public void makeTransportationDialog() {
+        Toasty.Config.getInstance()
+                .setInfoColor(ContextCompat.getColor(getContext(), android.R.color.black))
+                .apply();
+
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice);
+        arrayAdapter.add("자동차");
+        arrayAdapter.add("대중교통");
+        arrayAdapter.add("도보");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("이동할 방법을 선택하세요.");
+        builder.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int position) {
+                String BASE_URI = "daummaps://route?";
+                String uri = BASE_URI + "sp=" + currentLatitude + "," + currentLongitude + "&ep=" + hospital.getLatitude() + "," + hospital.getLongitude();
+
+                switch (position) {
+                    case 0:
+                        uri += "&by=CAR";
+                        break;
+                    case 1:
+                        uri += "&by=PUBLICTRANSIT";
+                        break;
+                    case 2:
+                        uri += "&by=FOOT";
+                        break;
+                }
+                dialogInterface.dismiss();
+                startKakaoMap(uri);
+            }
+        });
+        builder.show();
+    }
+
+    public void startKakaoMap(String uri) {
+        String MARKET_URI = "market://details?id=net.daum.android.map";
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            startActivity(intent);
+        }
+        // 지도 앱이 없는 경우.
+        catch (ActivityNotFoundException e) {
+            Toasty.info(getContext(), "카카오 맵 설치를 위해 마켓으로 이동합니다.", Toast.LENGTH_SHORT, true).show();
+            Toasty.Config.reset();
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(MARKET_URI));
+            startActivity(intent);
+        } catch (Exception e) {
+            Toasty.error(this, "해당 목적지에 대한 길 찾기를 지원하지 않습니다.", Toast.LENGTH_SHORT, true).show();
+        }
     }
 
     @Override
