@@ -490,7 +490,6 @@ public class HospitalDetailActivity extends BaseActivity
     @Override
     protected void onPause() {
         super.onPause();
-        // 다른 액티비티 갔다가 오면 (다음 지도 앱 갔다가 오면) 현재 위치 세팅해주도록 하자.
     }
 
     @Override
