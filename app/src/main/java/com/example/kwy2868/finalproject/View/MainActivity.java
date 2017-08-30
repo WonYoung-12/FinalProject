@@ -43,6 +43,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import es.dmoral.toasty.Toasty;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -310,8 +311,7 @@ public class MainActivity extends BaseActivity
             public void onResponse(Call<BaseResult> call, Response<BaseResult> response) {
                 if(response.isSuccessful()){
                     if(response.body().getResultCode() == 200){
-                        Toast.makeText(MainActivity.this, "알람 세팅 변경 완료", Toast.LENGTH_SHORT).show();
-                        // 바뀌었을 테니 화면에서도 바꿔줘야지!
+                        Toasty.success(MainActivity.this, "알람 세팅 변경 완료", Toast.LENGTH_SHORT, true).show();
                     }
                 }
             }

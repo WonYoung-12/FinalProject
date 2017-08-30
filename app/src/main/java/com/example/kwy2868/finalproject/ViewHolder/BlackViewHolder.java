@@ -2,7 +2,6 @@ package com.example.kwy2868.finalproject.ViewHolder;
 
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -16,6 +15,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import co.dift.ui.SwipeToAction;
+import me.zhanghai.android.materialratingbar.MaterialRatingBar;
 
 /**
  * Created by kwy2868 on 2017-08-18.
@@ -31,7 +31,7 @@ public class BlackViewHolder extends SwipeToAction.ViewHolder<Black> {
     @BindView(R.id.hospitalTel)
     TextView hospitalTel;
     @BindView(R.id.hospitalRating)
-    RatingBar hospitalRating;
+    MaterialRatingBar hospitalRating;
 
     private List<Black> blackList;
 

@@ -29,7 +29,7 @@ public class BlackAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
 
-        View view = inflater.inflate(R.layout.cardview_favorite, parent, shouldAttachToParentImmediately);
+        View view = inflater.inflate(R.layout.cardview_black, parent, shouldAttachToParentImmediately);
         BlackViewHolder blackViewHolder = new BlackViewHolder(view, blackList);
 
         return blackViewHolder;

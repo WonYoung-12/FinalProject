@@ -95,18 +95,6 @@
         </activity>
 
         <activity
-            android:name=".View.MyPetActivity"
-            android:theme="@style/AppTheme">
-
-        </activity>
-
-        <activity
-            android:name=".View.MyChartActivity"
-            android:theme="@style/AppTheme">
-
-        </activity>
-
-        <activity
             android:name=".View.MyBlackActivity"
             android:theme="@style/AppTheme">
 

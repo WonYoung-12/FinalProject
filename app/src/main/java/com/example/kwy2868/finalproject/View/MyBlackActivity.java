@@ -43,7 +43,6 @@ public class MyBlackActivity extends BaseActivity {
     private List<Black> blackList;
     private BlackAdapter blackAdapter;
     private LinearLayoutManager layoutManager;
-    private static final int COLUMN_SPAN = 2;
 
     private SwipeToAction swipeToAction;
 

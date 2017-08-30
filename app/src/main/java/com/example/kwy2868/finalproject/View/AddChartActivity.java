@@ -154,7 +154,6 @@ public class AddChartActivity extends BaseActivity implements OnDateSelectedList
                 .commit();
     }
 
-    // 이거 두번 누르면 터짐.
     public void constructDateTimeDialog(final int flag){
         dateTimeDialogFragment = (SwitchDateTimeDialogFragment) getSupportFragmentManager().findFragmentByTag(TAG_DATETIME_FRAGMENT);
         if(dateTimeDialogFragment == null){
@@ -293,7 +292,6 @@ public class AddChartActivity extends BaseActivity implements OnDateSelectedList
     @Override
     public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
         Log.d("달",date+" ");
-//        constructDateTimeDialog(date);
     }
 
     public void getPetListFromServer(){

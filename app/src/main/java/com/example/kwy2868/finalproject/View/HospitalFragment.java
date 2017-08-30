@@ -404,11 +404,9 @@ public class HospitalFragment extends Fragment
             isFirst = !isFirst;
         }
         else{
+            getHospitalList(currentDistrict);
             if(checkBox.isChecked()){
                 refreshRecyclerView(sortedHospitalList);
-            }
-            else{
-                getHospitalList(currentDistrict);
             }
         }
     }

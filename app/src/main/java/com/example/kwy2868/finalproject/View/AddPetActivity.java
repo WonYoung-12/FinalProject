@@ -431,7 +431,7 @@ public class AddPetActivity extends BaseActivity implements View.OnKeyListener, 
         Toasty.Config.getInstance()
                 .setInfoColor(ContextCompat.getColor(this, android.R.color.black))
                 .apply();
-        Toasty.info(this, "서버에 데이터를 전송합니다.", Toast.LENGTH_SHORT, true).show();
+        Toasty.info(this, "펫 정보를 등록 중입니다.", Toast.LENGTH_SHORT, true).show();
         Toasty.Config.reset();
 
         Uri file = Uri.fromFile(new File(imagePath));
