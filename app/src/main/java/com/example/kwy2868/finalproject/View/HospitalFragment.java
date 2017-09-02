@@ -140,6 +140,14 @@ public class HospitalFragment extends Fragment
                 if (response.isSuccessful()) {
                     hospitalList = response.body();
                     refreshRecyclerView(hospitalList);
+                    // 거리순으로 보는 방식이면.
+                    if(checkBox.isChecked()){
+                        calcDistance(hospitalList);
+                        sortedHospitalList = new ArrayList<Hospital>();
+                        sortedHospitalList.addAll(hospitalList);
+                        Collections.sort(sortedHospitalList);
+                        refreshRecyclerView(sortedHospitalList);
+                    }
                 } else {
 //                    Log.d("씨발", "레트로핏 안된다.");
                 }
@@ -402,13 +410,8 @@ public class HospitalFragment extends Fragment
         }
         if(isFirst){
             isFirst = !isFirst;
+            return;
         }
-        else{
-            if(checkBox.isChecked()){
-                refreshRecyclerView(sortedHospitalList);
-                return;
-            }
-            refreshRecyclerView(hospitalList);
-        }
+        getHospitalList(currentDistrict);
     }
 }
